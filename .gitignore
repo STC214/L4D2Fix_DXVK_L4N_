@@ -1,0 +1,47 @@
+# Runtime installers and packaged binaries are too large for the source repo.
+VC_redist*.exe
+*.zip
+*.7z
+*.exe
+*.dll
+*.vcs
+*.syso
+
+# Bundled third-party tools and binary payloads.
+tools/Everything/
+L4N_单文件便携版/
+L4N_Go_Win32_Portable/
+只需进行一次复制粘贴 L4N+dxvk2.7.1/
+只需进行一次复制粘贴 L4N+dxvk2.3.1(AMD显卡用)/
+
+# Local install/restore state.
+.l4n_auto_backup/
+.gotmp/
+.gocache/
+.cache/
+cache/
+tmp/
+temp/
+logs/
+*.tmp
+*.temp
+*.log
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.pid
+*.lock
+*.part
+*.crdownload
+*~
+
+# Editor and OS noise.
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini

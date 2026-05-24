@@ -1,0 +1,9 @@
+mat_info
+
+ShaderAPI: shaderapivk
+
+
+
+mem_dump
+
+2,048.00MB

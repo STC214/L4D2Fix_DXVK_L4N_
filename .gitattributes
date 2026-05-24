@@ -1,0 +1,13 @@
+* text=auto
+
+*.go text eol=lf
+*.mod text eol=lf
+*.md text eol=lf
+*.txt text eol=crlf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.manifest text eol=crlf
+
+*.jpg binary
+*.ico binary
+*.png binary
