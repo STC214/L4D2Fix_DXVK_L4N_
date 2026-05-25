@@ -41,25 +41,24 @@ var (
 	comctl32 = syscall.NewLazyDLL("comctl32.dll")
 	advapi32 = syscall.NewLazyDLL("advapi32.dll")
 
-	procCreateWindowExW       = user32.NewProc("CreateWindowExW")
-	procDefWindowProcW        = user32.NewProc("DefWindowProcW")
-	procDestroyWindow         = user32.NewProc("DestroyWindow")
-	procDispatchMessageW      = user32.NewProc("DispatchMessageW")
-	procGetMessageW           = user32.NewProc("GetMessageW")
-	procLoadCursorW           = user32.NewProc("LoadCursorW")
-	procLoadIconW             = user32.NewProc("LoadIconW")
-	procLoadImageW            = user32.NewProc("LoadImageW")
-	procPostQuitMessage       = user32.NewProc("PostQuitMessage")
-	procPostMessageW          = user32.NewProc("PostMessageW")
-	procRegisterClassExW      = user32.NewProc("RegisterClassExW")
-	procSendMessageW          = user32.NewProc("SendMessageW")
-	procSetWindowTextW        = user32.NewProc("SetWindowTextW")
-	procSystemParametersInfoW = user32.NewProc("SystemParametersInfoW")
-	procTranslateMessage      = user32.NewProc("TranslateMessage")
-	procUpdateWindow          = user32.NewProc("UpdateWindow")
-	procShowWindow            = user32.NewProc("ShowWindow")
-	procEnableWindow          = user32.NewProc("EnableWindow")
-	procGetDlgCtrlID          = user32.NewProc("GetDlgCtrlID")
+	procCreateWindowExW  = user32.NewProc("CreateWindowExW")
+	procDefWindowProcW   = user32.NewProc("DefWindowProcW")
+	procDestroyWindow    = user32.NewProc("DestroyWindow")
+	procDispatchMessageW = user32.NewProc("DispatchMessageW")
+	procGetMessageW      = user32.NewProc("GetMessageW")
+	procLoadCursorW      = user32.NewProc("LoadCursorW")
+	procLoadIconW        = user32.NewProc("LoadIconW")
+	procLoadImageW       = user32.NewProc("LoadImageW")
+	procPostQuitMessage  = user32.NewProc("PostQuitMessage")
+	procPostMessageW     = user32.NewProc("PostMessageW")
+	procRegisterClassExW = user32.NewProc("RegisterClassExW")
+	procSendMessageW     = user32.NewProc("SendMessageW")
+	procSetWindowTextW   = user32.NewProc("SetWindowTextW")
+	procTranslateMessage = user32.NewProc("TranslateMessage")
+	procUpdateWindow     = user32.NewProc("UpdateWindow")
+	procShowWindow       = user32.NewProc("ShowWindow")
+	procEnableWindow     = user32.NewProc("EnableWindow")
+	procGetDlgCtrlID     = user32.NewProc("GetDlgCtrlID")
 
 	procGetModuleHandleW = kernel32.NewProc("GetModuleHandleW")
 	procGetStockObject   = gdi32.NewProc("GetStockObject")
@@ -171,9 +170,6 @@ const (
 	hkeyCurrentUser  = 0x80000001
 	hkeyLocalMachine = 0x80000002
 	keyRead          = 0x20019
-
-	spiGetNonClientMetrics = 0x0029
-	lfFaceSize             = 32
 )
 
 type wchar uint16
@@ -225,42 +221,6 @@ type drawItemStruct struct {
 	hdc        uintptr
 	rcItem     rect
 	itemData   uintptr
-}
-
-type logFont struct {
-	height         int32
-	width          int32
-	escapement     int32
-	orientation    int32
-	weight         int32
-	italic         byte
-	underline      byte
-	strikeOut      byte
-	charSet        byte
-	outPrecision   byte
-	clipPrecision  byte
-	quality        byte
-	pitchAndFamily byte
-	faceName       [lfFaceSize]uint16
-}
-
-type nonClientMetrics struct {
-	cbSize            uint32
-	borderWidth       int32
-	scrollWidth       int32
-	scrollHeight      int32
-	captionWidth      int32
-	captionHeight     int32
-	captionFont       logFont
-	smCaptionWidth    int32
-	smCaptionHeight   int32
-	smCaptionFont     logFont
-	menuWidth         int32
-	menuHeight        int32
-	menuFont          logFont
-	statusFont        logFont
-	messageFont       logFont
-	paddedBorderWidth int32
 }
 
 type manifest struct {

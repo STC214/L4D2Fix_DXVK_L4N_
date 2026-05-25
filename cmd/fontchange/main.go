@@ -107,6 +107,8 @@ var (
 	fontsMu      sync.Mutex
 	fontNames    []string
 	fontSet      = map[string]string{}
+	inputMu      sync.Mutex
+	fontInput    string
 )
 
 const (
@@ -128,6 +130,7 @@ const (
 	bnClicked     = 0
 	cbnSelChange  = 1
 	cbnEditChange = 5
+	cbnEditUpdate = 6
 
 	wsCaption      = 0x00C00000
 	wsSysMenu      = 0x00080000
@@ -163,6 +166,7 @@ const (
 	cbGetLBText    = 0x0148
 	cbGetLBTextLen = 0x0149
 	cbInitStorage  = 0x0161
+	cbLimitText    = 0x0141
 
 	colorBlack         = 0x0f0f0f
 	colorWhite         = 0x00ffffff
@@ -383,8 +387,13 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 				}
 			}
 		}
-		if id == idFontCombo && (code == cbnSelChange || code == cbnEditChange) {
-			updateSelectedFontDisplay()
+		if id == idFontCombo {
+			switch code {
+			case cbnSelChange:
+				updateFontInputFromComboSelection()
+			case cbnEditChange, cbnEditUpdate:
+				updateFontInputFromCombo()
+			}
 		}
 		return 0
 	case wmDrawItem:
@@ -418,6 +427,7 @@ func createControls(hwnd uintptr) {
 	procSendMessageW.Call(fontLabel, wmSetFont, textFont, 1)
 	fontCombo = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropdown|cbsAutoHScroll|cbsHasStrings, 128, 138, 380, 320, hwnd, idFontCombo)
 	procSendMessageW.Call(fontCombo, wmSetFont, textFont, 1)
+	procSendMessageW.Call(fontCombo, cbLimitText, 128, 0)
 	selectedCtl = label(hwnd, "字体预览", 540, 132, 340, 86)
 	procSendMessageW.Call(selectedCtl, wmSetFont, titleFont, 1)
 
@@ -859,7 +869,7 @@ func fontNamesSnapshot() []string {
 }
 
 func selectedFontName() (string, error) {
-	text := strings.TrimSpace(windowText(fontCombo))
+	text := strings.TrimSpace(currentFontInput())
 	if text == "" {
 		return "", errors.New("请先选择或输入字体名")
 	}
@@ -891,7 +901,7 @@ func selectedFontName() (string, error) {
 }
 
 func updateSelectedFontDisplay() {
-	text := strings.TrimSpace(windowText(fontCombo))
+	text := strings.TrimSpace(currentFontInput())
 	display := "字体预览"
 	fontName := ""
 	if text != "" {
@@ -911,6 +921,46 @@ func updateSelectedFontDisplay() {
 		setPreviewFont("Segoe UI")
 	}
 	procSetWindowTextW.Call(selectedCtl, uintptr(unsafe.Pointer(utf16Ptr(display))))
+}
+
+func updateFontInputFromCombo() {
+	setFontInput(windowText(fontCombo))
+	updateSelectedFontDisplay()
+}
+
+func updateFontInputFromComboSelection() {
+	if name := comboSelectedText(); name != "" {
+		setFontInput(name)
+		updateSelectedFontDisplay()
+		return
+	}
+	updateFontInputFromCombo()
+}
+
+func comboSelectedText() string {
+	idx, _, _ := procSendMessageW.Call(fontCombo, cbGetCurSel, 0, 0)
+	if int32(idx) < 0 {
+		return ""
+	}
+	length, _, _ := procSendMessageW.Call(fontCombo, cbGetLBTextLen, idx, 0)
+	if int32(length) < 0 {
+		return ""
+	}
+	buf := make([]uint16, int(length)+1)
+	procSendMessageW.Call(fontCombo, cbGetLBText, idx, uintptr(unsafe.Pointer(&buf[0])))
+	return syscall.UTF16ToString(buf)
+}
+
+func setFontInput(s string) {
+	inputMu.Lock()
+	fontInput = strings.TrimSpace(s)
+	inputMu.Unlock()
+}
+
+func currentFontInput() string {
+	inputMu.Lock()
+	defer inputMu.Unlock()
+	return fontInput
 }
 
 func setPreviewFont(fontName string) {
@@ -938,6 +988,7 @@ func firstFontPrefixMatch(prefix string) string {
 
 func setComboText(s string) {
 	procSetWindowTextW.Call(fontCombo, uintptr(unsafe.Pointer(utf16Ptr(s))))
+	setFontInput(s)
 }
 
 func readFontModName() string {
@@ -1148,15 +1199,24 @@ func hasAnyRelativeFile(root string, rels []string) bool {
 }
 
 func resolveGameExe(packageRoot string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Second)
+	defer cancel()
+	return resolveGameExeContext(ctx, packageRoot)
+}
+
+func resolveGameExeContext(ctx context.Context, packageRoot string) (string, error) {
 	for _, root := range steamRoots("") {
+		if ctx.Err() != nil {
+			return "", errors.New("定位游戏目录超时")
+		}
 		if found := findGameExeFromSteamRoot(root, packageRoot); found != "" {
 			return found, nil
 		}
 	}
-	if found := searchEverything(packageRoot); found != "" {
+	if found := searchEverything(ctx, packageRoot); found != "" {
 		return found, nil
 	}
-	if found := searchCommonDirs(packageRoot); found != "" {
+	if found := searchCommonDirs(ctx, packageRoot); found != "" {
 		return found, nil
 	}
 	return "", errors.New("无法自动定位真实 left4dead2.exe")
@@ -1221,14 +1281,18 @@ func steamLibraries(root string) []string {
 	return uniqueExistingDirs(libs)
 }
 
-func searchEverything(packageRoot string) string {
+func searchEverything(ctx context.Context, packageRoot string) string {
 	resRoot := resourceRoot(packageRoot)
 	exe := filepath.Join(resRoot, "tools", "Everything", "everything.exe")
 	if exists(exe) {
 		cmd := exec.Command(exe, "-startup")
 		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 		_ = cmd.Start()
-		time.Sleep(2 * time.Second)
+		select {
+		case <-time.After(2 * time.Second):
+		case <-ctx.Done():
+			return ""
+		}
 	}
 	for _, es := range []string{
 		filepath.Join(resRoot, "tools", "Everything", "es.exe"),
@@ -1239,9 +1303,12 @@ func searchEverything(packageRoot string) string {
 		if !exists(es) {
 			continue
 		}
+		if ctx.Err() != nil {
+			return ""
+		}
 		appendLog("[search] Everything CLI: " + es)
-		ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
-		cmd := exec.CommandContext(ctx, es, "-n", "50", "left4dead2.exe")
+		cmdCtx, cancel := context.WithTimeout(ctx, 8*time.Second)
+		cmd := exec.CommandContext(cmdCtx, es, "-n", "50", "left4dead2.exe")
 		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 		out, err := cmd.Output()
 		cancel()
@@ -1258,7 +1325,7 @@ func searchEverything(packageRoot string) string {
 	return ""
 }
 
-func searchCommonDirs(packageRoot string) string {
+func searchCommonDirs(ctx context.Context, packageRoot string) string {
 	var roots []string
 	for _, steam := range steamRoots("") {
 		for _, lib := range steamLibraries(steam) {
@@ -1272,8 +1339,14 @@ func searchCommonDirs(packageRoot string) string {
 		}
 	}
 	for _, root := range uniqueExistingDirs(roots) {
+		if ctx.Err() != nil {
+			return ""
+		}
 		var found string
 		filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+			if ctx.Err() != nil {
+				return filepath.SkipAll
+			}
 			if err != nil || d.IsDir() || !strings.EqualFold(d.Name(), "left4dead2.exe") {
 				return nil
 			}

@@ -1036,11 +1036,14 @@ func updateConfigTahomaFont(path, fontName string) error {
 	if err != nil {
 		return err
 	}
+	for i := start; i < end; i++ {
+		lines[i] = uncommentConfigLine(lines[i])
+	}
 	re := regexp.MustCompile(`^(\s*)(//\s*)?"Tahoma"\s+"([^"]*)"([^\r\n]*)`)
 	for i := start; i < end; i++ {
 		body, br := splitLineBreak(lines[i])
 		if m := re.FindStringSubmatch(body); len(m) == 5 {
-			lines[i] = fmt.Sprintf(`%s%s"Tahoma" "%s"%s%s`, m[1], m[2], fontName, m[4], br)
+			lines[i] = fmt.Sprintf(`%s"Tahoma" "%s"%s%s`, m[1], fontName, m[4], br)
 			return os.WriteFile(path, []byte(strings.Join(lines, "")), 0644)
 		}
 	}
