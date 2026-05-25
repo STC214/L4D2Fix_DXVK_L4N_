@@ -1,0 +1,42 @@
+style: &style
+# Remove '#' to override font style
+#  size: 64
+#  width: 0
+#  weight: 0
+#  italic: false
+#  underLine: false
+#  strikeOut: false
+#  charSet: 0
+#  outPrecision: 0
+#  clipPrecision: 0
+quality: 4
+#  pitchAndFamily: 0
+
+fonts:
+  Tahoma: 
+    name: YouErYuan
+    <<: *style
+  ToolBox:
+    name: Microsoft YaHei
+  Courier New:
+    name: Microsoft YaHei
+
+
+fixGSOFont: true # true is to use system UI font
+#fixGSOFont: *zh-cn-font # Or replace with user defined font
+
+#gdiplus:
+#  SimSun:
+#    replace: Microsoft YaHei
+#  Microsoft YaHei:
+#    size: 72.0
+#    style: regular
+##    style: 0
+#    unit: point
+##    unit: 3
+
+#gdipGFFSansSerif: Calibri
+#gdipGFFSerif: Times New Roman
+#gdipGFFMonospace: Consolas
+
+debug: false

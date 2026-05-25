@@ -30,7 +30,8 @@ const (
 	modBackupDirName             = "addons_backup"
 	displaySettingsBackupDirName = "display_settings_backup"
 	videoSettingsRelativePath    = "left4dead2/cfg/video.txt"
-	usageInstructions            = "使用步骤\r\n\r\n1. 先关闭 Steam 和游戏。\r\n\r\n2. 普通显卡点“通用处理”。\r\n\r\n3. AMD 显卡点“AMD处理”。\r\n\r\n4. “备份MOD”保存 addons 和显示设置。\r\n\r\n5. “恢复MOD”还原 MOD 和显示设置。\r\n\r\n6. “一键清理”按 .l4n_auto_backup 还原补丁和 Steam 配置。\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
+	fontChangeDirName            = "Font_change"
+	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 普通显卡：通用处理\r\n3. AMD 显卡：AMD处理\r\n4. 备份MOD：保存 addons 和显示设置\r\n5. 恢复MOD：还原 MOD 和显示设置\r\n6. 换柚儿园/恢复字体：未安装则复制 Font_change，已安装则只删游戏目录同名文件\r\n7. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
 )
 
 var (
@@ -331,7 +332,7 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 			case idClean:
 				go guarded("一键清理", runRestore)
 			case idClose:
-				procDestroyWindow.Call(hwnd)
+				go guarded("切换字体", runToggleFont)
 			}
 		}
 		return 0
@@ -359,7 +360,7 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 func createControls(hwnd uintptr) {
 	title := label(hwnd, "DXVK + L4N 一键处理工具", 22, 28, 300, 26)
 	procSendMessageW.Call(title, wmSetFont, titleFont, 1)
-	desc := label(hwnd, "自动识别游戏目录，安装运行库，备份原文件，并用所选补丁目录覆盖游戏源文件。", 22, 68, 610, 24)
+	desc := label(hwnd, "自动识别游戏目录，安装运行库，备份原文件，\r\n并用所选补丁目录覆盖游戏源文件。", 22, 62, 594, 48)
 	procSendMessageW.Call(desc, wmSetFont, textFont, 1)
 
 	btnRun = button(hwnd, "通用处理", idRun, 22, 122, 174, 42)
@@ -367,7 +368,7 @@ func createControls(hwnd uintptr) {
 	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 232, 122, 174, 42)
 	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 232, 174, 174, 42)
 	btnClean = button(hwnd, "一键清理", idClean, 442, 122, 174, 42)
-	btnClose = button(hwnd, "关闭", idClose, 442, 174, 174, 42)
+	btnClose = button(hwnd, "换柚儿园/恢复字体", idClose, 442, 174, 174, 42)
 	for _, h := range []uintptr{btnRun, btnAMD, btnBackupMod, btnRestoreMod, btnClean, btnClose} {
 		procSendMessageW.Call(h, wmSetFont, buttonFont, 1)
 	}
@@ -383,9 +384,9 @@ func createControls(hwnd uintptr) {
 	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 22, 322, 594, 194, hwnd, 0)
 	procSendMessageW.Call(logCtl, wmSetFont, textFont, 1)
 
-	guideTitle := label(hwnd, "使用说明", 630, 28, 280, 26)
+	guideTitle := label(hwnd, "使用说明", 630, 22, 280, 24)
 	procSendMessageW.Call(guideTitle, wmSetFont, titleFont, 1)
-	guideCtl := create("EDIT", usageInstructions, wsChild|wsVisible|wsBorder|esMultiline|esReadOnly, 630, 68, 300, 448, hwnd, 0)
+	guideCtl := create("EDIT", usageInstructions, wsChild|wsVisible|wsBorder|esMultiline|esReadOnly, 630, 50, 300, 466, hwnd, 0)
 	procSendMessageW.Call(guideCtl, wmSetFont, guideFont, 1)
 
 	appendLog("[prepare] ready; resources directory: " + resourceDirName)
@@ -489,7 +490,7 @@ func buttonText(id uint32) string {
 	case idClean:
 		return "一键清理"
 	case idClose:
-		return "关闭"
+		return "换柚儿园/恢复字体"
 	default:
 		return ""
 	}
@@ -568,6 +569,7 @@ func setBusy(v bool) {
 		procEnableWindow.Call(btnBackupMod, en)
 		procEnableWindow.Call(btnRestoreMod, en)
 		procEnableWindow.Call(btnClean, en)
+		procEnableWindow.Call(btnClose, en)
 	})
 }
 
@@ -672,6 +674,55 @@ func runRestoreMods() error {
 	}
 	setProgress(95)
 	appendLog("[mod] addons restore complete")
+	return nil
+}
+
+func runToggleFont() error {
+	root, err := packageRoot()
+	if err != nil {
+		return err
+	}
+	fontDir, err := findFontChangeDir(root)
+	if err != nil {
+		return err
+	}
+	gameExe, err := resolveGameExe(root)
+	if err != nil {
+		return err
+	}
+	gameRoot := filepath.Dir(gameExe)
+	files, err := relativeFiles(fontDir)
+	if err != nil {
+		return err
+	}
+	if len(files) == 0 {
+		return fmt.Errorf("Font_change 目录内没有可复制的文件: %s", fontDir)
+	}
+
+	appendLog("[font] source: " + fontDir)
+	appendLog("[font] target game directory: " + gameRoot)
+	setProgress(10)
+	if hasAnyRelativeFile(gameRoot, files) {
+		removed := 0
+		for i, rel := range files {
+			dst := filepath.Join(gameRoot, rel)
+			if exists(dst) {
+				if err := os.Remove(dst); err != nil {
+					return fmt.Errorf("删除字体文件失败 %s: %w", dst, err)
+				}
+				removed++
+				removeEmptyParents(filepath.Dir(dst), gameRoot)
+			}
+			setProgress(10 + i*85/max(1, len(files)))
+		}
+		appendLog(fmt.Sprintf("[font] removed %d matching files from game directory", removed))
+		return nil
+	}
+
+	if err := copyDirContents(fontDir, gameRoot, 10, 85); err != nil {
+		return err
+	}
+	appendLog("[font] YouErYuan font files installed")
 	return nil
 }
 
@@ -1423,6 +1474,50 @@ func resourceRoot(exeRoot string) string {
 		return res
 	}
 	return exeRoot
+}
+
+func findFontChangeDir(root string) (string, error) {
+	for _, dir := range []string{
+		filepath.Join(root, fontChangeDirName),
+		filepath.Join(resourceRoot(root), fontChangeDirName),
+	} {
+		if exists(dir) {
+			return dir, nil
+		}
+	}
+	return "", errors.New("未找到 Font_change 目录")
+}
+
+func relativeFiles(root string) ([]string, error) {
+	root = clean(root)
+	var files []string
+	if err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		rel, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+		files = append(files, rel)
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+	sort.Strings(files)
+	return files, nil
+}
+
+func hasAnyRelativeFile(root string, rels []string) bool {
+	for _, rel := range rels {
+		if exists(filepath.Join(root, rel)) {
+			return true
+		}
+	}
+	return false
 }
 
 func uniqueExistingDirs(paths []string) []string {
