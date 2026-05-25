@@ -16,6 +16,10 @@ L4N_Go_Win32_Portable/
 
 # Local install/restore state.
 .l4n_auto_backup/
+addons_backup/
+resources/addons_backup/
+display_settings_backup/
+resources/display_settings_backup/
 .gotmp/
 .gocache/
 .cache/

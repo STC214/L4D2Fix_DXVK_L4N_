@@ -10,6 +10,8 @@
 - 支持 AMD 专用补丁 `L4N_dxvk2.3.1_AMD`
 - 覆盖前逐文件备份，记录到 exe 同级 `.l4n_auto_backup/`
 - 一键清理可恢复游戏文件和 Steam 配置
+- 可备份/恢复 `left4dead2/addons` 下的 MOD 文件
+- 备份/恢复 MOD 时会同时处理显示设置 `left4dead2/cfg/video.txt`
 - 自动写入 Steam AppID `550` 启动参数
 - UI 内置中文使用说明、启动项和验证指令
 
@@ -23,9 +25,19 @@ L4N_Go_Win32_Portable/L4N_Go_Win32.exe
 
 按钮说明：
 
-- `通用一键处理`：使用 `resources/L4N_dxvk2.7.1`
-- `AMD 一键处理`：使用 `resources/L4N_dxvk2.3.1_AMD`
-- `一键清理`：按 `.l4n_auto_backup/manifest.json` 还原
+UI 上的六个按钮分为三列两行：
+
+```text
+通用处理    备份MOD    一键清理
+AMD处理     恢复MOD    关闭
+```
+
+- `通用处理`：使用 `resources/L4N_dxvk2.7.1`
+- `AMD处理`：使用 `resources/L4N_dxvk2.3.1_AMD`
+- `备份MOD`：复制游戏 `left4dead2/addons` 到 `resources/addons_backup`，并备份 `left4dead2/cfg/video.txt`
+- `恢复MOD`：复制 `resources/addons_backup` 到游戏 `left4dead2/addons`，同名文件会覆盖，并恢复 `left4dead2/cfg/video.txt`
+- `一键清理`：按 `.l4n_auto_backup/manifest.json` 还原游戏文件和 Steam 配置
+- `关闭`：关闭工具
 
 建议先关闭 Steam 和游戏，再执行处理或清理。
 
@@ -61,6 +73,8 @@ L4N_Go_Win32_Portable/
       Everything/
     L4N_dxvk2.7.1/
     L4N_dxvk2.3.1_AMD/
+    addons_backup/              # 运行“备份MOD”后生成
+    display_settings_backup/    # 运行“备份MOD”后生成
 ```
 
 运行后的备份和记录会写到：

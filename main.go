@@ -22,12 +22,15 @@ import (
 )
 
 const (
-	appTitle             = "L4N"
-	defaultLaunchOptions = "-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan"
-	resourceDirName      = "resources"
-	genericPatchDirName  = "L4N_dxvk2.7.1"
-	amdPatchDirName      = "L4N_dxvk2.3.1_AMD"
-	usageInstructions    = "使用步骤\r\n\r\n1. 关闭 Steam 和游戏后运行本工具。\r\n\r\n2. 普通显卡点击“通用一键处理”。\r\n\r\n3. AMD 显卡点击“AMD 一键处理”。\r\n\r\n4. 工具会先备份原文件，再用 resources 中的补丁覆盖游戏源文件。\r\n\r\n5. 需要撤销时点击“一键清理”。备份记录保存在 exe 同级 .l4n_auto_backup。\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证方式\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
+	appTitle                     = "L4N"
+	defaultLaunchOptions         = "-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan"
+	resourceDirName              = "resources"
+	genericPatchDirName          = "L4N_dxvk2.7.1"
+	amdPatchDirName              = "L4N_dxvk2.3.1_AMD"
+	modBackupDirName             = "addons_backup"
+	displaySettingsBackupDirName = "display_settings_backup"
+	videoSettingsRelativePath    = "left4dead2/cfg/video.txt"
+	usageInstructions            = "使用步骤\r\n\r\n1. 先关闭 Steam 和游戏。\r\n\r\n2. 普通显卡点“通用处理”。\r\n\r\n3. AMD 显卡点“AMD处理”。\r\n\r\n4. “备份MOD”保存 addons 和显示设置。\r\n\r\n5. “恢复MOD”还原 MOD 和显示设置。\r\n\r\n6. “一键清理”按 .l4n_auto_backup 还原补丁和 Steam 配置。\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
 )
 
 var (
@@ -74,27 +77,29 @@ var (
 	procRegQueryValueExW = advapi32.NewProc("RegQueryValueExW")
 	procRegCloseKey      = advapi32.NewProc("RegCloseKey")
 
-	hInstance    uintptr
-	hWnd         uintptr
-	btnRun       uintptr
-	btnAMD       uintptr
-	btnClean     uintptr
-	btnClose     uintptr
-	progress     uintptr
-	statusCtl    uintptr
-	logCtl       uintptr
-	blackBr      uintptr
-	textFont     uintptr
-	titleFont    uintptr
-	buttonFont   uintptr
-	guideFont    uintptr
-	busyMu       sync.Mutex
-	busy         bool
-	progressMu   sync.Mutex
-	lastProgress int
-	uiMu         sync.Mutex
-	uiNext       uintptr
-	uiWork       = map[uintptr]func(){}
+	hInstance     uintptr
+	hWnd          uintptr
+	btnRun        uintptr
+	btnAMD        uintptr
+	btnBackupMod  uintptr
+	btnRestoreMod uintptr
+	btnClean      uintptr
+	btnClose      uintptr
+	progress      uintptr
+	statusCtl     uintptr
+	logCtl        uintptr
+	blackBr       uintptr
+	textFont      uintptr
+	titleFont     uintptr
+	buttonFont    uintptr
+	guideFont     uintptr
+	busyMu        sync.Mutex
+	busy          bool
+	progressMu    sync.Mutex
+	lastProgress  int
+	uiMu          sync.Mutex
+	uiNext        uintptr
+	uiWork        = map[uintptr]func(){}
 )
 
 const (
@@ -129,10 +134,12 @@ const (
 
 	cbs = wsCaption | wsSysMenu | wsMinimizeBox
 
-	idRun   = 1001
-	idClean = 1002
-	idClose = 1003
-	idAMD   = 1004
+	idRun        = 1001
+	idClean      = 1002
+	idClose      = 1003
+	idAMD        = 1004
+	idBackupMod  = 1005
+	idRestoreMod = 1006
 
 	pbmSetRange32 = 0x0400 + 6
 	pbmSetPos     = 0x0400 + 2
@@ -317,6 +324,10 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 				go guarded("一键处理", runInstall)
 			case idAMD:
 				go guarded("AMD 一键处理", runInstallAMD)
+			case idBackupMod:
+				go guarded("备份MOD", runBackupMods)
+			case idRestoreMod:
+				go guarded("恢复MOD", runRestoreMods)
 			case idClean:
 				go guarded("一键清理", runRestore)
 			case idClose:
@@ -351,28 +362,30 @@ func createControls(hwnd uintptr) {
 	desc := label(hwnd, "自动识别游戏目录，安装运行库，备份原文件，并用所选补丁目录覆盖游戏源文件。", 22, 68, 610, 24)
 	procSendMessageW.Call(desc, wmSetFont, textFont, 1)
 
-	btnRun = button(hwnd, "通用一键处理", idRun, 22, 134, 150, 46)
-	btnAMD = button(hwnd, "AMD 一键处理", idAMD, 184, 134, 150, 46)
-	btnClean = button(hwnd, "一键清理", idClean, 346, 134, 128, 46)
-	btnClose = button(hwnd, "关闭", idClose, 506, 134, 110, 46)
-	for _, h := range []uintptr{btnRun, btnAMD, btnClean, btnClose} {
+	btnRun = button(hwnd, "通用处理", idRun, 22, 122, 174, 42)
+	btnAMD = button(hwnd, "AMD处理", idAMD, 22, 174, 174, 42)
+	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 232, 122, 174, 42)
+	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 232, 174, 174, 42)
+	btnClean = button(hwnd, "一键清理", idClean, 442, 122, 174, 42)
+	btnClose = button(hwnd, "关闭", idClose, 442, 174, 174, 42)
+	for _, h := range []uintptr{btnRun, btnAMD, btnBackupMod, btnRestoreMod, btnClean, btnClose} {
 		procSendMessageW.Call(h, wmSetFont, buttonFont, 1)
 	}
 
-	progress = create("msctls_progress32", "", wsChild|wsVisible, 22, 197, 594, 17, hwnd, 0)
+	progress = create("msctls_progress32", "", wsChild|wsVisible, 22, 242, 594, 17, hwnd, 0)
 	procSendMessageW.Call(progress, pbmSetRange32, 0, 100)
 	procSendMessageW.Call(progress, pbmSetPos, 0, 0)
 
-	statusCtl = label(hwnd, "就绪 - 请选择通用或 AMD 补丁覆盖游戏源文件", 22, 230, 594, 24)
+	statusCtl = label(hwnd, "就绪 - 请选择通用或 AMD 补丁覆盖游戏源文件", 22, 273, 594, 24)
 	procSendMessageW.Call(statusCtl, wmSetFont, textFont, 1)
-	logTitle := label(hwnd, "日志", 22, 263, 80, 20)
+	logTitle := label(hwnd, "日志", 22, 303, 80, 20)
 	procSendMessageW.Call(logTitle, wmSetFont, textFont, 1)
-	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 22, 282, 594, 234, hwnd, 0)
+	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 22, 322, 594, 194, hwnd, 0)
 	procSendMessageW.Call(logCtl, wmSetFont, textFont, 1)
 
-	guideTitle := label(hwnd, "使用说明", 650, 28, 240, 26)
+	guideTitle := label(hwnd, "使用说明", 630, 28, 280, 26)
 	procSendMessageW.Call(guideTitle, wmSetFont, titleFont, 1)
-	guideCtl := create("EDIT", usageInstructions, wsChild|wsVisible|wsBorder|esMultiline|esReadOnly, 650, 68, 270, 448, hwnd, 0)
+	guideCtl := create("EDIT", usageInstructions, wsChild|wsVisible|wsBorder|esMultiline|esReadOnly, 630, 68, 300, 448, hwnd, 0)
 	procSendMessageW.Call(guideCtl, wmSetFont, guideFont, 1)
 
 	appendLog("[prepare] ready; resources directory: " + resourceDirName)
@@ -466,9 +479,13 @@ func drawButton(dis *drawItemStruct) {
 func buttonText(id uint32) string {
 	switch id {
 	case idRun:
-		return "通用一键处理"
+		return "通用处理"
 	case idAMD:
-		return "AMD 一键处理"
+		return "AMD处理"
+	case idBackupMod:
+		return "备份MOD"
+	case idRestoreMod:
+		return "恢复MOD"
 	case idClean:
 		return "一键清理"
 	case idClose:
@@ -548,6 +565,8 @@ func setBusy(v bool) {
 		}
 		procEnableWindow.Call(btnRun, en)
 		procEnableWindow.Call(btnAMD, en)
+		procEnableWindow.Call(btnBackupMod, en)
+		procEnableWindow.Call(btnRestoreMod, en)
 		procEnableWindow.Call(btnClean, en)
 	})
 }
@@ -590,6 +609,70 @@ func runInstall() error {
 
 func runInstallAMD() error {
 	return runInstallWithPatch(amdPatchDirName)
+}
+
+func runBackupMods() error {
+	root, err := packageRoot()
+	if err != nil {
+		return err
+	}
+	resRoot := resourceRoot(root)
+	gameExe, err := resolveGameExe(root)
+	if err != nil {
+		return err
+	}
+	addonsDir := filepath.Join(filepath.Dir(gameExe), "left4dead2", "addons")
+	if !exists(addonsDir) {
+		return fmt.Errorf("未找到 addons 目录: %s", addonsDir)
+	}
+	backupDir := filepath.Join(resRoot, modBackupDirName)
+	appendLog("[mod] source addons: " + addonsDir)
+	appendLog("[mod] backup target: " + backupDir)
+	setProgress(10)
+	if err := os.RemoveAll(backupDir); err != nil {
+		return err
+	}
+	if err := copyDirContents(addonsDir, backupDir, 10, 85); err != nil {
+		return err
+	}
+	setProgress(88)
+	if err := backupDisplaySettings(filepath.Dir(gameExe), resRoot); err != nil {
+		appendLog("[display] " + err.Error())
+	}
+	setProgress(95)
+	appendLog("[mod] addons backup complete")
+	return nil
+}
+
+func runRestoreMods() error {
+	root, err := packageRoot()
+	if err != nil {
+		return err
+	}
+	resRoot := resourceRoot(root)
+	backupDir := filepath.Join(resRoot, modBackupDirName)
+	if !exists(backupDir) {
+		return fmt.Errorf("未找到 MOD 备份目录: %s", backupDir)
+	}
+	gameExe, err := resolveGameExe(root)
+	if err != nil {
+		return err
+	}
+	addonsDir := filepath.Join(filepath.Dir(gameExe), "left4dead2", "addons")
+	appendLog("[mod] backup source: " + backupDir)
+	appendLog("[mod] restore target addons: " + addonsDir)
+	appendLog("[mod] existing files with the same name will be overwritten")
+	setProgress(10)
+	if err := copyDirContents(backupDir, addonsDir, 10, 85); err != nil {
+		return err
+	}
+	setProgress(88)
+	if err := restoreDisplaySettings(filepath.Dir(gameExe), resRoot); err != nil {
+		appendLog("[display] " + err.Error())
+	}
+	setProgress(95)
+	appendLog("[mod] addons restore complete")
+	return nil
 }
 
 func runInstallWithPatch(patchDirName string) error {
@@ -1198,6 +1281,94 @@ func copyFile(src, dst string) error {
 		return copyErr
 	}
 	return closeErr
+}
+
+func copyDirContents(srcRoot, dstRoot string, progressStart, progressSpan int) error {
+	srcRoot = clean(srcRoot)
+	dstRoot = clean(dstRoot)
+	var files []string
+	if err := filepath.WalkDir(srcRoot, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(srcRoot, path)
+		if err != nil || rel == "." {
+			return err
+		}
+		dst := filepath.Join(dstRoot, rel)
+		if d.IsDir() {
+			return os.MkdirAll(dst, 0755)
+		}
+		files = append(files, path)
+		return nil
+	}); err != nil {
+		return err
+	}
+	sort.Strings(files)
+	if len(files) == 0 {
+		return os.MkdirAll(dstRoot, 0755)
+	}
+	for i, src := range files {
+		rel, err := filepath.Rel(srcRoot, src)
+		if err != nil {
+			return err
+		}
+		dst := filepath.Join(dstRoot, rel)
+		if err := copyFile(src, dst); err != nil {
+			return err
+		}
+		if info, err := os.Stat(src); err == nil {
+			_ = os.Chmod(dst, info.Mode().Perm())
+			_ = os.Chtimes(dst, info.ModTime(), info.ModTime())
+		}
+		setProgress(progressStart + i*progressSpan/max(1, len(files)))
+	}
+	appendLog(fmt.Sprintf("[copy] %d files copied", len(files)))
+	return nil
+}
+
+func videoSettingsPath(gameRoot string) string {
+	return filepath.Join(gameRoot, filepath.FromSlash(videoSettingsRelativePath))
+}
+
+func displaySettingsBackupPath(resRoot string) string {
+	return filepath.Join(resRoot, displaySettingsBackupDirName, "video.txt")
+}
+
+func backupDisplaySettings(gameRoot, resRoot string) error {
+	src := videoSettingsPath(gameRoot)
+	if !exists(src) {
+		appendLog("[display] video settings not found; skipped: " + src)
+		return nil
+	}
+	dst := displaySettingsBackupPath(resRoot)
+	if err := copyFile(src, dst); err != nil {
+		return err
+	}
+	if info, err := os.Stat(src); err == nil {
+		_ = os.Chmod(dst, info.Mode().Perm())
+		_ = os.Chtimes(dst, info.ModTime(), info.ModTime())
+	}
+	appendLog("[display] backed up: " + src)
+	return nil
+}
+
+func restoreDisplaySettings(gameRoot, resRoot string) error {
+	src := displaySettingsBackupPath(resRoot)
+	if !exists(src) {
+		appendLog("[display] backup not found; skipped: " + src)
+		return nil
+	}
+	dst := videoSettingsPath(gameRoot)
+	if err := copyFile(src, dst); err != nil {
+		return err
+	}
+	if info, err := os.Stat(src); err == nil {
+		_ = os.Chmod(dst, info.Mode().Perm())
+		_ = os.Chtimes(dst, info.ModTime(), info.ModTime())
+	}
+	appendLog("[display] restored: " + dst)
+	return nil
 }
 
 func restoreFileMetadata(entry fileEntry) {
