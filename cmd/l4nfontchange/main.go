@@ -1036,8 +1036,10 @@ func updateConfigTahomaFont(path, fontName string) error {
 	if err != nil {
 		return err
 	}
-	for i := start; i < end; i++ {
-		lines[i] = uncommentConfigLine(lines[i])
+	if fontBlockIsCommented(lines[start:end]) {
+		for i := start; i < end; i++ {
+			lines[i] = uncommentConfigLine(lines[i])
+		}
 	}
 	re := regexp.MustCompile(`^(\s*)(//\s*)?"Tahoma"\s+"([^"]*)"([^\r\n]*)`)
 	for i := start; i < end; i++ {
@@ -1094,6 +1096,17 @@ func findFontBlockLines(lines []string) (int, int, error) {
 		}
 	}
 	return 0, 0, errors.New("config.vdf 中 font 配置块不完整")
+}
+
+func fontBlockIsCommented(lines []string) bool {
+	for _, line := range lines {
+		body := strings.TrimSpace(lineWithoutLineBreak(line))
+		if body == "" {
+			continue
+		}
+		return strings.HasPrefix(body, `// "font"`)
+	}
+	return false
 }
 
 func commentConfigLine(line string) string {

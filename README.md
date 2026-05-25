@@ -41,6 +41,13 @@ AMD处理     恢复MOD    系统字体/游戏默认
 
 建议先关闭 Steam 和游戏，再执行处理或清理。
 
+字体工具说明：
+
+- `L4N_Font_Change.exe`：仅用于使用 L4N 平台时的字体切换，读取并修改 `left4dead2/neko/config.vdf` 中的 `font` 配置块。
+- `L4D2_Font_Change.exe`：使用旧的 `Font_change` 文件复制方式，游戏使用 L4N 平台时此方式无效。
+- L4N 字体切换只会启用或修改真正生效的 `"Tahoma" "字体名"` 替换行；配置原文中已经注释的说明行、示例行和备用字体行会始终保持注释状态。
+- L4N 恢复默认字体时，会给整个 `font` 配置块增加一层 `//` 注释；再次启用时只移除这一层由工具添加的注释，不会误解除原文中已有的注释。
+
 Steam 启动参数：
 
 ```text
@@ -64,6 +71,8 @@ mem_dump
 ```text
 L4N_Go_Win32_Portable/
   L4N_Go_Win32.exe
+  L4N_Font_Change.exe
+  L4D2_Font_Change.exe
   resources/
     VC_redist.x86.exe
     VC_redist.x64.exe

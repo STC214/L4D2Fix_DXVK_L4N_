@@ -1487,8 +1487,10 @@ func toggleFontBlock(text, systemFont string) (string, string, error) {
 		}
 		return strings.Join(lines, ""), "game", nil
 	}
-	for i := start; i < end; i++ {
-		lines[i] = uncommentConfigLine(lines[i])
+	if fontBlockIsCommented(lines[start:end]) {
+		for i := start; i < end; i++ {
+			lines[i] = uncommentConfigLine(lines[i])
+		}
 	}
 	if err := activateTahomaFontLine(lines[start:end], systemFont); err != nil {
 		return "", "", err
@@ -1535,6 +1537,17 @@ func fontBlockUsesSystem(lines []string) bool {
 		if regexp.MustCompile(`^\s*"Tahoma"\s+"[^"]+"`).MatchString(body) {
 			return true
 		}
+	}
+	return false
+}
+
+func fontBlockIsCommented(lines []string) bool {
+	for _, line := range lines {
+		body := strings.TrimSpace(lineWithoutLineBreak(line))
+		if body == "" {
+			continue
+		}
+		return strings.HasPrefix(body, `// "font"`)
 	}
 	return false
 }
