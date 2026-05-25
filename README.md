@@ -29,7 +29,7 @@ UI 上的六个按钮分为三列两行：
 
 ```text
 通用处理    备份MOD    一键清理
-AMD处理     恢复MOD    关闭
+AMD处理     恢复MOD    系统字体/游戏默认
 ```
 
 - `通用处理`：使用 `resources/L4N_dxvk2.7.1`
@@ -37,7 +37,7 @@ AMD处理     恢复MOD    关闭
 - `备份MOD`：复制游戏 `left4dead2/addons` 到 `resources/addons_backup`，并备份 `left4dead2/cfg/video.txt`
 - `恢复MOD`：复制 `resources/addons_backup` 到游戏 `left4dead2/addons`，同名文件会覆盖，并恢复 `left4dead2/cfg/video.txt`
 - `一键清理`：按 `.l4n_auto_backup/manifest.json` 还原游戏文件和 Steam 配置
-- `关闭`：关闭工具
+- `系统字体/游戏默认`：通用处理后切换 `left4dead2/neko/config.vdf` 中的 `Tahoma` 字体替换行；未执行通用处理时会提示先进行通用处理
 
 建议先关闭 Steam 和游戏，再执行处理或清理。
 
@@ -127,3 +127,9 @@ go build -ldflags="-H=windowsgui" -o L4N_Go_Win32.exe .
 https://www.bilibili.com/video/BV1oHoMBbE7m/?spm_id_from=333.337.search-card.all.click&vd_source=7fbb056ce8209fd91e3f904175a597fa
 
 感谢原视频作者对 L4D2、L4N 和 DXVK 配置流程的分享。本项目在此基础上整理为 Go + Win32 便携工具，并补充了自动定位、备份还原、Steam 启动项写入和便携目录管理等自动化流程。
+
+字体切换功能参考自 Bilibili 视频《保姆级求生之路2利用L4N平台修改游戏字体以及进行武器检视》：
+
+https://www.bilibili.com/video/BV1JpCjB9Ewp/?spm_id_from=333.337.search-card.all.click&vd_source=7fbb056ce8209fd91e3f904175a597fa
+
+本工具将视频中的 L4N 字体替换思路整理为按钮操作：检测通用处理生成的 `left4dead2/neko/config.vdf`，并在系统字体与游戏默认字体之间切换。

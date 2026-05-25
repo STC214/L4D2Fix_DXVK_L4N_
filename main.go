@@ -30,8 +30,8 @@ const (
 	modBackupDirName             = "addons_backup"
 	displaySettingsBackupDirName = "display_settings_backup"
 	videoSettingsRelativePath    = "left4dead2/cfg/video.txt"
-	fontChangeDirName            = "Font_change"
-	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 普通显卡：通用处理\r\n3. AMD 显卡：AMD处理\r\n4. 备份MOD：保存 addons 和显示设置\r\n5. 恢复MOD：还原 MOD 和显示设置\r\n6. 换柚儿园/恢复字体：未安装则复制 Font_change，已安装则只删游戏目录同名文件\r\n7. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
+	configRelativePath           = "left4dead2/neko/config.vdf"
+	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 普通显卡：通用处理\r\n3. AMD 显卡：AMD处理\r\n4. 备份MOD：保存 addons 和显示设置\r\n5. 恢复MOD：还原 MOD 和显示设置\r\n6. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n7. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
 )
 
 var (
@@ -41,24 +41,25 @@ var (
 	comctl32 = syscall.NewLazyDLL("comctl32.dll")
 	advapi32 = syscall.NewLazyDLL("advapi32.dll")
 
-	procCreateWindowExW  = user32.NewProc("CreateWindowExW")
-	procDefWindowProcW   = user32.NewProc("DefWindowProcW")
-	procDestroyWindow    = user32.NewProc("DestroyWindow")
-	procDispatchMessageW = user32.NewProc("DispatchMessageW")
-	procGetMessageW      = user32.NewProc("GetMessageW")
-	procLoadCursorW      = user32.NewProc("LoadCursorW")
-	procLoadIconW        = user32.NewProc("LoadIconW")
-	procLoadImageW       = user32.NewProc("LoadImageW")
-	procPostQuitMessage  = user32.NewProc("PostQuitMessage")
-	procPostMessageW     = user32.NewProc("PostMessageW")
-	procRegisterClassExW = user32.NewProc("RegisterClassExW")
-	procSendMessageW     = user32.NewProc("SendMessageW")
-	procSetWindowTextW   = user32.NewProc("SetWindowTextW")
-	procTranslateMessage = user32.NewProc("TranslateMessage")
-	procUpdateWindow     = user32.NewProc("UpdateWindow")
-	procShowWindow       = user32.NewProc("ShowWindow")
-	procEnableWindow     = user32.NewProc("EnableWindow")
-	procGetDlgCtrlID     = user32.NewProc("GetDlgCtrlID")
+	procCreateWindowExW       = user32.NewProc("CreateWindowExW")
+	procDefWindowProcW        = user32.NewProc("DefWindowProcW")
+	procDestroyWindow         = user32.NewProc("DestroyWindow")
+	procDispatchMessageW      = user32.NewProc("DispatchMessageW")
+	procGetMessageW           = user32.NewProc("GetMessageW")
+	procLoadCursorW           = user32.NewProc("LoadCursorW")
+	procLoadIconW             = user32.NewProc("LoadIconW")
+	procLoadImageW            = user32.NewProc("LoadImageW")
+	procPostQuitMessage       = user32.NewProc("PostQuitMessage")
+	procPostMessageW          = user32.NewProc("PostMessageW")
+	procRegisterClassExW      = user32.NewProc("RegisterClassExW")
+	procSendMessageW          = user32.NewProc("SendMessageW")
+	procSetWindowTextW        = user32.NewProc("SetWindowTextW")
+	procSystemParametersInfoW = user32.NewProc("SystemParametersInfoW")
+	procTranslateMessage      = user32.NewProc("TranslateMessage")
+	procUpdateWindow          = user32.NewProc("UpdateWindow")
+	procShowWindow            = user32.NewProc("ShowWindow")
+	procEnableWindow          = user32.NewProc("EnableWindow")
+	procGetDlgCtrlID          = user32.NewProc("GetDlgCtrlID")
 
 	procGetModuleHandleW = kernel32.NewProc("GetModuleHandleW")
 	procGetStockObject   = gdi32.NewProc("GetStockObject")
@@ -170,6 +171,9 @@ const (
 	hkeyCurrentUser  = 0x80000001
 	hkeyLocalMachine = 0x80000002
 	keyRead          = 0x20019
+
+	spiGetNonClientMetrics = 0x0029
+	lfFaceSize             = 32
 )
 
 type wchar uint16
@@ -221,6 +225,42 @@ type drawItemStruct struct {
 	hdc        uintptr
 	rcItem     rect
 	itemData   uintptr
+}
+
+type logFont struct {
+	height         int32
+	width          int32
+	escapement     int32
+	orientation    int32
+	weight         int32
+	italic         byte
+	underline      byte
+	strikeOut      byte
+	charSet        byte
+	outPrecision   byte
+	clipPrecision  byte
+	quality        byte
+	pitchAndFamily byte
+	faceName       [lfFaceSize]uint16
+}
+
+type nonClientMetrics struct {
+	cbSize            uint32
+	borderWidth       int32
+	scrollWidth       int32
+	scrollHeight      int32
+	captionWidth      int32
+	captionHeight     int32
+	captionFont       logFont
+	smCaptionWidth    int32
+	smCaptionHeight   int32
+	smCaptionFont     logFont
+	menuWidth         int32
+	menuHeight        int32
+	menuFont          logFont
+	statusFont        logFont
+	messageFont       logFont
+	paddedBorderWidth int32
 }
 
 type manifest struct {
@@ -368,7 +408,7 @@ func createControls(hwnd uintptr) {
 	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 232, 122, 174, 42)
 	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 232, 174, 174, 42)
 	btnClean = button(hwnd, "一键清理", idClean, 442, 122, 174, 42)
-	btnClose = button(hwnd, "换柚儿园/恢复字体", idClose, 442, 174, 174, 42)
+	btnClose = button(hwnd, "系统字体/游戏默认", idClose, 442, 174, 174, 42)
 	for _, h := range []uintptr{btnRun, btnAMD, btnBackupMod, btnRestoreMod, btnClean, btnClose} {
 		procSendMessageW.Call(h, wmSetFont, buttonFont, 1)
 	}
@@ -490,7 +530,7 @@ func buttonText(id uint32) string {
 	case idClean:
 		return "一键清理"
 	case idClose:
-		return "换柚儿园/恢复字体"
+		return "系统字体/游戏默认"
 	default:
 		return ""
 	}
@@ -682,47 +722,30 @@ func runToggleFont() error {
 	if err != nil {
 		return err
 	}
-	fontDir, err := findFontChangeDir(root)
-	if err != nil {
-		return err
-	}
 	gameExe, err := resolveGameExe(root)
 	if err != nil {
 		return err
 	}
 	gameRoot := filepath.Dir(gameExe)
-	files, err := relativeFiles(fontDir)
+	configPath := filepath.Join(gameRoot, filepath.FromSlash(configRelativePath))
+	if !exists(configPath) {
+		return errors.New("没有进行通用处理，通用处理后再次点击本按钮")
+	}
+
+	systemFont := systemDefaultFont()
+	appendLog("[font] config: " + configPath)
+	appendLog("[font] system default font: " + systemFont)
+	setProgress(10)
+	mode, err := toggleConfigFont(configPath, systemFont)
 	if err != nil {
 		return err
 	}
-	if len(files) == 0 {
-		return fmt.Errorf("Font_change 目录内没有可复制的文件: %s", fontDir)
+	setProgress(95)
+	if mode == "system" {
+		appendLog("[font] switched to system font")
+	} else {
+		appendLog("[font] switched to game default")
 	}
-
-	appendLog("[font] source: " + fontDir)
-	appendLog("[font] target game directory: " + gameRoot)
-	setProgress(10)
-	if hasAnyRelativeFile(gameRoot, files) {
-		removed := 0
-		for i, rel := range files {
-			dst := filepath.Join(gameRoot, rel)
-			if exists(dst) {
-				if err := os.Remove(dst); err != nil {
-					return fmt.Errorf("删除字体文件失败 %s: %w", dst, err)
-				}
-				removed++
-				removeEmptyParents(filepath.Dir(dst), gameRoot)
-			}
-			setProgress(10 + i*85/max(1, len(files)))
-		}
-		appendLog(fmt.Sprintf("[font] removed %d matching files from game directory", removed))
-		return nil
-	}
-
-	if err := copyDirContents(fontDir, gameRoot, 10, 85); err != nil {
-		return err
-	}
-	appendLog("[font] YouErYuan font files installed")
 	return nil
 }
 
@@ -1476,48 +1499,155 @@ func resourceRoot(exeRoot string) string {
 	return exeRoot
 }
 
-func findFontChangeDir(root string) (string, error) {
-	for _, dir := range []string{
-		filepath.Join(root, fontChangeDirName),
-		filepath.Join(resourceRoot(root), fontChangeDirName),
-	} {
-		if exists(dir) {
-			return dir, nil
-		}
+func toggleConfigFont(path, systemFont string) (string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
 	}
-	return "", errors.New("未找到 Font_change 目录")
+	text := string(data)
+	updated, mode, err := toggleFontBlock(text, systemFont)
+	if err != nil {
+		return "", err
+	}
+	if err := os.WriteFile(path, []byte(updated), 0644); err != nil {
+		return "", err
+	}
+	return mode, nil
 }
 
-func relativeFiles(root string) ([]string, error) {
-	root = clean(root)
-	var files []string
-	if err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if d.IsDir() {
-			return nil
-		}
-		rel, err := filepath.Rel(root, path)
-		if err != nil {
-			return err
-		}
-		files = append(files, rel)
-		return nil
-	}); err != nil {
-		return nil, err
+func toggleFontBlock(text, systemFont string) (string, string, error) {
+	lines := strings.SplitAfter(text, "\n")
+	start, end, err := findFontBlockLines(lines)
+	if err != nil {
+		return "", "", err
 	}
-	sort.Strings(files)
-	return files, nil
+	if fontBlockUsesSystem(lines[start:end]) {
+		for i := start; i < end; i++ {
+			lines[i] = commentConfigLine(lines[i])
+		}
+		return strings.Join(lines, ""), "game", nil
+	}
+	for i := start; i < end; i++ {
+		lines[i] = uncommentConfigLine(lines[i])
+	}
+	if err := activateTahomaFontLine(lines[start:end], systemFont); err != nil {
+		return "", "", err
+	}
+	return strings.Join(lines, ""), "system", nil
 }
 
-func hasAnyRelativeFile(root string, rels []string) bool {
-	for _, rel := range rels {
-		if exists(filepath.Join(root, rel)) {
+func findFontBlockLines(lines []string) (int, int, error) {
+	start := -1
+	for i, line := range lines {
+		if regexp.MustCompile(`^\s*(//\s*)?"font"(\s|//|$)`).MatchString(lineWithoutLineBreak(line)) {
+			start = i
+			break
+		}
+	}
+	if start < 0 {
+		return 0, 0, errors.New("config.vdf 中未找到 font 配置块")
+	}
+	depth := 0
+	seenOpen := false
+	for i := start; i < len(lines); i++ {
+		body := uncommentConfigLine(lineWithoutLineBreak(lines[i]))
+		for _, r := range body {
+			switch r {
+			case '{':
+				depth++
+				seenOpen = true
+			case '}':
+				if seenOpen {
+					depth--
+					if depth == 0 {
+						return start, i + 1, nil
+					}
+				}
+			}
+		}
+	}
+	return 0, 0, errors.New("config.vdf 中 font 配置块不完整")
+}
+
+func fontBlockUsesSystem(lines []string) bool {
+	for _, line := range lines {
+		body := lineWithoutLineBreak(line)
+		if regexp.MustCompile(`^\s*"Tahoma"\s+"[^"]+"`).MatchString(body) {
 			return true
 		}
 	}
 	return false
+}
+
+func activateTahomaFontLine(lines []string, systemFont string) error {
+	re := regexp.MustCompile(`^(\s*)(//\s*)?"Tahoma"\s+"([^"]*)"([^\r\n]*)`)
+	for i, line := range lines {
+		body, br := splitLineBreak(line)
+		m := re.FindStringSubmatch(body)
+		if len(m) == 5 {
+			lines[i] = fmt.Sprintf(`%s"Tahoma" "%s"%s%s`, m[1], systemFont, m[4], br)
+			return nil
+		}
+	}
+	return errors.New("config.vdf 中未找到 Tahoma 字体替换行")
+}
+
+func commentConfigLine(line string) string {
+	body, br := splitLineBreak(line)
+	if strings.TrimSpace(body) == "" {
+		return line
+	}
+	indentLen := len(body) - len(strings.TrimLeft(body, " \t"))
+	return body[:indentLen] + "// " + body[indentLen:] + br
+}
+
+func uncommentConfigLine(line string) string {
+	body, br := splitLineBreak(line)
+	re := regexp.MustCompile(`^([ \t]*)// ?(.*)$`)
+	if m := re.FindStringSubmatch(body); len(m) == 3 {
+		return m[1] + m[2] + br
+	}
+	return line
+}
+
+func lineWithoutLineBreak(line string) string {
+	body, _ := splitLineBreak(line)
+	return body
+}
+
+func splitLineBreak(line string) (string, string) {
+	if strings.HasSuffix(line, "\r\n") {
+		return strings.TrimSuffix(line, "\r\n"), "\r\n"
+	}
+	if strings.HasSuffix(line, "\n") {
+		return strings.TrimSuffix(line, "\n"), "\n"
+	}
+	if strings.HasSuffix(line, "\r") {
+		return strings.TrimSuffix(line, "\r"), "\r"
+	}
+	return line, ""
+}
+
+func systemDefaultFont() string {
+	return fallbackSystemFont()
+}
+
+func fallbackSystemFont() string {
+	build := regString(hkeyLocalMachine, `SOFTWARE\Microsoft\Windows NT\CurrentVersion`, "CurrentBuildNumber")
+	if build == "" {
+		build = regString(hkeyLocalMachine, `SOFTWARE\Microsoft\Windows NT\CurrentVersion`, "CurrentBuild")
+	}
+	if build != "" {
+		var n int
+		if _, err := fmt.Sscanf(build, "%d", &n); err == nil && n >= 6000 {
+			return "Segoe UI"
+		}
+	}
+	product := strings.ToLower(regString(hkeyLocalMachine, `SOFTWARE\Microsoft\Windows NT\CurrentVersion`, "ProductName"))
+	if strings.Contains(product, "xp") || strings.Contains(product, "2003") {
+		return "Tahoma"
+	}
+	return "Segoe UI"
 }
 
 func uniqueExistingDirs(paths []string) []string {
