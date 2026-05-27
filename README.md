@@ -96,7 +96,7 @@ left4dead2/neko/config.vdf
 | `恢复默认字体` | 扫描 `Font_change` 目录内的文件列表，只删除游戏目录中与 `Font_change` 内相同相对路径的文件，不删除项目内的 `Font_change` 文件。 |
 | `浏览字体文件` | 选择用户自备字体文件并自动安装。安装后仍需在下拉框中确认字体，再点击更换字体。 |
 
-`Font_change/fonts/` 内的字体文件是可选资源，不再是便携包运行条件；默认配置使用系统常见字体 `Microsoft YaHei`。
+为避免字体授权和再分发问题，便携包不再内置字体文件。`Font_change/fonts/` 内的字体文件是可选资源，不再是便携包运行条件；默认配置使用系统常见字体 `Microsoft YaHei`。
 
 字体选择规则：
 
