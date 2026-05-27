@@ -14,7 +14,7 @@ quality: 4
 
 fonts:
   Tahoma: 
-    name: YouErYuan
+    name: Microsoft YaHei
     <<: *style
   ToolBox:
     name: Microsoft YaHei

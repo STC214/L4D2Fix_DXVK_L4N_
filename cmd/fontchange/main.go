@@ -809,8 +809,6 @@ func populateFontCombo(names []string, preferred string) {
 			}
 			if selectedIndex >= 0 {
 				procSendMessageW.Call(fontCombo, cbSetCurSel, uintptr(selectedIndex), 0)
-			}
-			if preferred != "" {
 				setComboText(preferred)
 			}
 			updateSelectedFontDisplay()
