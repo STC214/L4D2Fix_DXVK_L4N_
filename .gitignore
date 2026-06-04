@@ -1,31 +1,42 @@
-# Runtime installers and packaged binaries are too large for the source repo.
-VC_redist*.exe
-*.zip
-*.7z
+# Build outputs and packaged binaries.
 *.exe
 *.dll
-*.vcs
 *.syso
+*.vcs
+*.zip
+*.7z
+*.rar
+*.ico
+*.icns
+*.cur
 
-# Bundled third-party tools and binary payloads.
+# Runtime installers and bundled binary payloads.
+VC_redist*.exe
 tools/Everything/
-L4N_单文件便携版/
 L4N_Go_Win32_Portable/
+L4N_单文件便携版/
+
+# Patch/resource packages kept out of source control.
 只需进行一次复制粘贴 L4N+dxvk2.7.1/
 只需进行一次复制粘贴 L4N+dxvk2.3.1(AMD显卡用)/
+只需进行一次复制粘贴 L4N+dxvk*/
 
-# Local install/restore state.
+# Local install, restore, and generated runtime state.
 .l4n_auto_backup/
 addons_backup/
-resources/addons_backup/
 display_settings_backup/
+resources/addons_backup/
 resources/display_settings_backup/
-.gotmp/
+
+# Go and temporary caches.
 .gocache/
+.gotmp/
 .cache/
 cache/
 tmp/
 temp/
+
+# Logs and transient files.
 logs/
 *.tmp
 *.temp
