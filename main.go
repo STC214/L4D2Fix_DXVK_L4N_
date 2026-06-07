@@ -31,7 +31,7 @@ const (
 	displaySettingsBackupDirName = "display_settings_backup"
 	videoSettingsRelativePath    = "left4dead2/cfg/video.txt"
 	configRelativePath           = "left4dead2/neko/config.vdf"
-	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理\r\n4. 备份MOD：保存 addons 和显示设置\r\n5. 恢复MOD：还原 MOD 和显示设置\r\n6. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n7. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
+	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理，程序会安装 L4N 基础文件和所选 DXVK\r\n4. 需要保留 MOD 时，可先备份MOD，再恢复MOD\r\n5. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n6. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\n版本来源\r\ndxvk其他版本 下的子目录会自动加入菜单。\r\n支持 dxvk-x.x/x32 或 dxvk-x.x/dxvk-x.x/x32 结构。\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
 )
 
 var (
@@ -129,6 +129,7 @@ const (
 	wsTabStop     = 0x00010000
 	wsBorder      = 0x00800000
 	bsOwnerDraw   = 0x0000000B
+	bsGroupBox    = 0x00000007
 	cbsDropList   = 0x0003
 	cbsHasStrings = 0x0200
 	esMultiline   = 0x0004
@@ -376,29 +377,31 @@ func createControls(hwnd uintptr) {
 	desc := label(hwnd, "自动识别游戏目录，安装运行库，备份原文件，\r\n并用所选补丁目录覆盖游戏源文件。", 22, 62, 594, 48)
 	procSendMessageW.Call(desc, wmSetFont, textFont, 1)
 
-	versionLabel := label(hwnd, "DXVK版本", 22, 116, 174, 20)
+	actionBox := groupBox(hwnd, "处理选项", 16, 112, 606, 122)
+	procSendMessageW.Call(actionBox, wmSetFont, textFont, 1)
+	versionLabel := label(hwnd, "DXVK版本", 32, 136, 174, 20)
 	procSendMessageW.Call(versionLabel, wmSetFont, textFont, 1)
-	comboDxvk = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 22, 140, 174, 220, hwnd, 0)
+	comboDxvk = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 32, 160, 174, 220, hwnd, 0)
 	procSendMessageW.Call(comboDxvk, wmSetFont, textFont, 1)
-	btnRun = button(hwnd, "一键处理", idRun, 22, 184, 174, 42)
-	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 232, 122, 174, 42)
-	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 232, 174, 174, 42)
-	btnClean = button(hwnd, "一键清理", idClean, 442, 122, 174, 42)
-	btnClose = button(hwnd, "系统字体/游戏默认", idClose, 442, 174, 174, 42)
+	btnRun = button(hwnd, "一键处理", idRun, 32, 194, 174, 32)
+	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 232, 134, 174, 36)
+	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 232, 184, 174, 36)
+	btnClean = button(hwnd, "一键清理", idClean, 432, 134, 174, 36)
+	btnClose = button(hwnd, "系统字体/游戏默认", idClose, 432, 184, 174, 36)
 	for _, h := range []uintptr{btnRun, btnBackupMod, btnRestoreMod, btnClean, btnClose} {
 		procSendMessageW.Call(h, wmSetFont, buttonFont, 1)
 	}
 	loadDxvkOptionsIntoCombo()
 
-	progress = create("msctls_progress32", "", wsChild|wsVisible, 22, 242, 594, 17, hwnd, 0)
+	progress = create("msctls_progress32", "", wsChild|wsVisible, 22, 252, 594, 17, hwnd, 0)
 	procSendMessageW.Call(progress, pbmSetRange32, 0, 100)
 	procSendMessageW.Call(progress, pbmSetPos, 0, 0)
 
-	statusCtl = label(hwnd, "就绪 - 请选择 DXVK 版本后一键处理", 22, 273, 594, 24)
+	statusCtl = label(hwnd, "就绪 - 请选择 DXVK 版本后一键处理", 22, 283, 594, 24)
 	procSendMessageW.Call(statusCtl, wmSetFont, textFont, 1)
-	logTitle := label(hwnd, "日志", 22, 303, 80, 20)
+	logTitle := label(hwnd, "日志", 22, 313, 80, 20)
 	procSendMessageW.Call(logTitle, wmSetFont, textFont, 1)
-	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 22, 322, 594, 194, hwnd, 0)
+	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 22, 332, 594, 184, hwnd, 0)
 	procSendMessageW.Call(logCtl, wmSetFont, textFont, 1)
 
 	guideTitle := label(hwnd, "使用说明", 630, 22, 280, 24)
@@ -417,6 +420,10 @@ func label(hwnd uintptr, text string, x, y, w, h int32) uintptr {
 
 func button(hwnd uintptr, text string, id uintptr, x, y, w, h int32) uintptr {
 	return create("BUTTON", text, wsChild|wsVisible|wsTabStop|bsOwnerDraw, x, y, w, h, hwnd, id)
+}
+
+func groupBox(hwnd uintptr, text string, x, y, w, h int32) uintptr {
+	return create("BUTTON", text, wsChild|wsVisible|bsGroupBox, x, y, w, h, hwnd, 0)
 }
 
 func create(class, text string, style uintptr, x, y, w, h int32, parent, id uintptr) uintptr {

@@ -38,11 +38,12 @@
 L4N_Go_Win32_Portable/L4N_Go_Win32.exe
 ```
 
-主程序提供 DXVK 版本下拉菜单和常用操作按钮：
+主程序左侧操作区带有线框分组，包含 DXVK 版本下拉菜单和常用操作按钮；右侧为随程序内置的使用说明：
 
 ```text
-DXVK版本    一键处理
-备份MOD     恢复MOD    一键清理    系统字体/游戏默认
+处理选项
+  DXVK版本    一键处理
+  备份MOD     恢复MOD    一键清理    系统字体/游戏默认
 ```
 
 | 控件 | 作用 |
@@ -53,6 +54,13 @@ DXVK版本    一键处理
 | `恢复MOD` | 复制 `resources/addons_backup` 回游戏 `left4dead2/addons`，同名文件会覆盖，并恢复 `left4dead2/cfg/video.txt`。 |
 | `一键清理` | 按 `.l4n_auto_backup/manifest.json` 还原游戏文件和 Steam 配置。 |
 | `系统字体/游戏默认` | 一键处理后切换 `left4dead2/neko/config.vdf` 中的 `Tahoma` 字体替换行；未执行一键处理时会提示先进行一键处理。 |
+
+右侧说明会提示 DXVK 版本来源和支持的目录结构：
+
+```text
+dxvk其他版本/dxvk-x.x/x32/
+dxvk其他版本/dxvk-x.x/dxvk-x.x/x32/
+```
 
 ## 独立字体切换程序
 
