@@ -2,6 +2,7 @@
 
 *.go text eol=lf
 *.mod text eol=lf
+*.gitignore text eol=lf
 *.md text eol=lf
 *.txt text eol=crlf
 *.ps1 text eol=crlf

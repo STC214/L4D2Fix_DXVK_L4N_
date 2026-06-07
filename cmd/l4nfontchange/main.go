@@ -705,6 +705,9 @@ func runRestoreDefaultFont() error {
 	if err != nil {
 		return err
 	}
+	if err := backupConfigFile(configPath); err != nil {
+		return err
+	}
 	if err := os.WriteFile(configPath, []byte(updated), 0644); err != nil {
 		return err
 	}
@@ -1046,10 +1049,29 @@ func updateConfigTahomaFont(path, fontName string) error {
 		body, br := splitLineBreak(lines[i])
 		if m := re.FindStringSubmatch(body); len(m) == 5 {
 			lines[i] = fmt.Sprintf(`%s"Tahoma" "%s"%s%s`, m[1], fontName, m[4], br)
+			if err := backupConfigFile(path); err != nil {
+				return err
+			}
 			return os.WriteFile(path, []byte(strings.Join(lines, "")), 0644)
 		}
 	}
 	return errors.New("config.vdf 中未找到 Tahoma 字体替换行")
+}
+
+func backupConfigFile(path string) error {
+	backup := path + ".l4nfontchange.bak"
+	if exists(backup) {
+		return nil
+	}
+	if err := copyFile(path, backup); err != nil {
+		return err
+	}
+	if info, err := os.Stat(path); err == nil {
+		_ = os.Chmod(backup, info.Mode().Perm())
+		_ = os.Chtimes(backup, info.ModTime(), info.ModTime())
+	}
+	appendLog("[font] backup config: " + backup)
+	return nil
 }
 
 func commentConfigFontBlock(text string) (string, error) {

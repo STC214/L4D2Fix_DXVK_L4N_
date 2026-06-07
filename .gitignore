@@ -9,6 +9,10 @@
 *.ico
 *.icns
 *.cur
+*.ttf
+*.otf
+*.ttc
+*.fon
 
 # Runtime installers and bundled binary payloads.
 VC_redist*.exe
@@ -27,6 +31,9 @@ addons_backup/
 display_settings_backup/
 resources/addons_backup/
 resources/display_settings_backup/
+.l4d2_font_change_backup/
+*.l4nfontchange.bak
+*.old/
 
 # Go and temporary caches.
 .gocache/

@@ -26,12 +26,12 @@ const (
 	defaultLaunchOptions         = "-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan"
 	resourceDirName              = "resources"
 	genericPatchDirName          = "L4N_dxvk2.7.1"
-	amdPatchDirName              = "L4N_dxvk2.3.1_AMD"
+	dxvkVersionsDirName          = "dxvk其他版本"
 	modBackupDirName             = "addons_backup"
 	displaySettingsBackupDirName = "display_settings_backup"
 	videoSettingsRelativePath    = "left4dead2/cfg/video.txt"
 	configRelativePath           = "left4dead2/neko/config.vdf"
-	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 普通显卡：通用处理\r\n3. AMD 显卡：AMD处理\r\n4. 备份MOD：保存 addons 和显示设置\r\n5. 恢复MOD：还原 MOD 和显示设置\r\n6. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n7. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
+	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理\r\n4. 备份MOD：保存 addons 和显示设置\r\n5. 恢复MOD：还原 MOD 和显示设置\r\n6. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n7. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
 )
 
 var (
@@ -81,7 +81,7 @@ var (
 	hInstance     uintptr
 	hWnd          uintptr
 	btnRun        uintptr
-	btnAMD        uintptr
+	comboDxvk     uintptr
 	btnBackupMod  uintptr
 	btnRestoreMod uintptr
 	btnClean      uintptr
@@ -101,6 +101,7 @@ var (
 	uiMu          sync.Mutex
 	uiNext        uintptr
 	uiWork        = map[uintptr]func(){}
+	dxvkOptions   []dxvkOption
 )
 
 const (
@@ -128,6 +129,8 @@ const (
 	wsTabStop     = 0x00010000
 	wsBorder      = 0x00800000
 	bsOwnerDraw   = 0x0000000B
+	cbsDropList   = 0x0003
+	cbsHasStrings = 0x0200
 	esMultiline   = 0x0004
 	esAutovScroll = 0x0040
 	esReadOnly    = 0x0800
@@ -138,10 +141,12 @@ const (
 	idRun        = 1001
 	idClean      = 1002
 	idClose      = 1003
-	idAMD        = 1004
 	idBackupMod  = 1005
 	idRestoreMod = 1006
 
+	cbAddString   = 0x0143
+	cbGetCurSel   = 0x0147
+	cbSetCurSel   = 0x014E
 	pbmSetRange32 = 0x0400 + 6
 	pbmSetPos     = 0x0400 + 2
 	emSetSel      = 0x00B1
@@ -246,6 +251,16 @@ type steamEntry struct {
 	Backup  string `json:"backup"`
 }
 
+type dxvkOption struct {
+	Name string
+	Dir  string
+}
+
+type patchFile struct {
+	Src string
+	Rel string
+}
+
 func main() {
 	runtime.LockOSThread()
 	hInstance, _, _ = procGetModuleHandleW.Call(0)
@@ -323,8 +338,6 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 			switch id {
 			case idRun:
 				go guarded("一键处理", runInstall)
-			case idAMD:
-				go guarded("AMD 一键处理", runInstallAMD)
 			case idBackupMod:
 				go guarded("备份MOD", runBackupMods)
 			case idRestoreMod:
@@ -363,21 +376,25 @@ func createControls(hwnd uintptr) {
 	desc := label(hwnd, "自动识别游戏目录，安装运行库，备份原文件，\r\n并用所选补丁目录覆盖游戏源文件。", 22, 62, 594, 48)
 	procSendMessageW.Call(desc, wmSetFont, textFont, 1)
 
-	btnRun = button(hwnd, "通用处理", idRun, 22, 122, 174, 42)
-	btnAMD = button(hwnd, "AMD处理", idAMD, 22, 174, 174, 42)
+	versionLabel := label(hwnd, "DXVK版本", 22, 116, 174, 20)
+	procSendMessageW.Call(versionLabel, wmSetFont, textFont, 1)
+	comboDxvk = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 22, 140, 174, 220, hwnd, 0)
+	procSendMessageW.Call(comboDxvk, wmSetFont, textFont, 1)
+	btnRun = button(hwnd, "一键处理", idRun, 22, 184, 174, 42)
 	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 232, 122, 174, 42)
 	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 232, 174, 174, 42)
 	btnClean = button(hwnd, "一键清理", idClean, 442, 122, 174, 42)
 	btnClose = button(hwnd, "系统字体/游戏默认", idClose, 442, 174, 174, 42)
-	for _, h := range []uintptr{btnRun, btnAMD, btnBackupMod, btnRestoreMod, btnClean, btnClose} {
+	for _, h := range []uintptr{btnRun, btnBackupMod, btnRestoreMod, btnClean, btnClose} {
 		procSendMessageW.Call(h, wmSetFont, buttonFont, 1)
 	}
+	loadDxvkOptionsIntoCombo()
 
 	progress = create("msctls_progress32", "", wsChild|wsVisible, 22, 242, 594, 17, hwnd, 0)
 	procSendMessageW.Call(progress, pbmSetRange32, 0, 100)
 	procSendMessageW.Call(progress, pbmSetPos, 0, 0)
 
-	statusCtl = label(hwnd, "就绪 - 请选择通用或 AMD 补丁覆盖游戏源文件", 22, 273, 594, 24)
+	statusCtl = label(hwnd, "就绪 - 请选择 DXVK 版本后一键处理", 22, 273, 594, 24)
 	procSendMessageW.Call(statusCtl, wmSetFont, textFont, 1)
 	logTitle := label(hwnd, "日志", 22, 303, 80, 20)
 	procSendMessageW.Call(logTitle, wmSetFont, textFont, 1)
@@ -390,8 +407,8 @@ func createControls(hwnd uintptr) {
 	procSendMessageW.Call(guideCtl, wmSetFont, guideFont, 1)
 
 	appendLog("[prepare] ready; resources directory: " + resourceDirName)
-	appendLog("[prepare] generic patch: resources\\" + genericPatchDirName)
-	appendLog("[prepare] AMD patch: resources\\" + amdPatchDirName)
+	appendLog("[prepare] L4N base patch: resources\\" + genericPatchDirName)
+	appendLog("[prepare] DXVK versions directory: " + dxvkVersionsDirName)
 }
 
 func label(hwnd uintptr, text string, x, y, w, h int32) uintptr {
@@ -480,9 +497,7 @@ func drawButton(dis *drawItemStruct) {
 func buttonText(id uint32) string {
 	switch id {
 	case idRun:
-		return "通用处理"
-	case idAMD:
-		return "AMD处理"
+		return "一键处理"
 	case idBackupMod:
 		return "备份MOD"
 	case idRestoreMod:
@@ -494,6 +509,37 @@ func buttonText(id uint32) string {
 	default:
 		return ""
 	}
+}
+
+func loadDxvkOptionsIntoCombo() {
+	root, err := packageRoot()
+	if err != nil {
+		appendLog("[prepare] " + err.Error())
+		return
+	}
+	resRoot := resourceRoot(root)
+	dxvkOptions = discoverDxvkOptions(root, resRoot)
+	if len(dxvkOptions) == 0 {
+		appendLog("[prepare] no DXVK versions found under " + dxvkVersionsDirName)
+		return
+	}
+	for _, opt := range dxvkOptions {
+		procSendMessageW.Call(comboDxvk, cbAddString, 0, uintptr(unsafe.Pointer(utf16Ptr(opt.Name))))
+	}
+	procSendMessageW.Call(comboDxvk, cbSetCurSel, uintptr(len(dxvkOptions)-1), 0)
+	appendLog(fmt.Sprintf("[prepare] loaded %d DXVK versions", len(dxvkOptions)))
+}
+
+func selectedDxvkOption() (dxvkOption, error) {
+	if len(dxvkOptions) == 0 {
+		return dxvkOption{}, errors.New("未找到可用 DXVK 版本")
+	}
+	ret, _, _ := procSendMessageW.Call(comboDxvk, cbGetCurSel, 0, 0)
+	idx := int(ret)
+	if idx < 0 || idx >= len(dxvkOptions) {
+		return dxvkOption{}, errors.New("请选择 DXVK 版本")
+	}
+	return dxvkOptions[idx], nil
 }
 
 func invokeUI(fn func()) {
@@ -565,7 +611,7 @@ func setBusy(v bool) {
 			en = 0
 		}
 		procEnableWindow.Call(btnRun, en)
-		procEnableWindow.Call(btnAMD, en)
+		procEnableWindow.Call(comboDxvk, en)
 		procEnableWindow.Call(btnBackupMod, en)
 		procEnableWindow.Call(btnRestoreMod, en)
 		procEnableWindow.Call(btnClean, en)
@@ -606,11 +652,11 @@ func appendLog(s string) {
 }
 
 func runInstall() error {
-	return runInstallWithPatch(genericPatchDirName)
-}
-
-func runInstallAMD() error {
-	return runInstallWithPatch(amdPatchDirName)
+	opt, err := selectedDxvkOption()
+	if err != nil {
+		return err
+	}
+	return runInstallWithDxvk(opt)
 }
 
 func runBackupMods() error {
@@ -628,13 +674,19 @@ func runBackupMods() error {
 		return fmt.Errorf("未找到 addons 目录: %s", addonsDir)
 	}
 	backupDir := filepath.Join(resRoot, modBackupDirName)
+	tmpBackupDir := backupDir + ".tmp"
 	appendLog("[mod] source addons: " + addonsDir)
 	appendLog("[mod] backup target: " + backupDir)
 	setProgress(10)
-	if err := os.RemoveAll(backupDir); err != nil {
+	if err := os.RemoveAll(tmpBackupDir); err != nil {
 		return err
 	}
-	if err := copyDirContents(addonsDir, backupDir, 10, 85); err != nil {
+	if err := copyDirContents(addonsDir, tmpBackupDir, 10, 85); err != nil {
+		_ = os.RemoveAll(tmpBackupDir)
+		return err
+	}
+	if err := replaceDir(tmpBackupDir, backupDir); err != nil {
+		_ = os.RemoveAll(tmpBackupDir)
 		return err
 	}
 	setProgress(88)
@@ -689,7 +741,7 @@ func runToggleFont() error {
 	gameRoot := filepath.Dir(gameExe)
 	configPath := filepath.Join(gameRoot, filepath.FromSlash(configRelativePath))
 	if !exists(configPath) {
-		return errors.New("没有进行通用处理，通用处理后再次点击本按钮")
+		return errors.New("没有进行一键处理，一键处理后再次点击本按钮")
 	}
 
 	systemFont := systemDefaultFont()
@@ -709,7 +761,7 @@ func runToggleFont() error {
 	return nil
 }
 
-func runInstallWithPatch(patchDirName string) error {
+func runInstallWithDxvk(opt dxvkOption) error {
 	root, err := packageRoot()
 	if err != nil {
 		return err
@@ -717,8 +769,13 @@ func runInstallWithPatch(patchDirName string) error {
 	resRoot := resourceRoot(root)
 	appendLog("[prepare] exe root: " + root)
 	appendLog("[prepare] resource root: " + resRoot)
+	appendLog("[prepare] selected DXVK: " + opt.Name)
 	runtimeDir := resRoot
-	patchDir, err := findNamedPackageDir(resRoot, patchDirName)
+	patchDir, err := findNamedPackageDir(resRoot, genericPatchDirName)
+	if err != nil {
+		return err
+	}
+	patchFiles, err := buildPatchFileList(patchDir, opt)
 	if err != nil {
 		return err
 	}
@@ -743,7 +800,7 @@ func runInstallWithPatch(patchDirName string) error {
 	appendLog("[backup] manifest: " + filepath.Join(backupRoot, "manifest.json"))
 
 	setProgress(40)
-	if err := copyPatchFiles(man, backupRoot, gameRoot, patchDir); err != nil {
+	if err := copyPatchFiles(man, backupRoot, gameRoot, patchFiles); err != nil {
 		return err
 	}
 
@@ -775,14 +832,18 @@ func runRestore() error {
 	if err := json.Unmarshal(data, &man); err != nil {
 		return err
 	}
+	var restoreErrs []string
 	setProgress(15)
 	for i, e := range man.Files {
 		if e.Existed {
 			if e.Backup == "" {
-				appendLog("[restore] missing backup path: " + e.Target)
+				msg := "missing backup path: " + e.Target
+				restoreErrs = append(restoreErrs, msg)
+				appendLog("[restore] " + msg)
 				continue
 			}
 			if err := copyFile(e.Backup, e.Target); err != nil {
+				restoreErrs = append(restoreErrs, err.Error())
 				appendLog("[restore] " + err.Error())
 			} else {
 				restoreFileMetadata(e)
@@ -790,6 +851,7 @@ func runRestore() error {
 			}
 		} else if exists(e.Target) {
 			if err := os.Remove(e.Target); err != nil {
+				restoreErrs = append(restoreErrs, err.Error())
 				appendLog("[remove] " + err.Error())
 			} else {
 				removeEmptyParents(filepath.Dir(e.Target), man.GameRoot)
@@ -801,13 +863,22 @@ func runRestore() error {
 	for _, e := range man.SteamConfigs {
 		if e.Existed && exists(e.Backup) {
 			if err := copyFile(e.Backup, e.Target); err != nil {
+				restoreErrs = append(restoreErrs, err.Error())
 				appendLog("[steam] " + err.Error())
 			} else {
 				appendLog("[steam] restored: " + e.Target)
 			}
+		} else if e.Existed {
+			msg := "missing Steam config backup: " + e.Target
+			restoreErrs = append(restoreErrs, msg)
+			appendLog("[steam] " + msg)
 		}
 	}
 	setProgress(85)
+	if len(restoreErrs) > 0 {
+		appendLog("[clean] backup directory kept because restore had errors")
+		return fmt.Errorf("restore incomplete; kept backup directory: %s", backupRoot)
+	}
 	if err := os.RemoveAll(backupRoot); err != nil {
 		return err
 	}
@@ -845,27 +916,14 @@ func installRuntimes(root string) error {
 	return nil
 }
 
-func copyPatchFiles(man *manifest, backupRoot, gameRoot, patchDir string) error {
-	appendLog("[copy] source patch directory: " + patchDir)
+func copyPatchFiles(man *manifest, backupRoot, gameRoot string, files []patchFile) error {
 	appendLog("[copy] target game directory: " + gameRoot)
-	var files []string
-	err := filepath.WalkDir(patchDir, func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if !d.IsDir() {
-			files = append(files, path)
-		}
-		return nil
+	sort.Slice(files, func(i, j int) bool {
+		return strings.ToLower(files[i].Rel) < strings.ToLower(files[j].Rel)
 	})
-	if err != nil {
-		return err
-	}
-	sort.Strings(files)
-	for i, src := range files {
-		rel, _ := filepath.Rel(patchDir, src)
-		dst := filepath.Join(gameRoot, rel)
-		if err := copyWithBackup(man, backupRoot, gameRoot, src, dst); err != nil {
+	for i, file := range files {
+		dst := filepath.Join(gameRoot, file.Rel)
+		if err := copyWithBackup(man, backupRoot, gameRoot, file.Src, dst); err != nil {
 			return err
 		}
 		if i%5 == 0 {
@@ -874,6 +932,104 @@ func copyPatchFiles(man *manifest, backupRoot, gameRoot, patchDir string) error 
 	}
 	appendLog(fmt.Sprintf("[copy] %d patch files copied over the game files with backup", len(files)))
 	return nil
+}
+
+func buildPatchFileList(basePatchDir string, opt dxvkOption) ([]patchFile, error) {
+	appendLog("[copy] source L4N base directory: " + basePatchDir)
+	appendLog("[copy] source DXVK directory: " + opt.Dir)
+	files, err := collectBasePatchFiles(basePatchDir)
+	if err != nil {
+		return nil, err
+	}
+	dxvkFiles, err := collectDxvkPatchFiles(opt.Dir)
+	if err != nil {
+		return nil, err
+	}
+	files = append(files, dxvkFiles...)
+	return files, nil
+}
+
+func collectBasePatchFiles(basePatchDir string) ([]patchFile, error) {
+	var files []patchFile
+	err := filepath.WalkDir(basePatchDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		rel, err := filepath.Rel(basePatchDir, path)
+		if err != nil {
+			return err
+		}
+		if isDxvkTargetRel(rel) {
+			return nil
+		}
+		files = append(files, patchFile{Src: path, Rel: rel})
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return files, nil
+}
+
+func collectDxvkPatchFiles(versionDir string) ([]patchFile, error) {
+	x32, err := findDxvkX32Dir(versionDir)
+	if err != nil {
+		return nil, err
+	}
+	dxgi := filepath.Join(x32, "dxgi.dll")
+	d3d9 := filepath.Join(x32, "dxvk_d3d9.dll")
+	if !exists(dxgi) || !exists(d3d9) {
+		return nil, fmt.Errorf("DXVK x32 directory is incomplete: %s", x32)
+	}
+	binD3D9 := filepath.Join(x32, "bin", "dxvk_d3d9.dll")
+	if !exists(binD3D9) {
+		binD3D9 = d3d9
+	}
+	return []patchFile{
+		{Src: dxgi, Rel: "dxgi.dll"},
+		{Src: d3d9, Rel: "dxvk_d3d9.dll"},
+		{Src: binD3D9, Rel: filepath.Join("bin", "dxvk_d3d9.dll")},
+	}, nil
+}
+
+func findDxvkX32Dir(versionDir string) (string, error) {
+	var matches []string
+	err := filepath.WalkDir(versionDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !d.IsDir() || !strings.EqualFold(d.Name(), "x32") {
+			return nil
+		}
+		if exists(filepath.Join(path, "dxgi.dll")) && exists(filepath.Join(path, "dxvk_d3d9.dll")) {
+			matches = append(matches, path)
+			return filepath.SkipDir
+		}
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+	if len(matches) == 0 {
+		return "", fmt.Errorf("未找到有效 DXVK x32 目录: %s", versionDir)
+	}
+	sort.Slice(matches, func(i, j int) bool {
+		return len(matches[i]) < len(matches[j])
+	})
+	return matches[0], nil
+}
+
+func isDxvkTargetRel(rel string) bool {
+	rel = filepath.ToSlash(strings.ToLower(filepath.Clean(rel)))
+	switch rel {
+	case "dxgi.dll", "dxvk_d3d9.dll", "bin/dxvk_d3d9.dll":
+		return true
+	default:
+		return false
+	}
 }
 
 func copyWithBackup(man *manifest, backupRoot, gameRoot, src, dst string) error {
@@ -1259,14 +1415,75 @@ func findPackageDir(root string, required []string) (string, error) {
 }
 
 func findNamedPackageDir(root, name string) (string, error) {
-	dir := filepath.Join(root, name)
+	for _, base := range packageSearchRoots(root) {
+		dir := filepath.Join(base, name)
+		if isNamedPackageDir(dir) {
+			return dir, nil
+		}
+	}
+	return "", fmt.Errorf("未找到完整补丁目录: %s", name)
+}
+
+func isNamedPackageDir(dir string) bool {
 	required := []string{"readme_l4n.txt", filepath.Join("bin", "left4neko.dll"), "dxgi.dll", "dxvk_d3d9.dll"}
 	for _, rel := range required {
 		if !exists(filepath.Join(dir, rel)) {
-			return "", fmt.Errorf("未找到完整补丁目录: %s", dir)
+			return false
 		}
 	}
-	return dir, nil
+	return true
+}
+
+func discoverDxvkOptions(root, resRoot string) []dxvkOption {
+	var options []dxvkOption
+	seen := map[string]bool{}
+	for _, base := range packageSearchRoots(root) {
+		for _, versionsRoot := range []string{
+			filepath.Join(base, dxvkVersionsDirName),
+			filepath.Join(resRoot, dxvkVersionsDirName),
+		} {
+			entries, err := os.ReadDir(versionsRoot)
+			if err != nil {
+				continue
+			}
+			for _, entry := range entries {
+				if !entry.IsDir() {
+					continue
+				}
+				dir := filepath.Join(versionsRoot, entry.Name())
+				if _, err := findDxvkX32Dir(dir); err != nil {
+					appendLog("[prepare] skipped DXVK version " + entry.Name() + ": " + err.Error())
+					continue
+				}
+				key := strings.ToLower(entry.Name())
+				if seen[key] {
+					continue
+				}
+				seen[key] = true
+				options = append(options, dxvkOption{Name: entry.Name(), Dir: dir})
+			}
+		}
+	}
+	sort.Slice(options, func(i, j int) bool {
+		return strings.ToLower(options[i].Name) < strings.ToLower(options[j].Name)
+	})
+	return options
+}
+
+func packageSearchRoots(root string) []string {
+	var roots []string
+	add := func(path string) {
+		if path != "" && exists(path) {
+			roots = append(roots, path)
+		}
+	}
+	add(resourceRoot(root))
+	add(root)
+	add(filepath.Join(root, "resources"))
+	add(filepath.Join(root, "L4N_Go_Win32_Portable", "resources"))
+	add(filepath.Join(filepath.Dir(root), "resources"))
+	add(filepath.Join(filepath.Dir(root), "L4N_Go_Win32_Portable", "resources"))
+	return uniqueExistingDirs(roots)
 }
 
 func loadManifest(root, gameRoot string) *manifest {
@@ -1359,6 +1576,27 @@ func copyDirContents(srcRoot, dstRoot string, progressStart, progressSpan int) e
 	}
 	appendLog(fmt.Sprintf("[copy] %d files copied", len(files)))
 	return nil
+}
+
+func replaceDir(src, dst string) error {
+	parent := filepath.Dir(dst)
+	if err := os.MkdirAll(parent, 0755); err != nil {
+		return err
+	}
+	old := dst + ".old"
+	_ = os.RemoveAll(old)
+	if exists(dst) {
+		if err := os.Rename(dst, old); err != nil {
+			return err
+		}
+	}
+	if err := os.Rename(src, dst); err != nil {
+		if exists(old) {
+			_ = os.Rename(old, dst)
+		}
+		return err
+	}
+	return os.RemoveAll(old)
 }
 
 func videoSettingsPath(gameRoot string) string {
@@ -1469,10 +1707,29 @@ func toggleConfigFont(path, systemFont string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if err := backupConfigFile(path); err != nil {
+		return "", err
+	}
 	if err := os.WriteFile(path, []byte(updated), 0644); err != nil {
 		return "", err
 	}
 	return mode, nil
+}
+
+func backupConfigFile(path string) error {
+	backup := path + ".l4nfontchange.bak"
+	if exists(backup) {
+		return nil
+	}
+	if err := copyFile(path, backup); err != nil {
+		return err
+	}
+	if info, err := os.Stat(path); err == nil {
+		_ = os.Chmod(backup, info.Mode().Perm())
+		_ = os.Chtimes(backup, info.ModTime(), info.ModTime())
+	}
+	appendLog("[font] backup config: " + backup)
+	return nil
 }
 
 func toggleFontBlock(text, systemFont string) (string, string, error) {

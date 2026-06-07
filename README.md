@@ -20,7 +20,7 @@
 
 | 类别 | 能力 |
 | --- | --- |
-| 补丁处理 | 支持通用补丁 `L4N_dxvk2.7.1` 和 AMD 专用补丁 `L4N_dxvk2.3.1_AMD`。 |
+| 补丁处理 | 从 `dxvk其他版本/` 自动读取所有 DXVK 子目录，选择版本后一键安装 L4N 与对应 DXVK 文件。 |
 | 自动定位 | 从 Steam 库自动定位 L4D2，找不到时使用 Everything 辅助搜索。 |
 | 运行环境 | 自动安装 `VC_redist.x86.exe` / `VC_redist.x64.exe`。 |
 | 安全回滚 | 覆盖前逐文件备份，记录到 exe 同级 `.l4n_auto_backup/`。 |
@@ -38,21 +38,21 @@
 L4N_Go_Win32_Portable/L4N_Go_Win32.exe
 ```
 
-主程序按钮按三列两行排列：
+主程序提供 DXVK 版本下拉菜单和常用操作按钮：
 
 ```text
-通用处理    备份MOD    一键清理
-AMD处理     恢复MOD    系统字体/游戏默认
+DXVK版本    一键处理
+备份MOD     恢复MOD    一键清理    系统字体/游戏默认
 ```
 
-| 按钮 | 作用 |
+| 控件 | 作用 |
 | --- | --- |
-| `通用处理` | 使用 `resources/L4N_dxvk2.7.1` 作为补丁源目录。 |
-| `AMD处理` | 使用 `resources/L4N_dxvk2.3.1_AMD` 作为补丁源目录。 |
+| `DXVK版本` | 自动列出 `dxvk其他版本/` 下所有可用子目录名，例如 `dxvk-2.3`、`dxvk-2.7.1`。 |
+| `一键处理` | 使用 `resources/L4N_dxvk2.7.1` 作为 L4N 基础补丁，并将所选 DXVK 版本映射为 `dxgi.dll`、`dxvk_d3d9.dll`、`bin/dxvk_d3d9.dll` 后覆盖到游戏目录。 |
 | `备份MOD` | 复制游戏 `left4dead2/addons` 到 `resources/addons_backup`，并备份 `left4dead2/cfg/video.txt`。 |
 | `恢复MOD` | 复制 `resources/addons_backup` 回游戏 `left4dead2/addons`，同名文件会覆盖，并恢复 `left4dead2/cfg/video.txt`。 |
 | `一键清理` | 按 `.l4n_auto_backup/manifest.json` 还原游戏文件和 Steam 配置。 |
-| `系统字体/游戏默认` | 通用处理后切换 `left4dead2/neko/config.vdf` 中的 `Tahoma` 字体替换行；未执行通用处理时会提示先进行通用处理。 |
+| `系统字体/游戏默认` | 一键处理后切换 `left4dead2/neko/config.vdf` 中的 `Tahoma` 字体替换行；未执行一键处理时会提示先进行一键处理。 |
 
 ## 独立字体切换程序
 
@@ -79,7 +79,7 @@ left4dead2/neko/config.vdf
 
 注意事项：
 
-- 如果没有执行过通用处理，`config.vdf` 不存在，工具会提示先进行通用处理。
+- 如果没有执行过一键处理，`config.vdf` 不存在，工具会提示先进行一键处理。
 - L4N 字体切换只会启用或修改真正生效的 `"Tahoma" "字体名"` 替换行。
 - 配置原文中已经注释的说明行、示例行和备用字体行会始终保持注释状态。
 - 恢复默认字体后再次启用时，只移除工具给整个 `font` 配置块添加的最外层注释，不会误解除原文中已有的注释。
@@ -156,8 +156,10 @@ L4N_Go_Win32_Portable/
     验证指令【六】.txt
     tools/
       Everything/
-    L4N_dxvk2.7.1/
-    L4N_dxvk2.3.1_AMD/
+    L4N_dxvk2.7.1/            # L4N 基础补丁
+    dxvk其他版本/
+      dxvk-2.3/
+      dxvk-2.7.1/
     addons_backup/              # 运行“备份MOD”后生成
     display_settings_backup/    # 运行“备份MOD”后生成
 ```
@@ -217,4 +219,4 @@ https://www.bilibili.com/video/BV1oHoMBbE7m/?spm_id_from=333.337.search-card.all
 
 https://www.bilibili.com/video/BV1JpCjB9Ewp/?spm_id_from=333.337.search-card.all.click&vd_source=7fbb056ce8209fd91e3f904175a597fa
 
-本工具将视频中的 L4N 字体替换思路整理为按钮操作：检测通用处理生成的 `left4dead2/neko/config.vdf`，并在系统字体与游戏默认字体之间切换。
+本工具将视频中的 L4N 字体替换思路整理为按钮操作：检测一键处理生成的 `left4dead2/neko/config.vdf`，并在系统字体与游戏默认字体之间切换。

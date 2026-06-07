@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -24,6 +25,7 @@ const (
 	appTitle          = "L4D2 字体切换"
 	resourceDirName   = "resources"
 	fontChangeDirName = "Font_change"
+	fontBackupDirName = ".l4d2_font_change_backup"
 )
 
 var (
@@ -285,6 +287,21 @@ type openFileName struct {
 	pvReserved        uintptr
 	dwReserved        uint32
 	flagsEx           uint32
+}
+
+type fontManifest struct {
+	CreatedAt string          `json:"createdAt"`
+	GameRoot  string          `json:"gameRoot"`
+	Files     []fontFileEntry `json:"files"`
+}
+
+type fontFileEntry struct {
+	Target  string `json:"target"`
+	Rel     string `json:"relative"`
+	Existed bool   `json:"existed"`
+	Backup  string `json:"backup,omitempty"`
+	Mode    uint32 `json:"mode,omitempty"`
+	ModTime string `json:"modTime,omitempty"`
 }
 
 func main() {
@@ -674,12 +691,14 @@ func runApplyFontChange() error {
 		return err
 	}
 	gameRoot := filepath.Dir(gameExe)
+	backupRoot := filepath.Join(root, fontBackupDirName)
+	man := loadFontManifest(backupRoot, gameRoot)
 
 	appendLog("[font] source: " + fontDir)
 	appendLog("[font] target game directory: " + gameRoot)
 	appendLog("[font] selected: " + fontName)
 	setProgress(10)
-	if err := copyDirContents(fontDir, gameRoot, 10, 85); err != nil {
+	if err := copyDirContentsWithManifest(man, backupRoot, fontDir, gameRoot, 10, 85); err != nil {
 		return err
 	}
 	appendLog("[font] Font_change files installed")
@@ -691,36 +710,55 @@ func runRestoreDefaultFont() error {
 	if err != nil {
 		return err
 	}
-	fontDir, err := findFontChangeDir(root)
-	if err != nil {
-		return err
-	}
 	gameExe, err := resolveGameExe(root)
 	if err != nil {
 		return err
 	}
 	gameRoot := filepath.Dir(gameExe)
-	files, err := relativeFiles(fontDir)
+	backupRoot := filepath.Join(root, fontBackupDirName)
+	man, err := readFontManifest(backupRoot)
 	if err != nil {
 		return err
 	}
-	if len(files) == 0 {
-		return fmt.Errorf("Font_change 目录内没有可恢复的文件: %s", fontDir)
+	if !strings.EqualFold(clean(man.GameRoot), clean(gameRoot)) {
+		return fmt.Errorf("font backup belongs to a different game directory: %s", man.GameRoot)
 	}
 
 	appendLog("[font] restore target: " + gameRoot)
 	setProgress(10)
 	removed := 0
-	for i, rel := range files {
-		dst := filepath.Join(gameRoot, rel)
-		if exists(dst) {
-			if err := os.Remove(dst); err != nil {
-				return fmt.Errorf("删除字体文件失败 %s: %w", dst, err)
+	var restoreErrs []string
+	for i, entry := range man.Files {
+		if entry.Existed {
+			if entry.Backup == "" || !exists(entry.Backup) {
+				msg := "missing font backup: " + entry.Target
+				restoreErrs = append(restoreErrs, msg)
+				appendLog("[font] " + msg)
+			} else if err := copyFile(entry.Backup, entry.Target); err != nil {
+				restoreErrs = append(restoreErrs, err.Error())
+				appendLog("[font] " + err.Error())
+			} else {
+				restoreFontFileMetadata(entry)
+				appendLog("[font] restored: " + entry.Rel)
 			}
-			removed++
-			removeEmptyParents(filepath.Dir(dst), gameRoot)
+		} else if exists(entry.Target) {
+			if err := os.Remove(entry.Target); err != nil {
+				restoreErrs = append(restoreErrs, err.Error())
+				appendLog("[font] " + err.Error())
+			} else {
+				removed++
+				removeEmptyParents(filepath.Dir(entry.Target), gameRoot)
+				appendLog("[font] removed: " + entry.Rel)
+			}
 		}
-		setProgress(10 + i*85/max(1, len(files)))
+		setProgress(10 + i*85/max(1, len(man.Files)))
+	}
+	if len(restoreErrs) > 0 {
+		appendLog("[font] backup kept because restore had errors")
+		return fmt.Errorf("font restore incomplete; kept backup directory: %s", backupRoot)
+	}
+	if err := os.RemoveAll(backupRoot); err != nil {
+		return err
 	}
 	appendLog(fmt.Sprintf("[font] removed %d matching files from game directory", removed))
 	return nil
@@ -1185,6 +1223,131 @@ func relativeFiles(root string) ([]string, error) {
 	}
 	sort.Strings(files)
 	return files, nil
+}
+
+func readFontManifest(root string) (*fontManifest, error) {
+	path := filepath.Join(root, "manifest.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("font backup manifest was not found: %s", path)
+	}
+	var m fontManifest
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+func loadFontManifest(root, gameRoot string) *fontManifest {
+	if m, err := readFontManifest(root); err == nil {
+		if strings.EqualFold(clean(m.GameRoot), clean(gameRoot)) {
+			return m
+		}
+	}
+	return &fontManifest{CreatedAt: time.Now().Format(time.RFC3339), GameRoot: gameRoot}
+}
+
+func saveFontManifest(m *fontManifest, root string) error {
+	data, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(root, 0755); err != nil {
+		return err
+	}
+	path := filepath.Join(root, "manifest.json")
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, data, 0644); err != nil {
+		return err
+	}
+	return os.Rename(tmp, path)
+}
+
+func copyDirContentsWithManifest(man *fontManifest, backupRoot, srcRoot, dstRoot string, progressStart, progressSpan int) error {
+	files, err := relativeFiles(srcRoot)
+	if err != nil {
+		return err
+	}
+	if len(files) == 0 {
+		return os.MkdirAll(dstRoot, 0755)
+	}
+	for i, rel := range files {
+		src := filepath.Join(srcRoot, rel)
+		dst := filepath.Join(dstRoot, rel)
+		if err := copyWithFontBackup(man, backupRoot, dstRoot, src, dst); err != nil {
+			return err
+		}
+		if info, err := os.Stat(src); err == nil {
+			_ = os.Chmod(dst, info.Mode().Perm())
+			_ = os.Chtimes(dst, info.ModTime(), info.ModTime())
+		}
+		setProgress(progressStart + i*progressSpan/max(1, len(files)))
+	}
+	appendLog(fmt.Sprintf("[copy] %d files copied", len(files)))
+	return nil
+}
+
+func copyWithFontBackup(man *fontManifest, backupRoot, gameRoot, src, dst string) error {
+	if !fontManifestHasFile(man, dst) {
+		rel, err := filepath.Rel(gameRoot, dst)
+		if err != nil {
+			return err
+		}
+		entry := fontFileEntry{Target: dst, Rel: rel, Existed: exists(dst)}
+		if entry.Existed {
+			info, err := os.Stat(dst)
+			if err != nil {
+				return err
+			}
+			entry.Mode = uint32(info.Mode().Perm())
+			entry.ModTime = info.ModTime().Format(time.RFC3339Nano)
+			entry.Backup = filepath.Join(backupRoot, "files", rel)
+			if err := copyFile(dst, entry.Backup); err != nil {
+				return err
+			}
+			restoreFontBackupMetadata(entry)
+		}
+		man.Files = append(man.Files, entry)
+		if err := saveFontManifest(man, backupRoot); err != nil {
+			return err
+		}
+	}
+	return copyFile(src, dst)
+}
+
+func fontManifestHasFile(man *fontManifest, target string) bool {
+	target = clean(target)
+	for _, entry := range man.Files {
+		if strings.EqualFold(clean(entry.Target), target) {
+			return true
+		}
+	}
+	return false
+}
+
+func restoreFontFileMetadata(entry fontFileEntry) {
+	if entry.Mode != 0 {
+		_ = os.Chmod(entry.Target, os.FileMode(entry.Mode))
+	}
+	if entry.ModTime != "" {
+		if t, err := time.Parse(time.RFC3339Nano, entry.ModTime); err == nil {
+			_ = os.Chtimes(entry.Target, t, t)
+		}
+	}
+}
+
+func restoreFontBackupMetadata(entry fontFileEntry) {
+	if entry.Backup == "" {
+		return
+	}
+	if entry.Mode != 0 {
+		_ = os.Chmod(entry.Backup, os.FileMode(entry.Mode))
+	}
+	if entry.ModTime != "" {
+		if t, err := time.Parse(time.RFC3339Nano, entry.ModTime); err == nil {
+			_ = os.Chtimes(entry.Backup, t, t)
+		}
+	}
 }
 
 func hasAnyRelativeFile(root string, rels []string) bool {
