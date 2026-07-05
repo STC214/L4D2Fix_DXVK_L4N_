@@ -18,6 +18,8 @@
 VC_redist*.exe
 tools/Everything/
 L4N_Go_Win32_Portable/
+dxvk其他版本/
+Font_change/fonts/
 L4N_单文件便携版/
 
 # Patch/resource packages kept out of source control.

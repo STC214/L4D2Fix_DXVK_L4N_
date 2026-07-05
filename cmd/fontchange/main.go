@@ -36,6 +36,7 @@ var (
 	advapi32 = syscall.NewLazyDLL("advapi32.dll")
 	comdlg32 = syscall.NewLazyDLL("comdlg32.dll")
 	ole32    = syscall.NewLazyDLL("ole32.dll")
+	dwmapi   = syscall.NewLazyDLL("dwmapi.dll")
 
 	procCreateWindowExW  = user32.NewProc("CreateWindowExW")
 	procDefWindowProcW   = user32.NewProc("DefWindowProcW")
@@ -83,6 +84,8 @@ var (
 	procRegQueryValueExW = advapi32.NewProc("RegQueryValueExW")
 	procRegSetValueExW   = advapi32.NewProc("RegSetValueExW")
 	procRegCloseKey      = advapi32.NewProc("RegCloseKey")
+
+	procDwmSetWindowAttribute = dwmapi.NewProc("DwmSetWindowAttribute")
 
 	hInstance    uintptr
 	hWnd         uintptr
@@ -188,6 +191,9 @@ const (
 	dtVCenter    = 0x00000004
 	dtSingleLine = 0x00000020
 	odsSelected  = 0x0001
+
+	dwmwaUseImmersiveDarkMode       = 20
+	dwmwaUseImmersiveDarkModeBefore = 19
 
 	hkeyCurrentUser         = 0x80000001
 	hkeyLocalMachine        = 0x80000002
@@ -347,6 +353,7 @@ func main() {
 	)
 	procSendMessageW.Call(hWnd, wmSetIcon, iconBig, iconBigHandle)
 	procSendMessageW.Call(hWnd, wmSetIcon, iconSmall, iconSmallHandle)
+	enableDarkTitleBar(hWnd)
 	procShowWindow.Call(hWnd, swShow)
 	procUpdateWindow.Call(hWnd)
 	go func() {
@@ -364,6 +371,25 @@ func main() {
 		}
 		procTranslateMessage.Call(uintptr(unsafe.Pointer(&m)))
 		procDispatchMessageW.Call(uintptr(unsafe.Pointer(&m)))
+	}
+}
+
+func enableDarkTitleBar(hwnd uintptr) {
+	enabled := int32(1)
+	size := unsafe.Sizeof(enabled)
+	ret, _, _ := procDwmSetWindowAttribute.Call(
+		hwnd,
+		dwmwaUseImmersiveDarkMode,
+		uintptr(unsafe.Pointer(&enabled)),
+		size,
+	)
+	if ret != 0 {
+		procDwmSetWindowAttribute.Call(
+			hwnd,
+			dwmwaUseImmersiveDarkModeBefore,
+			uintptr(unsafe.Pointer(&enabled)),
+			size,
+		)
 	}
 }
 
