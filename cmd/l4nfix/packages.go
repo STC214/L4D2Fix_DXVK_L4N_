@@ -11,12 +11,15 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"hash/crc32"
 	"io"
+	"l4nfix/internal/pathguard"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 const maxPackageBytes int64 = 2 << 30
@@ -133,7 +136,14 @@ func extractPackage(source, root string) error {
 			return err
 		}
 		defer z.Close()
+		if err := validateZIPHeaders(z); err != nil {
+			return err
+		}
 		for _, f := range z.File {
+			name, err := zipResourceName(f)
+			if err != nil {
+				return err
+			}
 			if f.Mode()&os.ModeSymlink != 0 || (!f.FileInfo().IsDir() && !f.Mode().IsRegular()) {
 				return fmt.Errorf("压缩包含链接或特殊文件: %s", f.Name)
 			}
@@ -144,7 +154,7 @@ func extractPackage(source, root string) error {
 			if err != nil {
 				return err
 			}
-			err = b.write(root, f.Name, int64(f.UncompressedSize64), f.FileInfo().IsDir(), r)
+			err = b.write(root, name, int64(f.UncompressedSize64), f.FileInfo().IsDir(), r)
 			closeErr := r.Close()
 			if err != nil {
 				return err
@@ -196,6 +206,36 @@ func extractPackage(source, root string) error {
 	}
 }
 
+// Info-ZIP Unicode Path (0x7075) binds the UTF-8 path to the raw name by CRC32.
+// Older Chinese ZIPs may otherwise store GBK names with the UTF-8 flag unset.
+func zipResourceName(f *zip.File) (string, error) {
+	for extra := f.Extra; len(extra) >= 4; {
+		id, size := binary.LittleEndian.Uint16(extra), int(binary.LittleEndian.Uint16(extra[2:]))
+		if size > len(extra)-4 {
+			return "", fmt.Errorf("ZIP 路径扩展损坏: %q", f.Name)
+		}
+		field := extra[4 : 4+size]
+		extra = extra[4+size:]
+		if id == 0x7075 && len(field) >= 5 && field[0] == 1 && binary.LittleEndian.Uint32(field[1:]) == crc32.ChecksumIEEE([]byte(f.Name)) {
+			if !utf8.Valid(field[5:]) {
+				return "", fmt.Errorf("ZIP Unicode 路径无效")
+			}
+			return string(field[5:]), nil
+		}
+	}
+	if utf8.ValidString(f.Name) {
+		return f.Name, nil
+	}
+	if f.Flags&0x800 != 0 {
+		return "", fmt.Errorf("ZIP UTF-8 文件名无效")
+	}
+	name, err := decodeLaunchText([]byte(f.Name))
+	if err != nil {
+		return "", fmt.Errorf("ZIP 文件名解码失败: %w", err)
+	}
+	return name, nil
+}
+
 func packageInventory(root string) ([]string, error) {
 	var files []string
 	var total int64
@@ -203,7 +243,11 @@ func packageInventory(root string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		if d.Type()&os.ModeSymlink != 0 {
+		entryInfo, infoErr := d.Info()
+		if infoErr != nil {
+			return infoErr
+		}
+		if pathguard.Linked(entryInfo) {
 			return fmt.Errorf("资源包含链接: %s", p)
 		}
 		if d.IsDir() {
@@ -426,7 +470,7 @@ func preparePackage(source, resRoot, kind string) (info packageSource, err error
 	if err != nil {
 		return info, err
 	}
-	if st.Mode()&os.ModeSymlink != 0 {
+	if pathguard.Linked(st) {
 		return info, fmt.Errorf("资源源路径是链接")
 	}
 	resRoot, err = filepath.Abs(resRoot)
@@ -434,7 +478,7 @@ func preparePackage(source, resRoot, kind string) (info packageSource, err error
 		return info, err
 	}
 	cache := filepath.Join(resRoot, ".package_tmp")
-	if st, e := os.Lstat(cache); e == nil && (!st.IsDir() || st.Mode()&os.ModeSymlink != 0) {
+	if st, e := os.Lstat(cache); e == nil && (!st.IsDir() || pathguard.Linked(st)) {
 		return info, fmt.Errorf("临时资源目录必须是普通目录")
 	} else if e != nil && !os.IsNotExist(e) {
 		return info, e

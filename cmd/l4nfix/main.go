@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"l4nfix/internal/pathguard"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -32,7 +33,7 @@ const (
 	displaySettingsBackupDirName = "display_settings_backup"
 	videoSettingsRelativePath    = "left4dead2/cfg/video.txt"
 	configRelativePath           = "left4dead2/neko/config.vdf"
-	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理，程序会安装 L4N 基础文件和所选 DXVK\r\n4. 需要保留 MOD 时，可先备份MOD，再恢复MOD\r\n5. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n6. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\n版本来源\r\nDXVK 放在 resources/dxvk，L4N 放在 resources/l4n。目录与压缩包、新旧版本统一存放。\r\n支持 ZIP/TAR/TAR.GZ/TGZ；选择后解压到 resources/.package_tmp。\r\n自动剥离外层目录、识别32位DLL并整理路径。\r\n新增后重启刷新；缺失或多组关键文件会报错。\r\nL4N 内文件名同时含启动/指令的 TXT 自动提取 Steam 参数。\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
+	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理，程序会安装 L4N 基础文件和所选 DXVK\r\n4. 需要保留 MOD 时，可先备份MOD，再恢复MOD\r\n5. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n6. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n7. 更换dxvk和l4n版本需先清理再一键部署\r\n\r\n版本来源\r\nDXVK 放在 resources/dxvk，L4N 放在 resources/l4n。目录与压缩包、新旧版本统一存放。\r\n支持 ZIP/TAR/TAR.GZ/TGZ；选择后解压到 resources/.package_tmp。\r\n自动剥离外层目录、识别32位DLL并整理路径。\r\n新增后重启刷新；缺失或多组关键文件会报错。\r\nL4N 内文件名同时含启动/指令的 TXT 自动提取 Steam 参数。\r\n\r\nSteam 启动项（内置回退）\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
 )
 
 var (
@@ -82,32 +83,34 @@ var (
 
 	procDwmSetWindowAttribute = dwmapi.NewProc("DwmSetWindowAttribute")
 
-	hInstance     uintptr
-	hWnd          uintptr
-	btnRun        uintptr
-	comboDxvk     uintptr
-	comboL4n      uintptr
-	btnBackupMod  uintptr
-	btnRestoreMod uintptr
-	btnClean      uintptr
-	btnClose      uintptr
-	progress      uintptr
-	statusCtl     uintptr
-	logCtl        uintptr
-	blackBr       uintptr
-	textFont      uintptr
-	titleFont     uintptr
-	buttonFont    uintptr
-	guideFont     uintptr
-	busyMu        sync.Mutex
-	busy          bool
-	progressMu    sync.Mutex
-	lastProgress  int
-	uiMu          sync.Mutex
-	uiNext        uintptr
-	uiWork        = map[uintptr]func(){}
-	dxvkOptions   []dxvkOption
-	l4nOptions    []dxvkOption
+	hInstance           uintptr
+	hWnd                uintptr
+	btnRun              uintptr
+	comboDxvk           uintptr
+	comboL4n            uintptr
+	btnBackupMod        uintptr
+	btnRestoreMod       uintptr
+	btnClean            uintptr
+	btnClose            uintptr
+	progress            uintptr
+	statusCtl           uintptr
+	installedVersionCtl uintptr
+	btnRefreshVersion   uintptr
+	logCtl              uintptr
+	blackBr             uintptr
+	textFont            uintptr
+	titleFont           uintptr
+	buttonFont          uintptr
+	guideFont           uintptr
+	busyMu              sync.Mutex
+	busy                bool
+	progressMu          sync.Mutex
+	lastProgress        int
+	uiMu                sync.Mutex
+	uiNext              uintptr
+	uiWork              = map[uintptr]func(){}
+	dxvkOptions         []dxvkOption
+	l4nOptions          []dxvkOption
 )
 
 const (
@@ -145,11 +148,12 @@ const (
 
 	cbs = wsCaption | wsSysMenu | wsMinimizeBox
 
-	idRun        = 1001
-	idClean      = 1002
-	idClose      = 1003
-	idBackupMod  = 1005
-	idRestoreMod = 1006
+	idRun            = 1001
+	idClean          = 1002
+	idClose          = 1003
+	idBackupMod      = 1005
+	idRestoreMod     = 1006
+	idRefreshVersion = 1007
 
 	cbAddString   = 0x0143
 	cbGetCurSel   = 0x0147
@@ -252,6 +256,7 @@ type fileEntry struct {
 	Target       string `json:"target"`
 	Source       string `json:"source,omitempty"`
 	SourceSHA256 string `json:"sourceSHA256,omitempty"`
+	BackupSHA256 string `json:"backupSHA256,omitempty"`
 	Rel          string `json:"relative"`
 	Existed      bool   `json:"existed"`
 	Backup       string `json:"backup,omitempty"`
@@ -260,9 +265,10 @@ type fileEntry struct {
 }
 
 type steamEntry struct {
-	Target  string `json:"target"`
-	Existed bool   `json:"existed"`
-	Backup  string `json:"backup"`
+	Target       string `json:"target"`
+	Existed      bool   `json:"existed"`
+	Backup       string `json:"backup"`
+	BackupSHA256 string `json:"backupSHA256,omitempty"`
 }
 
 type dxvkOption struct {
@@ -321,6 +327,7 @@ func main() {
 		960, 560,
 		0, 0, hInstance, 0,
 	)
+	refreshInstalledVersions()
 	procSendMessageW.Call(hWnd, wmSetIcon, iconBig, iconBigHandle)
 	procSendMessageW.Call(hWnd, wmSetIcon, iconSmall, iconSmallHandle)
 	enableDarkTitleBar(hWnd)
@@ -370,6 +377,8 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 		code := uint16(wParam >> 16)
 		if code == bnClicked {
 			switch id {
+			case idRefreshVersion:
+				refreshInstalledVersions()
 			case idRun:
 				go guarded("一键处理", runInstall)
 			case idBackupMod:
@@ -407,8 +416,12 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 func createControls(hwnd uintptr) {
 	title := label(hwnd, "DXVK + L4N 一键处理工具", 22, 28, 300, 26)
 	procSendMessageW.Call(title, wmSetFont, titleFont, 1)
-	desc := label(hwnd, "自动识别游戏目录，安装运行库，备份原文件，\r\n并用所选补丁目录覆盖游戏源文件。", 22, 62, 594, 48)
+	desc := label(hwnd, "自动识别游戏目录，备份原文件并安装所选补丁。", 22, 62, 594, 20)
 	procSendMessageW.Call(desc, wmSetFont, textFont, 1)
+	installedVersionCtl = label(hwnd, "当前游戏：正在检测版本…", 22, 86, 594, 22)
+	procSendMessageW.Call(installedVersionCtl, wmSetFont, textFont, 1)
+	btnRefreshVersion = button(hwnd, "刷新版本", idRefreshVersion, 510, 24, 106, 30)
+	procSendMessageW.Call(btnRefreshVersion, wmSetFont, buttonFont, 1)
 
 	actionBox := groupBox(hwnd, "处理选项", 16, 112, 606, 180)
 	procSendMessageW.Call(actionBox, wmSetFont, textFont, 1)
@@ -441,7 +454,7 @@ func createControls(hwnd uintptr) {
 
 	guideTitle := label(hwnd, "使用说明", 630, 22, 280, 24)
 	procSendMessageW.Call(guideTitle, wmSetFont, titleFont, 1)
-	guideCtl := create("EDIT", usageInstructions, wsChild|wsVisible|wsBorder|esMultiline|esReadOnly, 630, 50, 300, 466, hwnd, 0)
+	guideCtl := create("EDIT", usageInstructions, wsChild|wsVisible|wsBorder|esMultiline|esReadOnly|wsVScroll|esAutovScroll, 630, 50, 300, 466, hwnd, 0)
 	procSendMessageW.Call(guideCtl, wmSetFont, guideFont, 1)
 
 	loadDxvkOptionsIntoCombo()
@@ -479,7 +492,7 @@ func loadAppIcon(size int32) uintptr {
 	for id := uint16(1); id <= 32; id++ {
 		icon, _, _ := procLoadImageW.Call(
 			hInstance,
-			uintptr(unsafe.Pointer(uint16PtrFromID(id))),
+			uintptr(id),
 			imageIcon,
 			uintptr(size),
 			uintptr(size),
@@ -540,6 +553,8 @@ func drawButton(dis *drawItemStruct) {
 
 func buttonText(id uint32) string {
 	switch id {
+	case idRefreshVersion:
+		return "刷新版本"
 	case idRun:
 		return "一键处理"
 	case idBackupMod:
@@ -624,6 +639,7 @@ func guarded(name string, fn func() error) {
 		return
 	}
 	busy = true
+	versionRefreshID.Add(1)
 	progressMu.Lock()
 	lastProgress = -1
 	progressMu.Unlock()
@@ -643,6 +659,7 @@ func guarded(name string, fn func() error) {
 		setStatus("完成")
 	}
 	setBusy(false)
+	refreshInstalledVersions()
 	busyMu.Lock()
 	busy = false
 	busyMu.Unlock()
@@ -661,6 +678,7 @@ func setBusy(v bool) {
 		procEnableWindow.Call(btnRestoreMod, en)
 		procEnableWindow.Call(btnClean, en)
 		procEnableWindow.Call(btnClose, en)
+		procEnableWindow.Call(btnRefreshVersion, en)
 	})
 }
 
@@ -709,38 +727,11 @@ func runBackupMods() error {
 	if err != nil {
 		return err
 	}
-	resRoot := resourceRoot(root)
 	gameExe, err := resolveGameExe(root)
 	if err != nil {
 		return err
 	}
-	addonsDir := filepath.Join(filepath.Dir(gameExe), "left4dead2", "addons")
-	if !exists(addonsDir) {
-		return fmt.Errorf("未找到 addons 目录: %s", addonsDir)
-	}
-	backupDir := filepath.Join(resRoot, modBackupDirName)
-	tmpBackupDir := backupDir + ".tmp"
-	appendLog("[mod] source addons: " + addonsDir)
-	appendLog("[mod] backup target: " + backupDir)
-	setProgress(10)
-	if err := os.RemoveAll(tmpBackupDir); err != nil {
-		return err
-	}
-	if err := copyDirContents(addonsDir, tmpBackupDir, 10, 85); err != nil {
-		_ = os.RemoveAll(tmpBackupDir)
-		return err
-	}
-	if err := replaceDir(tmpBackupDir, backupDir); err != nil {
-		_ = os.RemoveAll(tmpBackupDir)
-		return err
-	}
-	setProgress(88)
-	if err := backupDisplaySettings(filepath.Dir(gameExe), resRoot); err != nil {
-		appendLog("[display] " + err.Error())
-	}
-	setProgress(95)
-	appendLog("[mod] addons backup complete")
-	return nil
+	return backupModsAt(filepath.Dir(gameExe), resourceRoot(root))
 }
 
 func runRestoreMods() error {
@@ -748,30 +739,11 @@ func runRestoreMods() error {
 	if err != nil {
 		return err
 	}
-	resRoot := resourceRoot(root)
-	backupDir := filepath.Join(resRoot, modBackupDirName)
-	if !exists(backupDir) {
-		return fmt.Errorf("未找到 MOD 备份目录: %s", backupDir)
-	}
 	gameExe, err := resolveGameExe(root)
 	if err != nil {
 		return err
 	}
-	addonsDir := filepath.Join(filepath.Dir(gameExe), "left4dead2", "addons")
-	appendLog("[mod] backup source: " + backupDir)
-	appendLog("[mod] restore target addons: " + addonsDir)
-	appendLog("[mod] existing files with the same name will be overwritten")
-	setProgress(10)
-	if err := copyDirContents(backupDir, addonsDir, 10, 85); err != nil {
-		return err
-	}
-	setProgress(88)
-	if err := restoreDisplaySettings(filepath.Dir(gameExe), resRoot); err != nil {
-		appendLog("[display] " + err.Error())
-	}
-	setProgress(95)
-	appendLog("[mod] addons restore complete")
-	return nil
+	return restoreModsAt(filepath.Dir(gameExe), resourceRoot(root))
 }
 
 func runToggleFont() error {
@@ -785,6 +757,9 @@ func runToggleFont() error {
 	}
 	gameRoot := filepath.Dir(gameExe)
 	configPath := filepath.Join(gameRoot, filepath.FromSlash(configRelativePath))
+	if err := pathguard.Within(gameRoot, configPath); err != nil {
+		return err
+	}
 	if !exists(configPath) {
 		return errors.New("没有进行一键处理，一键处理后再次点击本按钮")
 	}
@@ -845,11 +820,6 @@ func runInstallWithDxvk(opt dxvkOption) error {
 	}
 	appendLog("[steam] launch options: " + launchOptions)
 
-	setProgress(5)
-	if err := installRuntimes(runtimeDir); err != nil {
-		appendLog("[runtime] " + err.Error())
-	}
-
 	setProgress(25)
 	gameExe, err := resolveGameExe(root)
 	if err != nil {
@@ -859,7 +829,22 @@ func runInstallWithDxvk(opt dxvkOption) error {
 	appendLog("[steam] game: " + gameExe)
 
 	backupRoot := filepath.Join(root, ".l4n_auto_backup")
-	man := loadManifest(backupRoot, gameRoot)
+	man, err := checkedInstallManifest(backupRoot, gameRoot)
+	if err != nil {
+		return err
+	}
+	archivedConfig, err := archiveL4nConfigIfChanged(gameRoot, resRoot, filepath.Join(baseSource.NormalizedDir, filepath.FromSlash(configRelativePath)), man)
+	if err != nil {
+		return fmt.Errorf("配置留档失败，已停止覆盖: %w", err)
+	}
+	if archivedConfig != "" {
+		appendLog("[config] 已保留现有配置: " + archivedConfig)
+	} else {
+		appendLog("[config] 配置未变化或尚未安装，无需留档")
+	}
+	if err := installRuntimes(runtimeDir); err != nil {
+		appendLog("[runtime] " + err.Error())
+	}
 	man.LaunchOptions = launchOptions
 	man.LaunchInstruction = &launchInstruction
 	man.PackageSources = append(man.PackageSources, baseSource, dxvkSource)
@@ -875,7 +860,7 @@ func runInstallWithDxvk(opt dxvkOption) error {
 
 	setProgress(78)
 	if err := setSteamLaunchOptions(man, backupRoot, launchOptions); err != nil {
-		appendLog("[steam] " + err.Error())
+		return fmt.Errorf("game files deployed and rollback retained; Steam launch options incomplete: %w", err)
 	}
 
 	setProgress(92)
@@ -903,6 +888,21 @@ func restoreFromBackup(backupRoot string) error {
 	var man manifest
 	if err := json.Unmarshal(data, &man); err != nil {
 		return err
+	}
+	if err := validateManifestBackupPaths(&man, backupRoot); err != nil {
+		return err
+	}
+	if err := validateManifestTargets(&man); err != nil {
+		return err
+	}
+	// Validate every original backup before any restore/removal takes place.
+	if err := validateOriginalBackups(&man); err != nil {
+		return err
+	}
+	if archived, err := archiveL4nConfigIfChanged(man.GameRoot, resourceRoot(filepath.Dir(backupRoot)), "", &man); err != nil {
+		return fmt.Errorf("清理前配置留档失败，已停止还原: %w", err)
+	} else if archived != "" {
+		appendLog("[config] 清理前保留现有配置: " + archived)
 	}
 	var restoreErrs []string
 	setProgress(15)
@@ -990,6 +990,24 @@ func installRuntimes(root string) error {
 
 func copyPatchFiles(man *manifest, backupRoot, gameRoot string, files []patchFile) error {
 	appendLog("[copy] target game directory: " + gameRoot)
+	if err := validateManifestBackupPaths(man, backupRoot); err != nil {
+		return err
+	}
+	for _, f := range files {
+		rel, err := packageRelative(f.Rel)
+		if err != nil || rel == "" {
+			return fmt.Errorf("补丁目标路径无效: %s", f.Rel)
+		}
+		if err := pathguard.Within(gameRoot, filepath.Join(gameRoot, rel)); err != nil {
+			return err
+		}
+	}
+	if err := validateManifestTargets(man); err != nil {
+		return err
+	}
+	if err := validateOriginalBackups(man); err != nil {
+		return err
+	}
 	sort.Slice(files, func(i, j int) bool {
 		return strings.ToLower(files[i].Rel) < strings.ToLower(files[j].Rel)
 	})
@@ -1105,6 +1123,25 @@ func isDxvkTargetRel(rel string) bool {
 }
 
 func copyWithBackup(man *manifest, backupRoot, gameRoot, src, dst string) error {
+	if err := validateManifestBackupPaths(man, backupRoot); err != nil {
+		return err
+	}
+	if err := pathguard.Within(gameRoot, dst); err != nil {
+		return err
+	}
+	if err := validateManifestTargets(man); err != nil {
+		return err
+	}
+	if !strings.EqualFold(clean(man.GameRoot), clean(gameRoot)) {
+		return fmt.Errorf("备份清单属于其他游戏目录")
+	}
+	for _, e := range man.Files {
+		if strings.EqualFold(clean(e.Target), clean(dst)) {
+			if err := validateOriginalBackups(&manifest{Files: []fileEntry{e}}); err != nil {
+				return err
+			}
+		}
+	}
 	sourceHash, err := fileHash(src)
 	if err != nil {
 		return err
@@ -1121,6 +1158,10 @@ func copyWithBackup(man *manifest, backupRoot, gameRoot, src, dst string) error 
 			entry.ModTime = info.ModTime().Format(time.RFC3339Nano)
 			entry.Backup = filepath.Join(backupRoot, "files", rel)
 			if err := copyFile(dst, entry.Backup); err != nil {
+				return err
+			}
+			entry.BackupSHA256, err = fileHash(entry.Backup)
+			if err != nil {
 				return err
 			}
 			restoreBackupMetadata(entry)
@@ -1173,32 +1214,41 @@ func setSteamLaunchOptions(man *manifest, backupRoot, options string) error {
 
 func setSteamLaunchOptionsForRoots(man *manifest, backupRoot, options string, roots []string) error {
 	updated := 0
+	var failures []string
 	for _, root := range roots {
 		userdata := filepath.Join(root, "userdata")
 		if !exists(userdata) {
 			continue
 		}
-		filepath.WalkDir(userdata, func(path string, d os.DirEntry, err error) error {
-			if err != nil || d.IsDir() || !strings.EqualFold(d.Name(), "localconfig.vdf") {
+		walkErr := filepath.WalkDir(userdata, func(path string, d os.DirEntry, err error) error {
+			if err != nil {
+				failures = append(failures, path+": "+err.Error())
+				return nil
+			}
+			if d.IsDir() || !strings.EqualFold(d.Name(), "localconfig.vdf") {
 				return nil
 			}
 			textBytes, err := os.ReadFile(path)
 			if err != nil {
+				failures = append(failures, path+": "+err.Error())
 				appendLog("[steam] read failed: " + path)
 				return nil
 			}
 			old := string(textBytes)
 			newText, err := setAppLaunchOptionsInText(old, options)
 			if err != nil {
+				failures = append(failures, path+": "+err.Error())
 				appendLog("[steam] " + err.Error())
 				return nil
 			}
 			if newText != old {
 				if err := backupSteamConfig(man, backupRoot, path); err != nil {
+					failures = append(failures, path+": "+err.Error())
 					appendLog("[steam] backup failed: " + err.Error())
 					return nil
 				}
-				if err := os.WriteFile(path, []byte(newText), 0644); err != nil {
+				if err := writeFileAtomic(path, []byte(newText), 0644); err != nil {
+					failures = append(failures, path+": "+err.Error())
 					appendLog("[steam] write failed: " + err.Error())
 					return nil
 				}
@@ -1209,6 +1259,12 @@ func setSteamLaunchOptionsForRoots(man *manifest, backupRoot, options string, ro
 			updated++
 			return nil
 		})
+		if walkErr != nil {
+			failures = append(failures, walkErr.Error())
+		}
+	}
+	if len(failures) > 0 {
+		return fmt.Errorf("Steam launch options updated in %d configs; errors: %s", updated, strings.Join(failures, "; "))
 	}
 	if updated == 0 {
 		return fmt.Errorf("没有找到可写入的 Steam 配置；请手动设置启动项: %s", options)
@@ -1227,39 +1283,12 @@ func backupSteamConfig(man *manifest, backupRoot, path string) error {
 	if err := copyFile(path, backup); err != nil {
 		return err
 	}
-	man.SteamConfigs = append(man.SteamConfigs, steamEntry{Target: path, Existed: true, Backup: backup})
+	hash, err := fileHash(backup)
+	if err != nil {
+		return err
+	}
+	man.SteamConfigs = append(man.SteamConfigs, steamEntry{Target: path, Existed: true, Backup: backup, BackupSHA256: hash})
 	return saveManifest(man, backupRoot)
-}
-
-func setAppLaunchOptionsInText(text, options string) (string, error) {
-	escaped := strings.ReplaceAll(strings.ReplaceAll(options, `\`, `\\`), `"`, `\"`)
-	if loc := regexp.MustCompile(`"550"\s*\{`).FindStringIndex(text); loc != nil {
-		open := strings.Index(text[loc[0]:], "{") + loc[0]
-		close := matchingBrace(text, open)
-		if close < 0 {
-			return "", errors.New("localconfig.vdf 中 AppID 550 块无效")
-		}
-		block := text[open+1 : close]
-		re := regexp.MustCompile(`(?m)^(\s*)"LaunchOptions"\s*"(?:\\.|[^"\\])*"`)
-		if re.MatchString(block) {
-			block = re.ReplaceAllStringFunc(block, func(old string) string {
-				return re.FindStringSubmatch(old)[1] + `"LaunchOptions"` + "\t" + `"` + escaped + `"`
-			})
-		} else {
-			block = strings.TrimRight(block, "\r\n\t ") + "\r\n\t\t\t\t\t\t\"LaunchOptions\"\t\"" + escaped + "\"\r\n"
-		}
-		return text[:open+1] + block + text[close:], nil
-	}
-	if loc := regexp.MustCompile(`"apps"\s*\{`).FindStringIndex(text); loc != nil {
-		open := strings.Index(text[loc[0]:], "{") + loc[0]
-		close := matchingBrace(text, open)
-		if close < 0 {
-			return "", errors.New("localconfig.vdf 中 apps 块无效")
-		}
-		insert := "\r\n\t\t\t\t\t\"550\"\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\t\"LaunchOptions\"\t\"" + escaped + "\"\r\n\t\t\t\t\t}\r\n"
-		return text[:close] + insert + text[close:], nil
-	}
-	return "", errors.New("localconfig.vdf 中未找到 apps 块")
 }
 
 func matchingBrace(s string, open int) int {
@@ -1555,6 +1584,96 @@ func loadManifest(root, gameRoot string) *manifest {
 	return &manifest{CreatedAt: time.Now().Format(time.RFC3339), GameRoot: gameRoot}
 }
 
+func checkedInstallManifest(root, gameRoot string) (*manifest, error) {
+	data, err := os.ReadFile(filepath.Join(root, "manifest.json"))
+	if os.IsNotExist(err) {
+		entries, e := os.ReadDir(root)
+		if e == nil && len(entries) != 0 {
+			return nil, fmt.Errorf("备份目录非空但清单缺失，请先检查原备份")
+		}
+		if e != nil && !os.IsNotExist(e) {
+			return nil, e
+		}
+		return &manifest{CreatedAt: time.Now().Format(time.RFC3339), GameRoot: gameRoot}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var m manifest
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, fmt.Errorf("备份清单损坏，请先保留并检查原备份: %w", err)
+	}
+	if !strings.EqualFold(clean(m.GameRoot), clean(gameRoot)) {
+		return nil, fmt.Errorf("现有备份属于另一游戏目录，请先还原原目录")
+	}
+	if err := validateManifestBackupPaths(&m, root); err != nil {
+		return nil, err
+	}
+	if err := validateManifestTargets(&m); err != nil {
+		return nil, err
+	}
+	if err := validateOriginalBackups(&m); err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+func validateOriginalBackups(m *manifest) error {
+	for _, e := range m.Files {
+		if !e.Existed {
+			continue
+		}
+		if e.Backup == "" {
+			return fmt.Errorf("原文件备份路径缺失: %s", e.Target)
+		}
+		hash, err := fileHash(e.Backup)
+		if err != nil {
+			return fmt.Errorf("原文件备份缺失或不可读: %s: %w", e.Backup, err)
+		}
+		if e.BackupSHA256 != "" && !strings.EqualFold(e.BackupSHA256, hash) {
+			return fmt.Errorf("原文件备份校验失败: %s", e.Backup)
+		}
+	}
+	for _, e := range m.SteamConfigs {
+		if e.Existed {
+			hash, err := fileHash(e.Backup)
+			if err != nil {
+				return fmt.Errorf("Steam 原配置备份缺失: %w", err)
+			}
+			if e.BackupSHA256 != "" && !strings.EqualFold(hash, e.BackupSHA256) {
+				return fmt.Errorf("Steam 原配置备份校验失败: %s", e.Backup)
+			}
+		}
+	}
+	return nil
+}
+
+func validateManifestTargets(m *manifest) error {
+	if !filepath.IsAbs(m.GameRoot) {
+		return fmt.Errorf("备份清单缺少游戏目录")
+	}
+	seen := map[string]bool{}
+	for _, e := range m.Files {
+		if err := pathguard.Within(m.GameRoot, e.Target); err != nil {
+			return err
+		}
+		key := strings.ToLower(clean(e.Target))
+		if seen[key] {
+			return fmt.Errorf("duplicate manifest target: %s", e.Target)
+		}
+		seen[key] = true
+		rel, err := filepath.Rel(clean(m.GameRoot), clean(e.Target))
+		if err != nil {
+			return err
+		}
+		normalized, err := packageRelative(rel)
+		if err != nil || normalized == "" {
+			return fmt.Errorf("备份清单目标超出游戏目录: %s", e.Target)
+		}
+	}
+	return nil
+}
+
 func saveManifest(m *manifest, root string) error {
 	data, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
@@ -1580,38 +1699,73 @@ func copyFile(src, dst string) error {
 	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
 		return err
 	}
-	out, err := os.Create(dst)
+	out, err := os.CreateTemp(filepath.Dir(dst), ".copy-*.tmp")
 	if err != nil {
 		return err
 	}
+	tmp := out.Name()
+	defer os.Remove(tmp)
 	_, copyErr := io.Copy(out, in)
 	closeErr := out.Close()
 	if copyErr != nil {
 		return copyErr
 	}
-	return closeErr
+	if closeErr != nil {
+		return closeErr
+	}
+	if err := in.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmp, dst)
 }
 
 func copyDirContents(srcRoot, dstRoot string, progressStart, progressSpan int) error {
+	return copyDirContentsSkipping(srcRoot, dstRoot, progressStart, progressSpan, nil)
+}
+
+func copyDirContentsSkipping(srcRoot, dstRoot string, progressStart, progressSpan int, skip map[string]bool) error {
 	srcRoot = clean(srcRoot)
 	dstRoot = clean(dstRoot)
 	var files []string
+	var dirs []string
+	if info, err := os.Lstat(dstRoot); err == nil && pathguard.Linked(info) {
+		return fmt.Errorf("linked copy destination: %s", dstRoot)
+	}
 	if err := filepath.WalkDir(srcRoot, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
+		}
+		info, infoErr := d.Info()
+		if infoErr != nil {
+			return infoErr
+		}
+		if pathguard.Linked(info) {
+			return fmt.Errorf("linked copy source: %s", path)
 		}
 		rel, err := filepath.Rel(srcRoot, path)
 		if err != nil || rel == "." {
 			return err
 		}
+		if skip[rel] {
+			return nil
+		}
 		dst := filepath.Join(dstRoot, rel)
+		if err := pathguard.Within(dstRoot, dst); err != nil {
+			return err
+		}
 		if d.IsDir() {
-			return os.MkdirAll(dst, 0755)
+			dirs = append(dirs, dst)
+			return nil
 		}
 		files = append(files, path)
 		return nil
 	}); err != nil {
 		return err
+	}
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
 	}
 	sort.Strings(files)
 	if len(files) == 0 {
@@ -1637,24 +1791,41 @@ func copyDirContents(srcRoot, dstRoot string, progressStart, progressSpan int) e
 }
 
 func replaceDir(src, dst string) error {
+	if !filepath.IsAbs(src) || !filepath.IsAbs(dst) || strings.EqualFold(clean(src), clean(dst)) {
+		return fmt.Errorf("invalid directory replacement paths")
+	}
 	parent := filepath.Dir(dst)
 	if err := os.MkdirAll(parent, 0755); err != nil {
 		return err
 	}
-	old := dst + ".old"
-	_ = os.RemoveAll(old)
-	if exists(dst) {
+	old, err := os.MkdirTemp(parent, ".replace-old-")
+	if err != nil {
+		return err
+	}
+	if err := os.Remove(old); err != nil {
+		return err
+	}
+	hadOriginal := false
+	if _, err := os.Lstat(dst); err == nil {
 		if err := os.Rename(dst, old); err != nil {
 			return err
 		}
+		hadOriginal = true
+	} else if !os.IsNotExist(err) {
+		return err
 	}
 	if err := os.Rename(src, dst); err != nil {
-		if exists(old) {
-			_ = os.Rename(old, dst)
+		if hadOriginal {
+			if restoreErr := os.Rename(old, dst); restoreErr != nil {
+				return fmt.Errorf("replace failed: %v; original retained at %s; restore failed: %w", err, old, restoreErr)
+			}
 		}
 		return err
 	}
-	return os.RemoveAll(old)
+	if hadOriginal {
+		return os.RemoveAll(old)
+	}
+	return nil
 }
 
 func videoSettingsPath(gameRoot string) string {
@@ -1663,42 +1834,6 @@ func videoSettingsPath(gameRoot string) string {
 
 func displaySettingsBackupPath(resRoot string) string {
 	return filepath.Join(resRoot, displaySettingsBackupDirName, "video.txt")
-}
-
-func backupDisplaySettings(gameRoot, resRoot string) error {
-	src := videoSettingsPath(gameRoot)
-	if !exists(src) {
-		appendLog("[display] video settings not found; skipped: " + src)
-		return nil
-	}
-	dst := displaySettingsBackupPath(resRoot)
-	if err := copyFile(src, dst); err != nil {
-		return err
-	}
-	if info, err := os.Stat(src); err == nil {
-		_ = os.Chmod(dst, info.Mode().Perm())
-		_ = os.Chtimes(dst, info.ModTime(), info.ModTime())
-	}
-	appendLog("[display] backed up: " + src)
-	return nil
-}
-
-func restoreDisplaySettings(gameRoot, resRoot string) error {
-	src := displaySettingsBackupPath(resRoot)
-	if !exists(src) {
-		appendLog("[display] backup not found; skipped: " + src)
-		return nil
-	}
-	dst := videoSettingsPath(gameRoot)
-	if err := copyFile(src, dst); err != nil {
-		return err
-	}
-	if info, err := os.Stat(src); err == nil {
-		_ = os.Chmod(dst, info.Mode().Perm())
-		_ = os.Chtimes(dst, info.ModTime(), info.ModTime())
-	}
-	appendLog("[display] restored: " + dst)
-	return nil
 }
 
 func restoreFileMetadata(entry fileEntry) {
@@ -1768,7 +1903,7 @@ func toggleConfigFont(path, systemFont string) (string, error) {
 	if err := backupConfigFile(path); err != nil {
 		return "", err
 	}
-	if err := os.WriteFile(path, []byte(updated), 0644); err != nil {
+	if err := writeFileAtomic(path, []byte(updated), 0644); err != nil {
 		return "", err
 	}
 	return mode, nil
@@ -1827,8 +1962,27 @@ func findFontBlockLines(lines []string) (int, int, error) {
 	depth := 0
 	seenOpen := false
 	for i := start; i < len(lines); i++ {
-		body := uncommentConfigLine(lineWithoutLineBreak(lines[i]))
-		for _, r := range body {
+		body := lineWithoutLineBreak(lines[i])
+		if strings.HasPrefix(strings.TrimSpace(lines[start]), "//") {
+			body = uncommentConfigLine(body)
+		}
+		inString := false
+		for j := 0; j < len(body); j++ {
+			r := body[j]
+			if inString && r == '\\' && j+1 < len(body) {
+				j++
+				continue
+			}
+			if r == '"' {
+				inString = !inString
+				continue
+			}
+			if inString {
+				continue
+			}
+			if r == '/' && j+1 < len(body) && body[j+1] == '/' {
+				break
+			}
 			switch r {
 			case '{':
 				depth++
@@ -1868,12 +2022,12 @@ func fontBlockIsCommented(lines []string) bool {
 }
 
 func activateTahomaFontLine(lines []string, systemFont string) error {
-	re := regexp.MustCompile(`^(\s*)(//\s*)?"Tahoma"\s+"([^"]*)"([^\r\n]*)`)
+	re := regexp.MustCompile(`^(\s*)(//\s*)?"Tahoma"\s+"((?:\\.|[^"\\])*)"([^\r\n]*)`)
 	for i, line := range lines {
 		body, br := splitLineBreak(line)
 		m := re.FindStringSubmatch(body)
 		if len(m) == 5 {
-			lines[i] = fmt.Sprintf(`%s"Tahoma" "%s"%s%s`, m[1], systemFont, m[4], br)
+			lines[i] = fmt.Sprintf(`%s"Tahoma" "%s"%s%s`, m[1], strings.ReplaceAll(strings.ReplaceAll(systemFont, `\`, `\\`), `"`, `\"`), m[4], br)
 			return nil
 		}
 	}
@@ -1989,10 +2143,6 @@ func exitCode(err error) int {
 func utf16Ptr(s string) *uint16 {
 	p, _ := syscall.UTF16PtrFromString(s)
 	return p
-}
-
-func uint16PtrFromID(id uint16) *uint16 {
-	return (*uint16)(unsafe.Pointer(uintptr(id)))
 }
 
 func loadL4nOptionsIntoCombo() {

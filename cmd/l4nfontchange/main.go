@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"l4nfix/internal/pathguard"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -524,7 +525,7 @@ func loadAppIcon(size int32) uintptr {
 	for id := uint16(1); id <= 32; id++ {
 		icon, _, _ := procLoadImageW.Call(
 			hInstance,
-			uintptr(unsafe.Pointer(uint16PtrFromID(id))),
+			uintptr(id),
 			imageIcon,
 			uintptr(size),
 			uintptr(size),
@@ -695,6 +696,9 @@ func runApplyFontChange() error {
 	}
 	gameRoot := filepath.Dir(gameExe)
 	configPath := filepath.Join(gameRoot, filepath.FromSlash(configRelativePath))
+	if err := pathguard.Within(gameRoot, configPath); err != nil {
+		return err
+	}
 	if !exists(configPath) {
 		return errors.New("没有进行通用处理，通用处理后再使用本工具")
 	}
@@ -720,6 +724,9 @@ func runRestoreDefaultFont() error {
 	}
 	gameRoot := filepath.Dir(gameExe)
 	configPath := filepath.Join(gameRoot, filepath.FromSlash(configRelativePath))
+	if err := pathguard.Within(gameRoot, configPath); err != nil {
+		return err
+	}
 	if !exists(configPath) {
 		return errors.New("没有进行通用处理，通用处理后再使用本工具")
 	}
@@ -734,7 +741,7 @@ func runRestoreDefaultFont() error {
 	if err := backupConfigFile(configPath); err != nil {
 		return err
 	}
-	if err := os.WriteFile(configPath, []byte(updated), 0644); err != nil {
+	if err := writeFileAtomic(configPath, []byte(updated), 0644); err != nil {
 		return err
 	}
 	appendLog("[font] config: " + configPath)
@@ -849,8 +856,7 @@ func installedFontNames() []string {
 	defer procReleaseDC.Call(0, hdc)
 	seen := map[string]bool{}
 	var names []string
-	cb := syscall.NewCallback(func(lplf uintptr, lpntme uintptr, fontType uintptr, lParam uintptr) uintptr {
-		lf := (*logFont)(unsafe.Pointer(lplf))
+	cb := syscall.NewCallback(func(lf *logFont, lpntme uintptr, fontType uintptr, lParam uintptr) uintptr {
 		name := strings.TrimSpace(syscall.UTF16ToString(lf.faceName[:]))
 		if name != "" && !strings.HasPrefix(name, "@") {
 			key := strings.ToLower(name)
@@ -1042,7 +1048,7 @@ func updateFontModName(path, fontName string) error {
 			}
 			indent := body[:strings.Index(body, "name:")]
 			lines[i] = indent + "name: " + fontName + lineBreak
-			if err := os.WriteFile(path, []byte(strings.Join(lines, "")), 0644); err != nil {
+			if err := writeFileAtomic(path, []byte(strings.Join(lines, "")), 0644); err != nil {
 				return err
 			}
 			appendLog("[font] FontMod.yaml Tahoma.name = " + fontName)
@@ -1070,15 +1076,15 @@ func updateConfigTahomaFont(path, fontName string) error {
 			lines[i] = uncommentConfigLine(lines[i])
 		}
 	}
-	re := regexp.MustCompile(`^(\s*)(//\s*)?"Tahoma"\s+"([^"]*)"([^\r\n]*)`)
+	re := regexp.MustCompile(`^(\s*)(//\s*)?"Tahoma"\s+"((?:\\.|[^"\\])*)"([^\r\n]*)`)
 	for i := start; i < end; i++ {
 		body, br := splitLineBreak(lines[i])
 		if m := re.FindStringSubmatch(body); len(m) == 5 {
-			lines[i] = fmt.Sprintf(`%s"Tahoma" "%s"%s%s`, m[1], fontName, m[4], br)
+			lines[i] = fmt.Sprintf(`%s"Tahoma" "%s"%s%s`, m[1], strings.ReplaceAll(strings.ReplaceAll(fontName, `\`, `\\`), `"`, `\"`), m[4], br)
 			if err := backupConfigFile(path); err != nil {
 				return err
 			}
-			return os.WriteFile(path, []byte(strings.Join(lines, "")), 0644)
+			return writeFileAtomic(path, []byte(strings.Join(lines, "")), 0644)
 		}
 	}
 	return errors.New("config.vdf 中未找到 Tahoma 字体替换行")
@@ -1127,8 +1133,27 @@ func findFontBlockLines(lines []string) (int, int, error) {
 	depth := 0
 	seenOpen := false
 	for i := start; i < len(lines); i++ {
-		body := uncommentConfigLine(lineWithoutLineBreak(lines[i]))
-		for _, r := range body {
+		body := lineWithoutLineBreak(lines[i])
+		if strings.HasPrefix(strings.TrimSpace(lines[start]), "//") {
+			body = uncommentConfigLine(body)
+		}
+		inString := false
+		for j := 0; j < len(body); j++ {
+			r := body[j]
+			if inString && r == '\\' && j+1 < len(body) {
+				j++
+				continue
+			}
+			if r == '"' {
+				inString = !inString
+				continue
+			}
+			if inString {
+				continue
+			}
+			if r == '/' && j+1 < len(body) && body[j+1] == '/' {
+				break
+			}
 			switch r {
 			case '{':
 				depth++
@@ -1579,16 +1604,24 @@ func copyFile(src, dst string) error {
 	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
 		return err
 	}
-	out, err := os.Create(dst)
+	out, err := os.CreateTemp(filepath.Dir(dst), ".copy-*.tmp")
 	if err != nil {
 		return err
 	}
+	tmp := out.Name()
+	defer os.Remove(tmp)
 	_, copyErr := io.Copy(out, in)
 	closeErr := out.Close()
 	if copyErr != nil {
 		return copyErr
 	}
-	return closeErr
+	if closeErr != nil {
+		return closeErr
+	}
+	if err := in.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmp, dst)
 }
 
 func removeEmptyParents(dir, stop string) {
@@ -1676,8 +1709,4 @@ func utf16DoubleNull(parts []string) []uint16 {
 	}
 	out = append(out, 0)
 	return out
-}
-
-func uint16PtrFromID(id uint16) *uint16 {
-	return (*uint16)(unsafe.Pointer(uintptr(id)))
 }

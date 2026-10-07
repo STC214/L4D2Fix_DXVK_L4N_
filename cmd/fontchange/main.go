@@ -8,12 +8,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"l4nfix/internal/pathguard"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -302,12 +304,13 @@ type fontManifest struct {
 }
 
 type fontFileEntry struct {
-	Target  string `json:"target"`
-	Rel     string `json:"relative"`
-	Existed bool   `json:"existed"`
-	Backup  string `json:"backup,omitempty"`
-	Mode    uint32 `json:"mode,omitempty"`
-	ModTime string `json:"modTime,omitempty"`
+	BackupSHA256 string `json:"backupSHA256,omitempty"`
+	Target       string `json:"target"`
+	Rel          string `json:"relative"`
+	Existed      bool   `json:"existed"`
+	Backup       string `json:"backup,omitempty"`
+	Mode         uint32 `json:"mode,omitempty"`
+	ModTime      string `json:"modTime,omitempty"`
 }
 
 func main() {
@@ -540,7 +543,7 @@ func loadAppIcon(size int32) uintptr {
 	for id := uint16(1); id <= 32; id++ {
 		icon, _, _ := procLoadImageW.Call(
 			hInstance,
-			uintptr(unsafe.Pointer(uint16PtrFromID(id))),
+			uintptr(id),
 			imageIcon,
 			uintptr(size),
 			uintptr(size),
@@ -709,16 +712,19 @@ func runApplyFontChange() error {
 	if err != nil {
 		return err
 	}
-	if err := updateFontModName(filepath.Join(fontDir, "FontMod.yaml"), fontName); err != nil {
-		return err
-	}
 	gameExe, err := resolveGameExe(root)
 	if err != nil {
 		return err
 	}
 	gameRoot := filepath.Dir(gameExe)
 	backupRoot := filepath.Join(root, fontBackupDirName)
-	man := loadFontManifest(backupRoot, gameRoot)
+	man, err := checkedFontManifest(backupRoot, gameRoot)
+	if err != nil {
+		return err
+	}
+	if err := updateFontModName(filepath.Join(fontDir, "FontMod.yaml"), fontName); err != nil {
+		return err
+	}
 
 	appendLog("[font] source: " + fontDir)
 	appendLog("[font] target game directory: " + gameRoot)
@@ -748,6 +754,10 @@ func runRestoreDefaultFont() error {
 	}
 	if !strings.EqualFold(clean(man.GameRoot), clean(gameRoot)) {
 		return fmt.Errorf("font backup belongs to a different game directory: %s", man.GameRoot)
+	}
+
+	if err := validateFontManifest(man, gameRoot, backupRoot); err != nil {
+		return err
 	}
 
 	appendLog("[font] restore target: " + gameRoot)
@@ -893,8 +903,7 @@ func installedFontNames() []string {
 	defer procReleaseDC.Call(0, hdc)
 	seen := map[string]bool{}
 	var names []string
-	cb := syscall.NewCallback(func(lplf uintptr, lpntme uintptr, fontType uintptr, lParam uintptr) uintptr {
-		lf := (*logFont)(unsafe.Pointer(lplf))
+	cb := syscall.NewCallback(func(lf *logFont, lpntme uintptr, fontType uintptr, lParam uintptr) uintptr {
 		name := strings.TrimSpace(syscall.UTF16ToString(lf.faceName[:]))
 		if name != "" && !strings.HasPrefix(name, "@") {
 			key := strings.ToLower(name)
@@ -1076,7 +1085,11 @@ func readFontModName() string {
 		if inTahoma {
 			trimmed := strings.TrimSpace(line)
 			if strings.HasPrefix(trimmed, "name:") {
-				return strings.TrimSpace(strings.TrimPrefix(trimmed, "name:"))
+				value := strings.TrimSpace(strings.TrimPrefix(trimmed, "name:"))
+				if decoded, err := strconv.Unquote(value); err == nil {
+					return decoded
+				}
+				return value
 			}
 			if strings.HasSuffix(trimmed, ":") && !strings.HasPrefix(line, "    ") {
 				break
@@ -1114,8 +1127,8 @@ func updateFontModName(path, fontName string) error {
 				body = strings.TrimSuffix(body, "\r")
 			}
 			indent := body[:strings.Index(body, "name:")]
-			lines[i] = indent + "name: " + fontName + lineBreak
-			if err := os.WriteFile(path, []byte(strings.Join(lines, "")), 0644); err != nil {
+			lines[i] = indent + "name: " + strconv.Quote(fontName) + lineBreak
+			if err := writeFileAtomic(path, []byte(strings.Join(lines, "")), 0644); err != nil {
 				return err
 			}
 			appendLog("[font] FontMod.yaml Tahoma.name = " + fontName)
@@ -1235,6 +1248,13 @@ func relativeFiles(root string) ([]string, error) {
 		if err != nil {
 			return err
 		}
+		info, infoErr := d.Info()
+		if infoErr != nil {
+			return infoErr
+		}
+		if pathguard.Linked(info) {
+			return fmt.Errorf("linked font resource: %s", path)
+		}
 		if d.IsDir() {
 			return nil
 		}
@@ -1264,15 +1284,6 @@ func readFontManifest(root string) (*fontManifest, error) {
 	return &m, nil
 }
 
-func loadFontManifest(root, gameRoot string) *fontManifest {
-	if m, err := readFontManifest(root); err == nil {
-		if strings.EqualFold(clean(m.GameRoot), clean(gameRoot)) {
-			return m
-		}
-	}
-	return &fontManifest{CreatedAt: time.Now().Format(time.RFC3339), GameRoot: gameRoot}
-}
-
 func saveFontManifest(m *fontManifest, root string) error {
 	data, err := json.MarshalIndent(m, "", "  ")
 	if err != nil {
@@ -1290,9 +1301,17 @@ func saveFontManifest(m *fontManifest, root string) error {
 }
 
 func copyDirContentsWithManifest(man *fontManifest, backupRoot, srcRoot, dstRoot string, progressStart, progressSpan int) error {
+	if err := validateFontManifest(man, dstRoot, backupRoot); err != nil {
+		return err
+	}
 	files, err := relativeFiles(srcRoot)
 	if err != nil {
 		return err
+	}
+	for _, rel := range files {
+		if err := pathguard.Within(dstRoot, filepath.Join(dstRoot, rel)); err != nil {
+			return err
+		}
 	}
 	if len(files) == 0 {
 		return os.MkdirAll(dstRoot, 0755)
@@ -1314,6 +1333,16 @@ func copyDirContentsWithManifest(man *fontManifest, backupRoot, srcRoot, dstRoot
 }
 
 func copyWithFontBackup(man *fontManifest, backupRoot, gameRoot, src, dst string) error {
+	if err := pathguard.Within(gameRoot, dst); err != nil {
+		return err
+	}
+	relCheck, err := filepath.Rel(gameRoot, dst)
+	if err != nil || relCheck == "." || relCheck == ".." || filepath.IsAbs(relCheck) || strings.HasPrefix(relCheck, ".."+string(filepath.Separator)) {
+		return fmt.Errorf("invalid font target: %s", dst)
+	}
+	if err := validateFontManifest(man, gameRoot, backupRoot); err != nil {
+		return err
+	}
 	if !fontManifestHasFile(man, dst) {
 		rel, err := filepath.Rel(gameRoot, dst)
 		if err != nil {
@@ -1329,6 +1358,10 @@ func copyWithFontBackup(man *fontManifest, backupRoot, gameRoot, src, dst string
 			entry.ModTime = info.ModTime().Format(time.RFC3339Nano)
 			entry.Backup = filepath.Join(backupRoot, "files", rel)
 			if err := copyFile(dst, entry.Backup); err != nil {
+				return err
+			}
+			entry.BackupSHA256, err = fontFileHash(entry.Backup)
+			if err != nil {
 				return err
 			}
 			restoreFontBackupMetadata(entry)
@@ -1639,16 +1672,24 @@ func copyFile(src, dst string) error {
 	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
 		return err
 	}
-	out, err := os.Create(dst)
+	out, err := os.CreateTemp(filepath.Dir(dst), ".copy-*.tmp")
 	if err != nil {
 		return err
 	}
+	tmp := out.Name()
+	defer os.Remove(tmp)
 	_, copyErr := io.Copy(out, in)
 	closeErr := out.Close()
 	if copyErr != nil {
 		return copyErr
 	}
-	return closeErr
+	if closeErr != nil {
+		return closeErr
+	}
+	if err := in.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmp, dst)
 }
 
 func removeEmptyParents(dir, stop string) {
@@ -1736,8 +1777,4 @@ func utf16DoubleNull(parts []string) []uint16 {
 	}
 	out = append(out, 0)
 	return out
-}
-
-func uint16PtrFromID(id uint16) *uint16 {
-	return (*uint16)(unsafe.Pointer(uintptr(id)))
 }

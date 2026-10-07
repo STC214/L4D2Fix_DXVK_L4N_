@@ -18,6 +18,8 @@
 
 ## 功能概览
 
+界面顶部显示当前游戏的 DXVK、L4N 已安装版本（按实际 DLL SHA256 匹配安装记录或资源包；L4N 还读取已确认产品名称的 DLL 内嵌版本信息，不使用下拉框选择值）。没有相关文件显示“未使用”，已检测到但未匹配的文件显示“版本未知”，多个包使用相同 DLL 时列出候选。启动和每次操作后自动刷新，也可点击“刷新版本”。检测在后台进行，不加载游戏 DLL；这里只检查磁盘文件，不等同于验证游戏进程已启用补丁。
+
 | 类别 | 能力 |
 | --- | --- |
 | 补丁处理 | 从 `dxvk/` 自动读取所有 DXVK 子目录，选择版本后一键安装 L4N 与对应 DXVK 文件。 |
@@ -31,6 +33,14 @@
 | 使用说明 | UI 内置中文使用说明、启动项和验证指令。 |
 
 ## 快速使用
+
+### 现有 L4N 配置留档
+
+一键处理覆盖游戏文件前，会检查游戏中的 `left4dead2/neko/config.vdf`。有本工具安装记录时，与上次安装的配置 SHA256 比较；没有记录时，与所选资源包的配置比较，不一致就保守留档（这不一定代表用户修改，也可能是版本差异）。
+
+留档位于 `resources/config_backups/<游戏路径标识>/<配置SHA256>/config.vdf`，同目录 `metadata.json` 记录来源、时间、哈希及比较基准。同一游戏的相同内容不会重复留档，不同内容分别保留。一键清理前也会保留安装后修改的配置。留档失败会停止覆盖或还原；留档独立于 `.l4n_auto_backup`，不会随一键清理删除，也不会自动覆盖回游戏。发布打包会排除个人留档。
+
+安装与还原前检查备份清单及原文件备份；清单损坏、归属其他游戏目录、原备份缺失或哈希不一致时停止操作，避免覆盖原备份。旧版没有哈希的清单仍兼容，但只能验证备份是否可读。
 
 下载或准备便携目录后，双击运行：
 
@@ -181,48 +191,43 @@ L4N_Go_Win32_Portable/.l4n_auto_backup/
 
 不要改名或移动 `resources/`。
 
-## 项目根目录分类
+## 项目目录分类
 
-- `main.go`、`cmd/`、`go.mod`：源码；`app.ico`、`app.manifest`、`rsrc.syso` 保持根目录构建路径。
-- `L4N_Go_Win32_Portable/`：现用成品及完整运行资源，目录位置保持不变。
-- `dist/`：已有发布压缩包。这里的 ZIP 是原有快照，本次未重新打包。
-- `assets/images/`：图标制作参考图片 `001.jpg`、`002.jpg`。
-- `docs/`：使用教程及历史流程说明；历史文档中的旧目录路径不作为当前入口。
-- `archive/legacy-root/`：旧 EXE、旧批处理/PowerShell 工具及配套资源，保持彼此相对位置，仅作历史归档，不是推荐运行入口。
-- `archive/source-packages/`：原始 DXVK、字体资源压缩包。
+```text
+cmd/l4nfix/                 # 主程序源码、测试与 rsrc.syso
+cmd/fontchange/             # 通用字体工具
+cmd/l4nfontchange/           # L4N 字体工具
+cmd/makeicon/               # 图标生成工具
+internal/                   # 共享内部模块
+scripts/                    # 构建、测试、打包和发行包清理脚本
+assets/windows/             # app.ico、app.manifest
+assets/images/              # 图标参考图片
+docs/                       # 使用文档
+L4N_Go_Win32_Portable/       # 现用 EXE 与 resources，位置不变
+dist/                       # 仅保留最新三版便携 ZIP
+archive/                    # 历史工具和资源来源镜像
+.gotmp/                     # 本地审查证据、撤回快照和临时文件
+```
 
-当前使用入口：`L4N_Go_Win32_Portable/L4N_Go_Win32.exe`。
-
-### 压缩包与资源规范化
-
-支持 ZIP、TAR、TAR.GZ、TGZ，无需用户预先解压。DXVK 放入 `resources/dxvk/`，L4N 放入 `resources/l4n/`（名称无需 L4N 前缀）。两个版本下拉框均支持目录与压缩包，新增后重启刷新。
-
-点击一键处理后，选中的资源解压到 `resources/.package_tmp/<类型>-<随机目录>/extracted/`，整理结果放入同级 `normalized/`。处理外层套目录、DXVK `d3d9.dll` 重命名及缺少独立 bin 副本、L4N 扁平 `left4neko.dll` 和顶层 `neko/`、`shaders/`；不猜测缺失文件或多套核心文件的对应关系。32 位 DLL 标识、关键配置、重复路径、越界路径及解压大小均会检查。
-
-原始资源不修改。临时目录的 `prepared.json` 与 `.l4n_auto_backup/manifest.json` 记录源压缩包、SHA256、整理路径及安装目标；仍通过一键清理恢复原有游戏文件并移除新增文件。成功处理的临时目录保留供核对，失败解压自动清理；安装结束后可手动清理 `.package_tmp`，游戏撤回依靠备份目录而非临时资源。
-
-所选 L4N 目录或压缩包内，文件名同时含“启动”和“指令”的 `.txt` 会自动提取启动参数（递归查找，也识别包内外层说明文件），写入 Steam 的 AppID 550。优先级为所选资源 > `resources/l4n/` 顶层公共 TXT > `resources/` 顶层历史 TXT > 内置默认参数；不读取未选中版本的指令。只提取参数行，不将说明正文或该 TXT 复制到游戏。多个文件指令不一致、存在多组方案、空指令或引号异常时在安装前报错。支持 UTF-8、UTF-16 BOM、GBK；来源文件与 SHA256 记录在备份清单。
-
-详见 [压缩包资源使用说明](docs/压缩包资源使用.md)。
-新增 DXVK 放入 `L4N_Go_Win32_Portable/resources/dxvk/`；原有和新增 L4N 基础包统一放在 `resources/l4n/L4N_dxvk2.7.1/`；也可在下拉框选择新增版本。
+根目录 `build.ps1`、`package.ps1` 是兼容入口，实现在 `scripts/`。当前使用入口：`L4N_Go_Win32_Portable/L4N_Go_Win32.exe`。详见 [目录整理说明](docs/项目目录整理.md)。
 
 ## 构建
 
 生成图标：
 
 ```powershell
-go run .\cmd\makeicon .\assets\images\001.jpg app.ico
-rsrc -ico app.ico -manifest app.manifest -o rsrc.syso
+go run .\cmd\makeicon .\assets\images\001.jpg .\assets\windows\app.ico
+rsrc -ico .\assets\windows\app.ico -manifest .\assets\windows\app.manifest -o .\cmd\l4nfix\rsrc.syso
 ```
 
-构建 GUI exe（管理员 PowerShell 运行测试）：
+测试并构建 GUI exe：
 
 ```powershell
-go test ./...
+.\scripts\test.ps1 -Race
 .\build.ps1
 ```
 
-主程序标题为 `L4N YYYYMMDDHHmm`。`build.ps1` 在构建时按北京时间（Asia/Shanghai）写入年月日时分；重复启动保持同一版本号。直接 `go build` 未注入版本时显示 `L4N 开发版`。构建脚本仅更新主程序，不修改字体工具或发布 ZIP。`build.ps1 -OutputPath <路径>` 可指定输出位置。
+主程序标题为 `L4N YYYYMMDDHHmm`。`build.ps1` 在构建时按北京时间（Asia/Shanghai）写入年月日时分；重复启动保持同一版本号。直接 `go build` 未注入版本时显示 `L4N 开发版`。构建脚本同时更新主程序与两个字体工具，不生成发布 ZIP。主程序包路径为 `./cmd/l4nfix`。`build.ps1 -OutputPath <路径>` 可指定输出位置。
 
 整理便携版时，将生成的主程序和两个字体工具放在便携目录根部，将运行库、Everything、补丁目录和 txt 说明放入 `resources/`。
 
@@ -241,7 +246,7 @@ go test ./...
 - 原始补丁目录和补丁压缩包
 - Go 缓存、临时目录和 `.l4n_auto_backup/`
 
-便携包和补丁资源建议通过 GitHub Release 附件分发。运行 `.\package.ps1` 可构建并生成 `dist/L4N_Go_Win32_Portable_YYYYMMDDHHmm.zip`；逐个校验 ZIP 文件内容，并排除备份、解压缓存。已有同名包时停止，避免覆盖。只打包现有成品可用 `.\package.ps1 -SkipBuild`。
+便携包和补丁资源建议通过 GitHub Release 附件分发。运行 `.\package.ps1` 可构建并生成 `dist/L4N_Go_Win32_Portable_YYYYMMDDHHmm.zip`；逐个校验 ZIP 文件内容，并排除备份、解压缓存。已有同名包时停止，避免覆盖。只打包现有成品可用 `.\package.ps1 -SkipBuild`。打包成功后自动仅保留最新三版；单独清理可运行 `.\scripts\prune-packages.ps1`，预览使用 `-WhatIf`。
 
 ## 来源与致谢
 

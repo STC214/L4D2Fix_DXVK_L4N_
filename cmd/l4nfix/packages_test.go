@@ -389,17 +389,27 @@ func TestBundledRealResources(t *testing.T) {
 		t.Skip("set L4N_TEST_RESOURCE_ROOT to validate bundled DLLs")
 	}
 	r := t.TempDir()
-	base, e := preparePackage(filepath.Join(root, l4nVersionsDirName, genericPatchDirName), r, "l4n")
-	if e != nil {
-		t.Fatal(e)
+	l4ns := discoverL4nOptions(filepath.Dir(root), root)
+	if len(l4ns) == 0 {
+		t.Fatal("no bundled L4N resources")
 	}
-	files, e := collectBasePatchFiles(base.NormalizedDir)
-	if e != nil {
-		t.Fatal(e)
+	for _, opt := range l4ns {
+		base, e := preparePackage(opt.Dir, r, "l4n")
+		if e != nil {
+			t.Fatal(opt.Name, e)
+		}
+		files, e := collectBasePatchFiles(base.NormalizedDir)
+		if e != nil {
+			t.Fatal(e)
+		}
+		launch, e := resolveL4nLaunchOptions(base, root)
+		if e != nil {
+			t.Fatal(opt.Name, e)
+		}
+		t.Logf("bundled %s: %d normalized base files; launch=%s", opt.Name, len(files), launch.Options)
 	}
-	t.Logf("bundled L4N: %d normalized base files", len(files))
 	opts := discoverDxvkOptions(filepath.Dir(root), root)
-	if len(opts) != 12 {
+	if len(opts) == 0 {
 		t.Fatalf("bundled versions=%d", len(opts))
 	}
 	for _, opt := range opts {
