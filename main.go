@@ -31,7 +31,7 @@ const (
 	displaySettingsBackupDirName = "display_settings_backup"
 	videoSettingsRelativePath    = "left4dead2/cfg/video.txt"
 	configRelativePath           = "left4dead2/neko/config.vdf"
-	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理，程序会安装 L4N 基础文件和所选 DXVK\r\n4. 需要保留 MOD 时，可先备份MOD，再恢复MOD\r\n5. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n6. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\n版本来源\r\ndxvk其他版本 下的子目录会自动加入菜单。\r\n支持 dxvk-x.x/x32 或 dxvk-x.x/dxvk-x.x/x32 结构。\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
+	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理，程序会安装 L4N 基础文件和所选 DXVK\r\n4. 需要保留 MOD 时，可先备份MOD，再恢复MOD\r\n5. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n6. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\n版本来源\r\nDXVK 放在 resources/dxvk其他版本，L4N 放在 resources 或 L4N其他版本。\r\n支持 ZIP/TAR/TAR.GZ/TGZ；选择后解压到 resources/.package_tmp。\r\n自动剥离外层目录、识别32位DLL并整理路径。\r\n新增后重启刷新；缺失或多组关键文件会报错。\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
 )
 
 var (
@@ -85,6 +85,7 @@ var (
 	hWnd          uintptr
 	btnRun        uintptr
 	comboDxvk     uintptr
+	comboL4n      uintptr
 	btnBackupMod  uintptr
 	btnRestoreMod uintptr
 	btnClean      uintptr
@@ -105,6 +106,7 @@ var (
 	uiNext        uintptr
 	uiWork        = map[uintptr]func(){}
 	dxvkOptions   []dxvkOption
+	l4nOptions    []dxvkOption
 )
 
 const (
@@ -236,20 +238,23 @@ type drawItemStruct struct {
 }
 
 type manifest struct {
-	CreatedAt     string       `json:"createdAt"`
-	GameRoot      string       `json:"gameRoot"`
-	Files         []fileEntry  `json:"files"`
-	SteamConfigs  []steamEntry `json:"steamConfigs"`
-	LaunchOptions string       `json:"launchOptions"`
+	CreatedAt      string          `json:"createdAt"`
+	GameRoot       string          `json:"gameRoot"`
+	Files          []fileEntry     `json:"files"`
+	SteamConfigs   []steamEntry    `json:"steamConfigs"`
+	LaunchOptions  string          `json:"launchOptions"`
+	PackageSources []packageSource `json:"packageSources,omitempty"`
 }
 
 type fileEntry struct {
-	Target  string `json:"target"`
-	Rel     string `json:"relative"`
-	Existed bool   `json:"existed"`
-	Backup  string `json:"backup,omitempty"`
-	Mode    uint32 `json:"mode,omitempty"`
-	ModTime string `json:"modTime,omitempty"`
+	Target       string `json:"target"`
+	Source       string `json:"source,omitempty"`
+	SourceSHA256 string `json:"sourceSHA256,omitempty"`
+	Rel          string `json:"relative"`
+	Existed      bool   `json:"existed"`
+	Backup       string `json:"backup,omitempty"`
+	Mode         uint32 `json:"mode,omitempty"`
+	ModTime      string `json:"modTime,omitempty"`
 }
 
 type steamEntry struct {
@@ -308,7 +313,7 @@ func main() {
 	hWnd, _, _ = procCreateWindowExW.Call(
 		0,
 		uintptr(unsafe.Pointer(className)),
-		uintptr(unsafe.Pointer(utf16Ptr(appTitle))),
+		uintptr(unsafe.Pointer(utf16Ptr(windowTitle()))),
 		cbs|wsVisible,
 		cwUseDefault, cwUseDefault,
 		960, 560,
@@ -403,31 +408,33 @@ func createControls(hwnd uintptr) {
 	desc := label(hwnd, "自动识别游戏目录，安装运行库，备份原文件，\r\n并用所选补丁目录覆盖游戏源文件。", 22, 62, 594, 48)
 	procSendMessageW.Call(desc, wmSetFont, textFont, 1)
 
-	actionBox := groupBox(hwnd, "处理选项", 16, 112, 606, 122)
+	actionBox := groupBox(hwnd, "处理选项", 16, 112, 606, 180)
 	procSendMessageW.Call(actionBox, wmSetFont, textFont, 1)
-	versionLabel := label(hwnd, "DXVK版本", 32, 136, 174, 20)
+	versionLabel := label(hwnd, "DXVK版本", 32, 136, 260, 20)
 	procSendMessageW.Call(versionLabel, wmSetFont, textFont, 1)
-	comboDxvk = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 32, 160, 174, 220, hwnd, 0)
+	comboDxvk = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 32, 160, 260, 220, hwnd, 0)
 	procSendMessageW.Call(comboDxvk, wmSetFont, textFont, 1)
-	btnRun = button(hwnd, "一键处理", idRun, 32, 194, 174, 32)
-	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 232, 134, 174, 36)
-	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 232, 184, 174, 36)
-	btnClean = button(hwnd, "一键清理", idClean, 432, 134, 174, 36)
-	btnClose = button(hwnd, "系统字体/游戏默认", idClose, 432, 184, 174, 36)
+	l4nLabel := label(hwnd, "L4N版本", 332, 136, 274, 20)
+	procSendMessageW.Call(l4nLabel, wmSetFont, textFont, 1)
+	comboL4n = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 332, 160, 274, 220, hwnd, 0)
+	procSendMessageW.Call(comboL4n, wmSetFont, textFont, 1)
+	btnRun = button(hwnd, "一键处理", idRun, 32, 200, 174, 36)
+	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 232, 200, 174, 36)
+	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 432, 200, 174, 36)
+	btnClean = button(hwnd, "一键清理", idClean, 32, 244, 174, 36)
+	btnClose = button(hwnd, "系统字体/游戏默认", idClose, 232, 244, 374, 36)
 	for _, h := range []uintptr{btnRun, btnBackupMod, btnRestoreMod, btnClean, btnClose} {
 		procSendMessageW.Call(h, wmSetFont, buttonFont, 1)
 	}
-	loadDxvkOptionsIntoCombo()
-
-	progress = create("msctls_progress32", "", wsChild|wsVisible, 22, 252, 594, 17, hwnd, 0)
+	progress = create("msctls_progress32", "", wsChild|wsVisible, 22, 306, 594, 17, hwnd, 0)
 	procSendMessageW.Call(progress, pbmSetRange32, 0, 100)
 	procSendMessageW.Call(progress, pbmSetPos, 0, 0)
 
-	statusCtl = label(hwnd, "就绪 - 请选择 DXVK 版本后一键处理", 22, 283, 594, 24)
+	statusCtl = label(hwnd, "就绪 - 请选择 DXVK 版本后一键处理", 22, 337, 594, 24)
 	procSendMessageW.Call(statusCtl, wmSetFont, textFont, 1)
-	logTitle := label(hwnd, "日志", 22, 313, 80, 20)
+	logTitle := label(hwnd, "日志", 22, 367, 80, 20)
 	procSendMessageW.Call(logTitle, wmSetFont, textFont, 1)
-	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 22, 332, 594, 184, hwnd, 0)
+	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 22, 386, 594, 130, hwnd, 0)
 	procSendMessageW.Call(logCtl, wmSetFont, textFont, 1)
 
 	guideTitle := label(hwnd, "使用说明", 630, 22, 280, 24)
@@ -435,8 +442,10 @@ func createControls(hwnd uintptr) {
 	guideCtl := create("EDIT", usageInstructions, wsChild|wsVisible|wsBorder|esMultiline|esReadOnly, 630, 50, 300, 466, hwnd, 0)
 	procSendMessageW.Call(guideCtl, wmSetFont, guideFont, 1)
 
+	loadDxvkOptionsIntoCombo()
+	loadL4nOptionsIntoCombo()
 	appendLog("[prepare] ready; resources directory: " + resourceDirName)
-	appendLog("[prepare] L4N base patch: resources\\" + genericPatchDirName)
+	appendLog("[prepare] select L4N directory or archive from resources")
 	appendLog("[prepare] DXVK versions directory: " + dxvkVersionsDirName)
 }
 
@@ -645,6 +654,7 @@ func setBusy(v bool) {
 		}
 		procEnableWindow.Call(btnRun, en)
 		procEnableWindow.Call(comboDxvk, en)
+		procEnableWindow.Call(comboL4n, en)
 		procEnableWindow.Call(btnBackupMod, en)
 		procEnableWindow.Call(btnRestoreMod, en)
 		procEnableWindow.Call(btnClean, en)
@@ -804,11 +814,21 @@ func runInstallWithDxvk(opt dxvkOption) error {
 	appendLog("[prepare] resource root: " + resRoot)
 	appendLog("[prepare] selected DXVK: " + opt.Name)
 	runtimeDir := resRoot
-	patchDir, err := findNamedPackageDir(resRoot, genericPatchDirName)
+	l4nOpt, err := selectedL4nOption()
 	if err != nil {
 		return err
 	}
-	patchFiles, err := buildPatchFileList(patchDir, opt)
+	baseSource, err := preparePackage(l4nOpt.Dir, resRoot, "l4n")
+	if err != nil {
+		return fmt.Errorf("L4N 校验失败: %w", err)
+	}
+	dxvkSource, err := preparePackage(opt.Dir, resRoot, "dxvk")
+	if err != nil {
+		return fmt.Errorf("DXVK 校验失败: %w", err)
+	}
+	appendLog("[prepare] normalized L4N: " + baseSource.NormalizedDir)
+	appendLog("[prepare] normalized DXVK: " + dxvkSource.NormalizedDir)
+	patchFiles, err := buildPatchFileList(baseSource.NormalizedDir, dxvkOption{Name: opt.Name, Dir: dxvkSource.NormalizedDir})
 	if err != nil {
 		return err
 	}
@@ -830,6 +850,10 @@ func runInstallWithDxvk(opt dxvkOption) error {
 	backupRoot := filepath.Join(root, ".l4n_auto_backup")
 	man := loadManifest(backupRoot, gameRoot)
 	man.LaunchOptions = launchOptions
+	man.PackageSources = append(man.PackageSources, baseSource, dxvkSource)
+	if err := saveManifest(man, backupRoot); err != nil {
+		return err
+	}
 	appendLog("[backup] manifest: " + filepath.Join(backupRoot, "manifest.json"))
 
 	setProgress(40)
@@ -855,7 +879,10 @@ func runRestore() error {
 	if err != nil {
 		return err
 	}
-	backupRoot := filepath.Join(root, ".l4n_auto_backup")
+	return restoreFromBackup(filepath.Join(root, ".l4n_auto_backup"))
+}
+
+func restoreFromBackup(backupRoot string) error {
 	manifestPath := filepath.Join(backupRoot, "manifest.json")
 	data, err := os.ReadFile(manifestPath)
 	if err != nil {
@@ -1066,9 +1093,13 @@ func isDxvkTargetRel(rel string) bool {
 }
 
 func copyWithBackup(man *manifest, backupRoot, gameRoot, src, dst string) error {
+	sourceHash, err := fileHash(src)
+	if err != nil {
+		return err
+	}
 	if !manifestHasFile(man, dst) {
 		rel, _ := filepath.Rel(gameRoot, dst)
-		entry := fileEntry{Target: dst, Rel: rel, Existed: exists(dst)}
+		entry := fileEntry{Target: dst, Rel: rel, Existed: exists(dst), Source: src, SourceSHA256: sourceHash}
 		if entry.Existed {
 			info, err := os.Stat(dst)
 			if err != nil {
@@ -1087,7 +1118,27 @@ func copyWithBackup(man *manifest, backupRoot, gameRoot, src, dst string) error 
 			return err
 		}
 	}
-	return copyFile(src, dst)
+	for i := range man.Files {
+		if strings.EqualFold(clean(man.Files[i].Target), clean(dst)) {
+			man.Files[i].Source = src
+			man.Files[i].SourceSHA256 = sourceHash
+			break
+		}
+	}
+	if err := saveManifest(man, backupRoot); err != nil {
+		return err
+	}
+	if err := copyFile(src, dst); err != nil {
+		return err
+	}
+	installedHash, err := fileHash(dst)
+	if err != nil {
+		return err
+	}
+	if installedHash != sourceHash {
+		return fmt.Errorf("安装文件校验失败: %s", dst)
+	}
+	return nil
 }
 
 func manifestHasFile(man *manifest, target string) bool {
@@ -1471,35 +1522,31 @@ func discoverDxvkOptions(root, resRoot string) []dxvkOption {
 	var options []dxvkOption
 	seen := map[string]bool{}
 	for _, base := range packageSearchRoots(root) {
-		for _, versionsRoot := range []string{
-			filepath.Join(base, dxvkVersionsDirName),
-			filepath.Join(resRoot, dxvkVersionsDirName),
-		} {
-			entries, err := os.ReadDir(versionsRoot)
-			if err != nil {
+		entries, err := os.ReadDir(filepath.Join(base, dxvkVersionsDirName))
+		if err != nil {
+			continue
+		}
+		for _, entry := range entries {
+			_, archive := archiveName(entry.Name())
+			if !entry.IsDir() && !archive {
 				continue
 			}
-			for _, entry := range entries {
-				if !entry.IsDir() {
+			dir := filepath.Join(base, dxvkVersionsDirName, entry.Name())
+			if entry.IsDir() {
+				if _, err := normalizedMappings("dxvk", dir); err != nil {
+					appendLog("[prepare] skipped DXVK " + entry.Name() + ": " + err.Error())
 					continue
 				}
-				dir := filepath.Join(versionsRoot, entry.Name())
-				if _, err := findDxvkX32Dir(dir); err != nil {
-					appendLog("[prepare] skipped DXVK version " + entry.Name() + ": " + err.Error())
-					continue
-				}
-				key := strings.ToLower(entry.Name())
-				if seen[key] {
-					continue
-				}
-				seen[key] = true
-				options = append(options, dxvkOption{Name: entry.Name(), Dir: dir})
 			}
+			key := strings.ToLower(entry.Name())
+			if seen[key] {
+				continue
+			}
+			seen[key] = true
+			options = append(options, dxvkOption{Name: entry.Name(), Dir: dir})
 		}
 	}
-	sort.Slice(options, func(i, j int) bool {
-		return strings.ToLower(options[i].Name) < strings.ToLower(options[j].Name)
-	})
+	sort.Slice(options, func(i, j int) bool { return strings.ToLower(options[i].Name) < strings.ToLower(options[j].Name) })
 	return options
 }
 
@@ -1968,4 +2015,34 @@ func utf16Ptr(s string) *uint16 {
 
 func uint16PtrFromID(id uint16) *uint16 {
 	return (*uint16)(unsafe.Pointer(uintptr(id)))
+}
+
+func loadL4nOptionsIntoCombo() {
+	root, err := packageRoot()
+	if err != nil {
+		return
+	}
+	l4nOptions = discoverL4nOptions(root, resourceRoot(root))
+	selected := 0
+	for i, opt := range l4nOptions {
+		procSendMessageW.Call(comboL4n, cbAddString, 0, uintptr(unsafe.Pointer(utf16Ptr(opt.Name))))
+		if opt.Name == genericPatchDirName {
+			selected = i
+		}
+	}
+	if len(l4nOptions) > 0 {
+		procSendMessageW.Call(comboL4n, cbSetCurSel, uintptr(selected), 0)
+	}
+	appendLog(fmt.Sprintf("[prepare] loaded %d L4N versions", len(l4nOptions)))
+}
+func selectedL4nOption() (dxvkOption, error) {
+	if len(l4nOptions) == 0 {
+		return dxvkOption{}, errors.New("未找到 L4N 资源目录或压缩包")
+	}
+	ret, _, _ := procSendMessageW.Call(comboL4n, cbGetCurSel, 0, 0)
+	i := int(int32(ret))
+	if i < 0 || i >= len(l4nOptions) {
+		return dxvkOption{}, errors.New("请选择 L4N 版本")
+	}
+	return l4nOptions[i], nil
 }

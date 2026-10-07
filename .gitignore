@@ -69,3 +69,7 @@ logs/
 .DS_Store
 Thumbs.db
 desktop.ini
+# Archived third-party resources remain local, not source control.
+archive/source-packages/
+archive/legacy-root/tools/Everything/
+**/.package_tmp/
