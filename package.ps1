@@ -15,6 +15,7 @@ $tempRoot=Join-Path $project '.gotmp';New-Item -ItemType Directory $tempRoot -Fo
 $stage=Join-Path $tempRoot ('package-'+[guid]::NewGuid().ToString('N'))
 $target=Join-Path $stage 'L4N_Go_Win32_Portable'
 New-Item -ItemType Directory $target -Force | Out-Null
+$zipTemp=Join-Path $tempRoot ('.package-'+[guid]::NewGuid().ToString('N')+'.zip')
 $excluded=@('.package_tmp','.l4n_auto_backup','addons_backup','display_settings_backup','.l4d2_font_change_backup')
 try{
  foreach($name in @('L4N_Go_Win32.exe','L4N_Font_Change.exe','L4D2_Font_Change.exe')){Copy-Item -LiteralPath (Join-Path $portable $name) -Destination $target}
@@ -31,9 +32,16 @@ try{
  New-Item -ItemType Directory (Join-Path $target 'resources/L4N其他版本') -Force | Out-Null
  Add-Type -AssemblyName System.IO.Compression
  Add-Type -AssemblyName System.IO.Compression.FileSystem
- [IO.Compression.ZipFile]::CreateFromDirectory($stage,$output,[IO.Compression.CompressionLevel]::Optimal,$false)
+ $writer=[IO.Compression.ZipFile]::Open($zipTemp,[IO.Compression.ZipArchiveMode]::Create)
+ try{
+  foreach($file in Get-ChildItem -LiteralPath $stage -Recurse -File){
+   $name=$file.FullName.Substring($stage.Length+1).Replace('\','/')
+   [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($writer,$file.FullName,$name,[IO.Compression.CompressionLevel]::Optimal)
+  }
+  [void]$writer.CreateEntry('L4N_Go_Win32_Portable/resources/L4N其他版本/')
+ }finally{$writer.Dispose()}
  # Verify every member against staging hashes before returning an artifact.
- $z=[IO.Compression.ZipFile]::OpenRead($output)
+ $z=[IO.Compression.ZipFile]::OpenRead($zipTemp)
  $count=0
  try{
   foreach($entry in $z.Entries){if($entry.FullName.EndsWith('/')){continue}
@@ -45,12 +53,14 @@ try{
   }
   if($count -ne @(Get-ChildItem -LiteralPath $stage -Recurse -File).Count){throw 'ZIP file count mismatch'}
  }finally{$z.Dispose()}
+ Move-Item -LiteralPath $zipTemp -Destination $output
  Write-Output "Package: $output"
  Write-Output "Version: $version"
  Write-Output "Verified files: $count"
  Write-Output "SHA256: $((Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash)"
  Write-Output "Bytes: $((Get-Item -LiteralPath $output).Length)"
 }finally{
+ if(Test-Path -LiteralPath $zipTemp){Remove-Item -LiteralPath $zipTemp}
  $resolved=[IO.Path]::GetFullPath($stage)
  $boundary=[IO.Path]::GetFullPath($tempRoot).TrimEnd('\')+'\'
  if(-not $resolved.StartsWith($boundary,[StringComparison]::OrdinalIgnoreCase)){throw 'Unexpected packaging temp path'}
