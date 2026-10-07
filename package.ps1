@@ -29,7 +29,7 @@ try{
   New-Item -ItemType Directory (Split-Path $dest) -Force | Out-Null
   Copy-Item -LiteralPath $f.FullName -Destination $dest
  }
- New-Item -ItemType Directory (Join-Path $target 'resources/L4N其他版本') -Force | Out-Null
+ foreach($folder in @('dxvk','l4n')){New-Item -ItemType Directory (Join-Path $target ('resources/'+$folder)) -Force | Out-Null}
  Add-Type -AssemblyName System.IO.Compression
  Add-Type -AssemblyName System.IO.Compression.FileSystem
  $writer=[IO.Compression.ZipFile]::Open($zipTemp,[IO.Compression.ZipArchiveMode]::Create)
@@ -38,7 +38,7 @@ try{
    $name=$file.FullName.Substring($stage.Length+1).Replace('\','/')
    [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($writer,$file.FullName,$name,[IO.Compression.CompressionLevel]::Optimal)
   }
-  [void]$writer.CreateEntry('L4N_Go_Win32_Portable/resources/L4N其他版本/')
+  foreach($folder in @('dxvk','l4n')){[void]$writer.CreateEntry('L4N_Go_Win32_Portable/resources/'+$folder+'/')}
  }finally{$writer.Dispose()}
  # Verify every member against staging hashes before returning an artifact.
  $z=[IO.Compression.ZipFile]::OpenRead($zipTemp)

@@ -289,9 +289,13 @@ func TestDiscoverArchivesAndL4NVersions(t *testing.T) {
 	r := t.TempDir()
 	res := filepath.Join(r, "resources")
 	testZip(t, filepath.Join(res, dxvkVersionsDirName, "dxvk-new.zip"), dxvkFixture("x32/"))
-	testZip(t, filepath.Join(res, "L4N-new.zip"), l4nFixture())
-	testFiles(t, filepath.Join(res, "L4N-folder"), l4nFixture())
-	testZip(t, filepath.Join(res, "L4N其他版本", "release.zip"), l4nFixture())
+	testZip(t, filepath.Join(res, l4nVersionsDirName, "L4N-new.zip"), l4nFixture())
+	testFiles(t, filepath.Join(res, l4nVersionsDirName, "old-folder"), l4nFixture())
+	testZip(t, filepath.Join(res, l4nVersionsDirName, "release.zip"), l4nFixture())
+	// Legacy locations and root-level packages must not be mixed into the lists.
+	testZip(t, filepath.Join(res, "L4N-root.zip"), l4nFixture())
+	testZip(t, filepath.Join(res, "L4N其他版本", "legacy.zip"), l4nFixture())
+	testZip(t, filepath.Join(res, "dxvk其他版本", "legacy.zip"), dxvkFixture("x32/"))
 	dx := discoverDxvkOptions(r, res)
 	if len(dx) != 1 || dx[0].Name != "dxvk-new.zip" {
 		t.Fatalf("DXVK options %v", dx)
@@ -308,7 +312,7 @@ func TestDiscoverArchivesAndL4NVersions(t *testing.T) {
 func TestArchiveInstallManifestAndRollback(t *testing.T) {
 	r := t.TempDir()
 	res := filepath.Join(r, "resources")
-	lp := filepath.Join(res, "L4N-new.zip")
+	lp := filepath.Join(res, l4nVersionsDirName, "L4N-new.zip")
 	dp := filepath.Join(res, dxvkVersionsDirName, "dxvk-new.zip")
 	testZip(t, lp, l4nFixture())
 	testZip(t, dp, dxvkFixture("nested/x32/"))
@@ -385,7 +389,7 @@ func TestBundledRealResources(t *testing.T) {
 		t.Skip("set L4N_TEST_RESOURCE_ROOT to validate bundled DLLs")
 	}
 	r := t.TempDir()
-	base, e := preparePackage(filepath.Join(root, genericPatchDirName), r, "l4n")
+	base, e := preparePackage(filepath.Join(root, l4nVersionsDirName, genericPatchDirName), r, "l4n")
 	if e != nil {
 		t.Fatal(e)
 	}

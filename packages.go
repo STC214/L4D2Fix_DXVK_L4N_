@@ -23,13 +23,14 @@ const maxPackageBytes int64 = 2 << 30
 const maxPackageFiles = 20000
 
 type packageSource struct {
-	Kind          string           `json:"kind"`
-	Source        string           `json:"source"`
-	SHA256        string           `json:"sha256,omitempty"`
-	TemporaryDir  string           `json:"temporaryDir"`
-	NormalizedDir string           `json:"normalizedDir"`
-	PreparedAt    string           `json:"preparedAt"`
-	Files         []packageMapping `json:"files"`
+	Kind               string           `json:"kind"`
+	Source             string           `json:"source"`
+	SHA256             string           `json:"sha256,omitempty"`
+	TemporaryDir       string           `json:"temporaryDir"`
+	NormalizedDir      string           `json:"normalizedDir"`
+	PreparedAt         string           `json:"preparedAt"`
+	Files              []packageMapping `json:"files"`
+	LaunchInstructions *launchSelection `json:"launchInstructions,omitempty"`
 }
 type packageMapping struct {
 	Source   string `json:"source"`
@@ -365,6 +366,9 @@ func normalizedMappings(kind, root string) ([]packageMapping, error) {
 			prefix = ""
 		}
 		for k, p := range byPath {
+			if isLaunchInstructionFile(p) {
+				continue
+			}
 			if !strings.HasPrefix(k, prefix) {
 				continue
 			}
@@ -472,6 +476,15 @@ func preparePackage(source, resRoot, kind string) (info packageSource, err error
 			return info, fmt.Errorf("解压期间源压缩包发生变化")
 		}
 	}
+	if kind == "l4n" {
+		info.LaunchInstructions, err = readLaunchDocuments(input, true)
+		if info.LaunchInstructions != nil {
+			info.LaunchInstructions.Scope = "selected-l4n"
+		}
+		if err != nil {
+			return info, err
+		}
+	}
 	info.Files, err = normalizedMappings(kind, input)
 	if err != nil {
 		return info, err
@@ -502,48 +515,32 @@ func preparePackage(source, resRoot, kind string) (info packageSource, err error
 	return info, err
 }
 
-func discoverL4nOptions(root, resRoot string) []dxvkOption {
+func discoverL4nOptions(_ string, resRoot string) []dxvkOption {
+	return discoverVersionOptions(resRoot, l4nVersionsDirName, "l4n")
+}
+
+// Both old/new directories and archives live inside the same kind folder.
+// Names inside l4n need no prefix; the folder determines the resource kind.
+func discoverVersionOptions(resRoot, folder, kind string) []dxvkOption {
 	var options []dxvkOption
-	seen := map[string]bool{}
-	for _, base := range packageSearchRoots(root) {
-		for _, dir := range []string{base, filepath.Join(base, "L4N其他版本")} {
-			entries, err := os.ReadDir(dir)
-			if err != nil {
+	base := filepath.Join(resRoot, folder)
+	entries, err := os.ReadDir(base)
+	if err != nil {
+		return options
+	}
+	for _, entry := range entries {
+		_, archive := archiveName(entry.Name())
+		if !entry.IsDir() && !archive {
+			continue
+		}
+		source := filepath.Join(base, entry.Name())
+		if entry.IsDir() {
+			if _, err := normalizedMappings(kind, source); err != nil {
+				appendLog("[prepare] skipped " + kind + " " + entry.Name() + ": " + err.Error())
 				continue
 			}
-			for _, e := range entries {
-				name, archive := archiveName(e.Name())
-				if !e.IsDir() && !archive {
-					continue
-				}
-				if dir == base && !strings.Contains(strings.ToLower(name), "l4n") {
-					continue
-				}
-				path := filepath.Join(dir, e.Name())
-				if e.IsDir() {
-					files, err := packageInventory(path)
-					if err != nil {
-						continue
-					}
-					found := false
-					for _, f := range files {
-						if strings.EqualFold(filepath.Base(f), "left4neko.dll") {
-							found = true
-							break
-						}
-					}
-					if !found {
-						continue
-					}
-				}
-				key := strings.ToLower(e.Name())
-				if seen[key] {
-					continue
-				}
-				seen[key] = true
-				options = append(options, dxvkOption{Name: e.Name(), Dir: path})
-			}
 		}
+		options = append(options, dxvkOption{Name: entry.Name(), Dir: source})
 	}
 	sort.Slice(options, func(i, j int) bool { return strings.ToLower(options[i].Name) < strings.ToLower(options[j].Name) })
 	return options

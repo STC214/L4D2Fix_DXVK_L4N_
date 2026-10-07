@@ -20,13 +20,13 @@
 
 | 类别 | 能力 |
 | --- | --- |
-| 补丁处理 | 从 `dxvk其他版本/` 自动读取所有 DXVK 子目录，选择版本后一键安装 L4N 与对应 DXVK 文件。 |
+| 补丁处理 | 从 `dxvk/` 自动读取所有 DXVK 子目录，选择版本后一键安装 L4N 与对应 DXVK 文件。 |
 | 自动定位 | 从 Steam 库自动定位 L4D2，找不到时使用 Everything 辅助搜索。 |
 | 运行环境 | 自动安装 `VC_redist.x86.exe` / `VC_redist.x64.exe`。 |
 | 安全回滚 | 覆盖前逐文件备份，记录到 exe 同级 `.l4n_auto_backup/`。 |
 | 一键清理 | 可恢复游戏文件和 Steam 配置。 |
 | MOD 管理 | 可备份/恢复 `left4dead2/addons`，并同步处理 `left4dead2/cfg/video.txt`。 |
-| 启动项 | 自动写入 Steam AppID `550` 启动参数。 |
+| 启动项 | 从 L4N 资源中的启动指令 TXT 提取并写入 Steam AppID `550`，缺少此类文件时使用公共文件或默认参数。 |
 | 字体工具 | 提供 L4N 字体切换和旧版 `Font_change` 字体切换工具。 |
 | 使用说明 | UI 内置中文使用说明、启动项和验证指令。 |
 
@@ -48,8 +48,8 @@ L4N_Go_Win32_Portable/L4N_Go_Win32.exe
 
 | 控件 | 作用 |
 | --- | --- |
-| `DXVK版本` | 自动列出 `dxvk其他版本/` 下所有可用子目录名，例如 `dxvk-2.3`、`dxvk-2.7.1`。 |
-| `一键处理` | 使用所选 L4N 目录或压缩包作为基础补丁（默认保留原有 `resources/L4N_dxvk2.7.1`），并将所选 DXVK 版本映射为 `dxgi.dll`、`dxvk_d3d9.dll`、`bin/dxvk_d3d9.dll` 后覆盖到游戏目录。 |
+| `DXVK版本` | 自动列出 `dxvk/` 下所有可用子目录名，例如 `dxvk-2.3`、`dxvk-2.7.1`。 |
+| `一键处理` | 使用所选 L4N 目录或压缩包作为基础补丁（默认保留原有 `resources/l4n/L4N_dxvk2.7.1`），并将所选 DXVK 版本映射为 `dxgi.dll`、`dxvk_d3d9.dll`、`bin/dxvk_d3d9.dll` 后覆盖到游戏目录。 |
 | `备份MOD` | 复制游戏 `left4dead2/addons` 到 `resources/addons_backup`，并备份 `left4dead2/cfg/video.txt`。 |
 | `恢复MOD` | 复制 `resources/addons_backup` 回游戏 `left4dead2/addons`，同名文件会覆盖，并恢复 `left4dead2/cfg/video.txt`。 |
 | `一键清理` | 按 `.l4n_auto_backup/manifest.json` 还原游戏文件和 Steam 配置。 |
@@ -58,8 +58,8 @@ L4N_Go_Win32_Portable/L4N_Go_Win32.exe
 右侧说明会提示 DXVK 版本来源和支持的目录结构：
 
 ```text
-dxvk其他版本/dxvk-x.x/x32/
-dxvk其他版本/dxvk-x.x/dxvk-x.x/x32/
+dxvk/dxvk-x.x/x32/
+dxvk/dxvk-x.x/dxvk-x.x/x32/
 ```
 
 ## 独立字体切换程序
@@ -164,8 +164,9 @@ L4N_Go_Win32_Portable/
     验证指令【六】.txt
     tools/
       Everything/
-    L4N_dxvk2.7.1/            # L4N 基础补丁
-    dxvk其他版本/
+    l4n/
+      L4N_dxvk2.7.1/          # L4N 基础补丁或新版本压缩包
+    dxvk/
       dxvk-2.3/
       dxvk-2.7.1/
     addons_backup/              # 运行“备份MOD”后生成
@@ -194,14 +195,16 @@ L4N_Go_Win32_Portable/.l4n_auto_backup/
 
 ### 压缩包与资源规范化
 
-支持 ZIP、TAR、TAR.GZ、TGZ，无需用户预先解压。DXVK 放入 `resources/dxvk其他版本/`，L4N 放入 `resources/`（名称包含 L4N）或 `resources/L4N其他版本/`。两个版本下拉框均支持目录与压缩包，新增后重启刷新。
+支持 ZIP、TAR、TAR.GZ、TGZ，无需用户预先解压。DXVK 放入 `resources/dxvk/`，L4N 放入 `resources/l4n/`（名称无需 L4N 前缀）。两个版本下拉框均支持目录与压缩包，新增后重启刷新。
 
 点击一键处理后，选中的资源解压到 `resources/.package_tmp/<类型>-<随机目录>/extracted/`，整理结果放入同级 `normalized/`。处理外层套目录、DXVK `d3d9.dll` 重命名及缺少独立 bin 副本、L4N 扁平 `left4neko.dll` 和顶层 `neko/`、`shaders/`；不猜测缺失文件或多套核心文件的对应关系。32 位 DLL 标识、关键配置、重复路径、越界路径及解压大小均会检查。
 
 原始资源不修改。临时目录的 `prepared.json` 与 `.l4n_auto_backup/manifest.json` 记录源压缩包、SHA256、整理路径及安装目标；仍通过一键清理恢复原有游戏文件并移除新增文件。成功处理的临时目录保留供核对，失败解压自动清理；安装结束后可手动清理 `.package_tmp`，游戏撤回依靠备份目录而非临时资源。
 
+所选 L4N 目录或压缩包内，文件名同时含“启动”和“指令”的 `.txt` 会自动提取启动参数（递归查找，也识别包内外层说明文件），写入 Steam 的 AppID 550。优先级为所选资源 > `resources/l4n/` 顶层公共 TXT > `resources/` 顶层历史 TXT > 内置默认参数；不读取未选中版本的指令。只提取参数行，不将说明正文或该 TXT 复制到游戏。多个文件指令不一致、存在多组方案、空指令或引号异常时在安装前报错。支持 UTF-8、UTF-16 BOM、GBK；来源文件与 SHA256 记录在备份清单。
+
 详见 [压缩包资源使用说明](docs/压缩包资源使用.md)。
-新增 DXVK 放入 `L4N_Go_Win32_Portable/resources/dxvk其他版本/`；原有 L4N 基础包可继续保留在 `resources/L4N_dxvk2.7.1/`；也可在下拉框选择新增版本。
+新增 DXVK 放入 `L4N_Go_Win32_Portable/resources/dxvk/`；原有和新增 L4N 基础包统一放在 `resources/l4n/L4N_dxvk2.7.1/`；也可在下拉框选择新增版本。
 
 ## 构建
 

@@ -26,12 +26,13 @@ const (
 	defaultLaunchOptions         = "-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan"
 	resourceDirName              = "resources"
 	genericPatchDirName          = "L4N_dxvk2.7.1"
-	dxvkVersionsDirName          = "dxvk其他版本"
+	dxvkVersionsDirName          = "dxvk"
+	l4nVersionsDirName           = "l4n"
 	modBackupDirName             = "addons_backup"
 	displaySettingsBackupDirName = "display_settings_backup"
 	videoSettingsRelativePath    = "left4dead2/cfg/video.txt"
 	configRelativePath           = "left4dead2/neko/config.vdf"
-	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理，程序会安装 L4N 基础文件和所选 DXVK\r\n4. 需要保留 MOD 时，可先备份MOD，再恢复MOD\r\n5. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n6. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\n版本来源\r\nDXVK 放在 resources/dxvk其他版本，L4N 放在 resources 或 L4N其他版本。\r\n支持 ZIP/TAR/TAR.GZ/TGZ；选择后解压到 resources/.package_tmp。\r\n自动剥离外层目录、识别32位DLL并整理路径。\r\n新增后重启刷新；缺失或多组关键文件会报错。\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
+	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理，程序会安装 L4N 基础文件和所选 DXVK\r\n4. 需要保留 MOD 时，可先备份MOD，再恢复MOD\r\n5. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n6. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n\r\n版本来源\r\nDXVK 放在 resources/dxvk，L4N 放在 resources/l4n。目录与压缩包、新旧版本统一存放。\r\n支持 ZIP/TAR/TAR.GZ/TGZ；选择后解压到 resources/.package_tmp。\r\n自动剥离外层目录、识别32位DLL并整理路径。\r\n新增后重启刷新；缺失或多组关键文件会报错。\r\nL4N 内文件名同时含启动/指令的 TXT 自动提取 Steam 参数。\r\n\r\nSteam 启动项\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
 )
 
 var (
@@ -238,12 +239,13 @@ type drawItemStruct struct {
 }
 
 type manifest struct {
-	CreatedAt      string          `json:"createdAt"`
-	GameRoot       string          `json:"gameRoot"`
-	Files          []fileEntry     `json:"files"`
-	SteamConfigs   []steamEntry    `json:"steamConfigs"`
-	LaunchOptions  string          `json:"launchOptions"`
-	PackageSources []packageSource `json:"packageSources,omitempty"`
+	CreatedAt         string           `json:"createdAt"`
+	GameRoot          string           `json:"gameRoot"`
+	Files             []fileEntry      `json:"files"`
+	SteamConfigs      []steamEntry     `json:"steamConfigs"`
+	LaunchOptions     string           `json:"launchOptions"`
+	LaunchInstruction *launchSelection `json:"launchInstruction,omitempty"`
+	PackageSources    []packageSource  `json:"packageSources,omitempty"`
 }
 
 type fileEntry struct {
@@ -832,7 +834,16 @@ func runInstallWithDxvk(opt dxvkOption) error {
 	if err != nil {
 		return err
 	}
-	launchOptions := readLaunchOptions(resRoot)
+	launchInstruction, err := resolveL4nLaunchOptions(baseSource, resRoot)
+	if err != nil {
+		return fmt.Errorf("启动指令提取失败: %w", err)
+	}
+	launchOptions := launchInstruction.Options
+	appendLog("[steam] launch instruction source: " + launchInstruction.Scope)
+	for _, doc := range launchInstruction.Documents {
+		appendLog("[steam] launch instruction TXT: " + doc.Path)
+	}
+	appendLog("[steam] launch options: " + launchOptions)
 
 	setProgress(5)
 	if err := installRuntimes(runtimeDir); err != nil {
@@ -850,6 +861,7 @@ func runInstallWithDxvk(opt dxvkOption) error {
 	backupRoot := filepath.Join(root, ".l4n_auto_backup")
 	man := loadManifest(backupRoot, gameRoot)
 	man.LaunchOptions = launchOptions
+	man.LaunchInstruction = &launchInstruction
 	man.PackageSources = append(man.PackageSources, baseSource, dxvkSource)
 	if err := saveManifest(man, backupRoot); err != nil {
 		return err
@@ -1156,7 +1168,10 @@ func setSteamLaunchOptions(man *manifest, backupRoot, options string) error {
 	if processExists("steam.exe") {
 		appendLog("[steam] Steam 正在运行；若退出时覆盖配置，请关闭 Steam 后重新执行")
 	}
-	roots := steamRoots("")
+	return setSteamLaunchOptionsForRoots(man, backupRoot, options, steamRoots(""))
+}
+
+func setSteamLaunchOptionsForRoots(man *manifest, backupRoot, options string, roots []string) error {
 	updated := 0
 	for _, root := range roots {
 		userdata := filepath.Join(root, "userdata")
@@ -1187,9 +1202,11 @@ func setSteamLaunchOptions(man *manifest, backupRoot, options string) error {
 					appendLog("[steam] write failed: " + err.Error())
 					return nil
 				}
-				updated++
 				appendLog("[steam] updated: " + path)
+			} else {
+				appendLog("[steam] already up to date: " + path)
 			}
+			updated++
 			return nil
 		})
 	}
@@ -1223,9 +1240,11 @@ func setAppLaunchOptionsInText(text, options string) (string, error) {
 			return "", errors.New("localconfig.vdf 中 AppID 550 块无效")
 		}
 		block := text[open+1 : close]
-		re := regexp.MustCompile(`(?m)^(\s*)"LaunchOptions"\s*"[^"]*"`)
+		re := regexp.MustCompile(`(?m)^(\s*)"LaunchOptions"\s*"(?:\\.|[^"\\])*"`)
 		if re.MatchString(block) {
-			block = re.ReplaceAllString(block, `${1}"LaunchOptions"`+"\t"+`"`+escaped+`"`)
+			block = re.ReplaceAllStringFunc(block, func(old string) string {
+				return re.FindStringSubmatch(old)[1] + `"LaunchOptions"` + "\t" + `"` + escaped + `"`
+			})
 		} else {
 			block = strings.TrimRight(block, "\r\n\t ") + "\r\n\t\t\t\t\t\t\"LaunchOptions\"\t\"" + escaped + "\"\r\n"
 		}
@@ -1248,10 +1267,12 @@ func matchingBrace(s string, open int) int {
 	inString := false
 	for i := open; i < len(s); i++ {
 		switch s[i] {
-		case '"':
-			if i == 0 || s[i-1] != '\\' {
-				inString = !inString
+		case '\\':
+			if inString && i+1 < len(s) {
+				i++
 			}
+		case '"':
+			inString = !inString
 		case '{':
 			if !inString {
 				depth++
@@ -1459,21 +1480,6 @@ func processExists(name string) bool {
 	return strings.Contains(strings.ToLower(string(out)), strings.ToLower(name))
 }
 
-func readLaunchOptions(root string) string {
-	files, _ := filepath.Glob(filepath.Join(root, "*.txt"))
-	for _, f := range files {
-		base := strings.ToLower(filepath.Base(f))
-		if strings.Contains(base, "验证") || strings.Contains(base, "verify") || strings.Contains(base, "validate") {
-			continue
-		}
-		data, err := os.ReadFile(f)
-		if err == nil && strings.Contains(string(data), "-heapsize") && strings.Contains(string(data), "-vulkan") {
-			return strings.TrimSpace(string(data))
-		}
-	}
-	return defaultLaunchOptions
-}
-
 func findPackageDir(root string, required []string) (string, error) {
 	var dirs []string
 	entries, _ := os.ReadDir(root)
@@ -1518,36 +1524,8 @@ func isNamedPackageDir(dir string) bool {
 	return true
 }
 
-func discoverDxvkOptions(root, resRoot string) []dxvkOption {
-	var options []dxvkOption
-	seen := map[string]bool{}
-	for _, base := range packageSearchRoots(root) {
-		entries, err := os.ReadDir(filepath.Join(base, dxvkVersionsDirName))
-		if err != nil {
-			continue
-		}
-		for _, entry := range entries {
-			_, archive := archiveName(entry.Name())
-			if !entry.IsDir() && !archive {
-				continue
-			}
-			dir := filepath.Join(base, dxvkVersionsDirName, entry.Name())
-			if entry.IsDir() {
-				if _, err := normalizedMappings("dxvk", dir); err != nil {
-					appendLog("[prepare] skipped DXVK " + entry.Name() + ": " + err.Error())
-					continue
-				}
-			}
-			key := strings.ToLower(entry.Name())
-			if seen[key] {
-				continue
-			}
-			seen[key] = true
-			options = append(options, dxvkOption{Name: entry.Name(), Dir: dir})
-		}
-	}
-	sort.Slice(options, func(i, j int) bool { return strings.ToLower(options[i].Name) < strings.ToLower(options[j].Name) })
-	return options
+func discoverDxvkOptions(_ string, resRoot string) []dxvkOption {
+	return discoverVersionOptions(resRoot, dxvkVersionsDirName, "dxvk")
 }
 
 func packageSearchRoots(root string) []string {
