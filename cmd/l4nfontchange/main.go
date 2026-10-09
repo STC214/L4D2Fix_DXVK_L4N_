@@ -425,7 +425,7 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 		}
 		return 0
 	case wmDrawItem:
-		drawButton((*drawItemStruct)(unsafe.Pointer(lParam)))
+		drawButton(copyDrawItem(lParam))
 		return 1
 	case wmCtlColorStatic, wmCtlColorEdit:
 		hdc := wParam

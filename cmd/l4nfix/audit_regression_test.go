@@ -36,7 +36,7 @@ func TestSteamPartialFailureIsReported(t *testing.T) {
 	bad := filepath.Join(steam, "userdata", "2", "config", "localconfig.vdf")
 	os.MkdirAll(filepath.Dir(good), 0755)
 	os.MkdirAll(filepath.Dir(bad), 0755)
-	os.WriteFile(good, []byte(`"apps" { "550" { "LaunchOptions" "old" } }`), 0644)
+	os.WriteFile(good, []byte(steamConfigFixture(`"apps" { "550" { "LaunchOptions" "old" } }`)), 0644)
 	os.WriteFile(bad, []byte(`"apps" {`), 0644)
 	m := &manifest{GameRoot: filepath.Join(r, "game")}
 	if err := setSteamLaunchOptionsForRoots(m, filepath.Join(r, "backup"), "-steam", []string{steam}); err == nil {

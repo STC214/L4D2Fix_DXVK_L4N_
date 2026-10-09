@@ -4,9 +4,11 @@ package main
 
 import (
 	"archive/zip"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"syscall"
 	"testing"
 )
 
@@ -57,7 +59,17 @@ func TestInstallManifestRejectsOutsideBackupSource(t *testing.T) {
 	outside := filepath.Join(r, "outside-backup")
 	os.WriteFile(outside, []byte("old"), 0644)
 	m.Files[0].Backup = outside
-	saveManifest(m, backup)
+	if err := saveManifest(m, backup); err == nil {
+		t.Fatal("outside backup accepted by save")
+	}
+	// Simulate an externally tampered manifest despite the writer rejecting it.
+	b, err := json.Marshal(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(backup, "manifest.json"), b, 0600); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := checkedInstallManifest(backup, game); err == nil {
 		t.Fatal("outside backup source accepted")
 	}
@@ -69,7 +81,9 @@ func TestPatchTargetsAllPreflightBeforeCopy(t *testing.T) {
 	outside := filepath.Join(r, "outside")
 	os.MkdirAll(game, 0755)
 	os.MkdirAll(outside, 0755)
-	if out, err := exec.Command("cmd", "/c", "mklink", "/J", filepath.Join(game, "z"), outside).CombinedOutput(); err != nil {
+	linkCmd := exec.Command("cmd", "/c", "mklink", "/J", filepath.Join(game, "z"), outside)
+	linkCmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	if out, err := linkCmd.CombinedOutput(); err != nil {
 		t.Fatalf("junction fixture: %v %s", err, out)
 	}
 	src := filepath.Join(r, "source")
@@ -165,7 +179,9 @@ func TestResourceInventoryRejectsJunction(t *testing.T) {
 	outside := filepath.Join(r, "outside")
 	os.MkdirAll(source, 0755)
 	testFiles(t, outside, map[string][]byte{"dxgi.dll": []byte("outside")})
-	if out, err := exec.Command("cmd", "/c", "mklink", "/J", filepath.Join(source, "linked"), outside).CombinedOutput(); err != nil {
+	linkCmd := exec.Command("cmd", "/c", "mklink", "/J", filepath.Join(source, "linked"), outside)
+	linkCmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	if out, err := linkCmd.CombinedOutput(); err != nil {
 		t.Fatalf("junction fixture: %v %s", err, out)
 	}
 	if _, err := packageInventory(source); err == nil {

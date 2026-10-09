@@ -10,7 +10,7 @@ import (
 
 func FuzzSteamVDFEdit(f *testing.F) {
 	for _, seed := range []string{`"apps" { "550" { "LaunchOptions" "old" } }`, `// } "apps"\n`, `"apps" {}`, `"apps" { "550" { "nested" { "LaunchOptions" "keep" } } }`, `"apps" { "550" "bad" }`} {
-		f.Add(seed)
+		f.Add(steamConfigFixture(seed))
 	}
 	f.Fuzz(func(t *testing.T, text string) {
 		options := `-steam +exec "some file.cfg"`

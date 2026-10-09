@@ -393,7 +393,7 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 		}
 		return 0
 	case wmDrawItem:
-		drawButton((*drawItemStruct)(unsafe.Pointer(lParam)))
+		drawButton(copyDrawItem(lParam))
 		return 1
 	case wmCtlColorStatic, wmCtlColorEdit:
 		hdc := wParam
@@ -707,6 +707,11 @@ func setProgress(v int) {
 }
 
 func appendLog(s string) {
+	if root, err := packageRoot(); err == nil {
+		if err := appendSessionLog(root, s); err != nil {
+			s += "\r\n[log] 日志保存失败: " + err.Error()
+		}
+	}
 	invokeUI(func() {
 		line := s + "\r\n"
 		procSendMessageW.Call(logCtl, emSetSel, ^uintptr(0), ^uintptr(0))
@@ -887,6 +892,9 @@ func restoreFromBackup(backupRoot string) error {
 	}
 	var man manifest
 	if err := json.Unmarshal(data, &man); err != nil {
+		return err
+	}
+	if err := resolveBackupLocations(&man, backupRoot); err != nil {
 		return err
 	}
 	if err := validateManifestBackupPaths(&man, backupRoot); err != nil {
@@ -1606,6 +1614,9 @@ func checkedInstallManifest(root, gameRoot string) (*manifest, error) {
 	if !strings.EqualFold(clean(m.GameRoot), clean(gameRoot)) {
 		return nil, fmt.Errorf("现有备份属于另一游戏目录，请先还原原目录")
 	}
+	if err := resolveBackupLocations(&m, root); err != nil {
+		return nil, err
+	}
 	if err := validateManifestBackupPaths(&m, root); err != nil {
 		return nil, err
 	}
@@ -1675,7 +1686,11 @@ func validateManifestTargets(m *manifest) error {
 }
 
 func saveManifest(m *manifest, root string) error {
-	data, err := json.MarshalIndent(m, "", "  ")
+	portable, err := portableManifest(m, root)
+	if err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(portable, "", "  ")
 	if err != nil {
 		return err
 	}

@@ -18,6 +18,7 @@ func TestSteamVDFStructuralEdit(t *testing.T) {
   "LaunchOptions" "old" // preserve this comment
  }
 }`
+	original = steamConfigFixture(original)
 	got, err := setAppLaunchOptionsInText(original, `-steam +exec "my file.cfg" $HOME`)
 	if err != nil {
 		t.Fatal(err)
@@ -35,7 +36,7 @@ func TestSteamVDFStructuralEdit(t *testing.T) {
 
 func TestSteamVDFRejectAmbiguity(t *testing.T) {
 	for _, text := range []string{`"apps" { "550" {} "550" {} }`, `"apps" { "550" { "LaunchOptions" "a" "LaunchOptions" "b" } }`, `"apps" {} "apps" {}`, `"apps" {`, `"apps" { "550" "bad" }`} {
-		if _, err := setAppLaunchOptionsInText(text, "-steam"); err == nil {
+		if _, err := setAppLaunchOptionsInText(steamConfigFixture(text), "-steam"); err == nil {
 			t.Fatalf("accepted ambiguous or malformed VDF: %s", text)
 		}
 	}

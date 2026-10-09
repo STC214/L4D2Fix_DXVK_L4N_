@@ -125,26 +125,13 @@ func setAppLaunchOptionsInText(text, options string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var apps []vdfNode
-	var visit func([]vdfNode)
-	visit = func(ns []vdfNode) {
-		for _, n := range ns {
-			if n.block {
-				if strings.EqualFold(n.key.value, "apps") {
-					apps = append(apps, n)
-				} else {
-					visit(n.children)
-				}
-			}
-		}
-	}
-	visit(nodes)
-	if len(apps) != 1 {
-		return "", fmt.Errorf("localconfig.vdf must contain exactly one apps block (found %d)", len(apps))
+	apps, err := steamLaunchAppsBlock(nodes)
+	if err != nil {
+		return "", err
 	}
 	escaped := strconv.Quote(options)
 	var games []vdfNode
-	for _, n := range apps[0].children {
+	for _, n := range apps.children {
 		if n.key.value == "550" {
 			games = append(games, n)
 		}
@@ -154,7 +141,7 @@ func setAppLaunchOptionsInText(text, options string) (string, error) {
 	}
 	if len(games) == 0 {
 		insert := "\r\n\t\t\t\t\t\"550\"\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\t\"LaunchOptions\"\t" + escaped + "\r\n\t\t\t\t\t}\r\n"
-		at := apps[0].close
+		at := apps.close
 		return text[:at] + insert + text[at:], nil
 	}
 	game := games[0]
@@ -178,4 +165,30 @@ func setAppLaunchOptionsInText(text, options string) (string, error) {
 		return text[:f.value.start] + escaped + text[f.value.end:], nil
 	}
 	return text[:game.close] + "\r\n\t\t\t\t\t\t\"LaunchOptions\"\t" + escaped + "\r\n" + text[game.close:], nil
+}
+
+// apps also exists under WebStorage and other unrelated branches. Only the
+// canonical Steam settings path owns game launch options. Require uniqueness
+// at every level so duplicate ancestors never silently select one account tree.
+func steamLaunchAppsBlock(nodes []vdfNode) (vdfNode, error) {
+	path := []string{"UserLocalConfigStore", "Software", "Valve", "Steam", "apps"}
+	var selected vdfNode
+	for i, key := range path {
+		var matches []vdfNode
+		for _, n := range nodes {
+			if strings.EqualFold(n.key.value, key) {
+				matches = append(matches, n)
+			}
+		}
+		location := strings.Join(path[:i+1], "/")
+		if len(matches) != 1 {
+			return vdfNode{}, fmt.Errorf("localconfig.vdf must contain exactly one block at %s (found %d)", location, len(matches))
+		}
+		selected = matches[0]
+		if !selected.block {
+			return vdfNode{}, fmt.Errorf("localconfig.vdf path is not a block: %s", location)
+		}
+		nodes = selected.children
+	}
+	return selected, nil
 }

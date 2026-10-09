@@ -188,6 +188,7 @@ func TestSteamExtractedInstructionsAndRestore(t *testing.T) {
 	steam := filepath.Join(r, "steam")
 	config := filepath.Join(steam, "userdata", "1", "config", "localconfig.vdf")
 	original := "\"apps\"\n{\n\"550\"\n{\n\t\"LaunchOptions\" \"-old +exec \\\"old.cfg\\\"\"\n}\n\"730\"\n{\n\t\"LaunchOptions\" \"-untouched\"\n}\n}\n"
+	original = steamConfigFixture(original)
 	testFiles(t, steam, map[string][]byte{"userdata/1/config/localconfig.vdf": []byte(original)})
 	backup := filepath.Join(r, "backup")
 	man := loadManifest(backup, filepath.Join(r, "game"))
