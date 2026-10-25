@@ -29,7 +29,8 @@ var platformChoices []string
 func createPlatformControls(hwnd uintptr) {
 	groupBox(hwnd, "平台资源与部署", 630, 22, 300, 310)
 	btnCheckUpdates = button(hwnd, "检查最新版并下载", idCheckUpdates, 646, 50, 268, 36)
-	label(hwnd, "增强平台（二选一）", 646, 102, 268, 22)
+	platformLabel := label(hwnd, "增强平台（二选一）", 646, 102, 268, 22)
+	procSendMessageW.Call(platformLabel, wmSetFont, textFont, 1)
 	comboPlatform = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 646, 130, 268, 180, hwnd, 0)
 	platformStatusCtl = label(hwnd, "尚未检查更新", 646, 164, 268, 42)
 	btnDeployPlatform = button(hwnd, "部署所选平台", idDeployPlatform, 646, 220, 268, 36)
