@@ -490,6 +490,9 @@ func preparePackage(source, resRoot, kind string) (info packageSource, err error
 		return info, err
 	}
 	cache := filepath.Join(resRoot, ".package_tmp")
+	if err = pathguard.Within(resRoot, filepath.Join(cache, "prepared.json")); err != nil {
+		return info, err
+	}
 	if st, e := os.Lstat(cache); e == nil && (!st.IsDir() || pathguard.Linked(st)) {
 		return info, fmt.Errorf("临时资源目录必须是普通目录")
 	} else if e != nil && !os.IsNotExist(e) {
@@ -585,6 +588,10 @@ func discoverVersionOptions(resRoot, folder, kind string) []dxvkOption {
 		return options
 	}
 	for _, entry := range entries {
+		// Interrupted downloads and validation copies are never user choices.
+		if strings.HasPrefix(entry.Name(), ".") {
+			continue
+		}
 		_, archive := archiveName(entry.Name())
 		if !entry.IsDir() && !archive {
 			continue

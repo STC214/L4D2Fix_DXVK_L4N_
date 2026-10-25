@@ -127,7 +127,7 @@ func archiveL4nConfigIfChanged(gameRoot, resRoot, incoming string, man *manifest
 	if err != nil || current != hash {
 		return "", fmt.Errorf("留档期间 config.vdf 发生变化，请重试")
 	}
-	if err := os.Rename(tmp, dest); err != nil {
+	if err := renameFileRetry(tmp, dest); err != nil {
 		return "", err
 	}
 	return archived, nil

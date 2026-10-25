@@ -591,6 +591,7 @@ func loadDxvkOptionsIntoCombo() {
 		return
 	}
 	resRoot := resourceRoot(root)
+	procSendMessageW.Call(comboDxvk, 0x014B, 0, 0) // CB_RESETCONTENT
 	dxvkOptions = discoverDxvkOptions(root, resRoot)
 	if len(dxvkOptions) == 0 {
 		appendLog("[prepare] no DXVK versions found under " + dxvkVersionsDirName)
@@ -945,6 +946,13 @@ func restoreFromBackup(backupRoot string) error {
 	if err := validateOriginalBackups(&man); err != nil {
 		return err
 	}
+	// Validate all editable navigation blocks before restoring/removing any
+	// platform file; malformed user edits must not leave a partial cleanup.
+	for _, entry := range man.Files {
+		if _, err := restoreModifiedPlatformAutoexec(&man, entry, false); err != nil {
+			return err
+		}
+	}
 	if archived, err := archiveConfigBeforeRestore(backupRoot, &man); err != nil {
 		return fmt.Errorf("清理前配置留档失败，已停止还原: %w", err)
 	} else if archived != "" {
@@ -953,7 +961,7 @@ func restoreFromBackup(backupRoot string) error {
 	var restoreErrs []string
 	setProgress(15)
 	for i, e := range man.Files {
-		if handled, err := restoreModifiedPlatformAutoexec(&man, e); handled {
+		if handled, err := restoreModifiedPlatformAutoexec(&man, e, true); handled {
 			if err != nil {
 				restoreErrs = append(restoreErrs, err.Error())
 			}
@@ -1724,6 +1732,10 @@ func validateManifestTargets(m *manifest) error {
 		normalized, err := packageRelative(rel)
 		if err != nil || normalized == "" {
 			return fmt.Errorf("备份清单目标超出游戏目录: %s", e.Target)
+		}
+		declared, err := packageRelative(e.Rel)
+		if err != nil || declared == "" || !strings.EqualFold(declared, normalized) {
+			return fmt.Errorf("备份清单相对路径与实际目标不符: %s / %s", e.Rel, e.Target)
 		}
 	}
 	return nil

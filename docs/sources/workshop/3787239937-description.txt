@@ -1,0 +1,115 @@
+Skeeto now supports English localization.
+
+This is not a traditional mod — it will redefine what you thought was possible in Left 4 Dead 2.
+
+Prepare to be amazed.
+
+
+Skeeto保姆级安装教程：https://www.bilibili.com/opus/1258983063457628164
+Bug反馈：bilibili @regoists
+
+【Skeeto】
+
+Skeeto 产品关键词：“正反馈”与“实用性”。在不破坏游戏平衡的前提下，优先提升反馈、局势可读性与操作确定性，解决原版诸多痛点。
+**Core Philosophy: Server-Compatible · Highly Customizable · Positive Feedback · Practicality First** Improve feedback, readability and control without affecting game balance.
+
+这不是传统意义上的 Mod。
+Skeeto（SKT）是一个《求生之路 2》客户端增强框架。绝大多数功能运行于客户端，可在多数服务器直接使用，无需服主安装 VScript / SourceMod，不修改敏感游戏文件，不触发 LAC / VAC。功能默认关闭、相互隔离，支持独立开关、样式、方向键挪位及 JSON / 素材 DIY。进入禁用 Mod 的对抗服务器时会自动隔离全部功能。
+
+**Skeeto (SKT) is a client-side enhancement framework for Left 4 Dead 2.** Most features work on regular servers without server-side VScript/SourceMod. Features are modular, disabled by default and highly customizable. They are automatically isolated on Mod-restricted competitive servers.
+
+相比脚本包、服务器插件和资源硬替换，SKT 更强调：**联机可用、关闭无残留、反馈直接、配置可保存。**
+Compared with scripts, server plugins or hard asset replacement, SKT focuses on **online compatibility, clean disabling, direct feedback and persistent configs.**
+
+主菜单模块包括：命中反馈、准星、自定义 HUD、世界 HUD、Skeetoscript、Background Engine、Career Archive、客户端体验优化、本地服体验优化等。
+
+━━━━━━━━━━━━━━━━━━━━
+◆ 安装与更新 / Installation
+━━━━━━━━━━━━━━━━━━━━
+
+· **首次安装 / First install：**将工坊 `.vpk` 改为 `.zip` 并完整解压，包内所有文件拖入游戏根目录即可。
+Rename the workshop .vpk to .zip and extract everything, then drag all files from the package into the game root directory.
+
+· **更新 / Updates：**保持订阅即可，Skeeto 会自动更新。建议同时订阅官方预设素材包。
+Keep the Workshop item subscribed; Skeeto updates automatically. The official preset asset pack is recommended.
+
+· 安装异常优先检查游戏目录、杀毒拦截以及游戏是否已关闭。
+
+━━━━━━━━━━━━━━━━━━━━
+◆ 能力与优势 / Features
+━━━━━━━━━━━━━━━━━━━━
+
+【命中与击杀反馈 / Hit & Kill Feedback】
+
+将 Hit / Kill / 爆头，以及空爆、断舌、Crown 等特殊击杀转化为可配置的图标、粒子和音效。普感与特感可分开配置，画面/音量独立控制；友伤仅真实掉血时触发。支持 JSON DIY，无需改源码即可新增反馈。
+
+Configurable **hit, kill, headshot and special-kill feedback** such as skeets, tongue cuts and Crowns, using icons, particles and sounds. JSON-based custom presets are supported.
+
+【自定义准星 / Custom Crosshairs】
+
+静态准星使用高清外置叠加层；动态准星读取引擎实时散布；贴图准星支持 VTF、工坊与 DIY。三套可同时开启且互不影响。
+Static overlay, real-time spread crosshair and VTF texture crosshair can be enabled independently or together.
+
+【自定义 HUD / Custom HUD】
+
+将队友状态、弹药、被控/救援、击杀统计与击杀列表、特感预警、开麦、导演压力、换弹/开火后摇、推击疲劳、治疗/投掷物计时、关卡进度、速度等拆成独立 HUD 模块。
+
+全部可独立开关、调样式/大小，并用方向键挪位（Shift 大步）。把原版固定 HUD 变成一套由玩家自由组合的工具箱。
+
+Modular HUD for **teammates, ammo, rescues, kill feed, infected warnings, Director pressure, reload/fire recovery, shove fatigue, item timers, map progress, speed and more.** Position, size and style are customizable.
+
+【世界 HUD / World HUD】
+
+将特感血条、伤害数字、技巧/击杀浮字、救援/解控、胆汁感染、黑白状态、惊扰警示等信息直接绑定实际角色模型，形成真正的三维世界 HUD。
+3D HUD elements attached directly to world entities: infected health, damage numbers, kills, rescues, bile, incapacitation warnings and more.
+
+【Skeetoscript】
+
+将低血量红屏、治疗绿屏、空仓/低弹提示音、弹壳与弹匣落地等常见 VScript 视听增强改为纯客户端 C++ 实现。
+Client-side C++ replacements for common VScript visual/audio enhancements, usable online without server scripts.
+
+【Skeeto Background Engine】
+
+突破原版主菜单仅支持 BIK 的限制。将 PNG / JPG、H.264 MP4 或 BIK 放入 `skeeto/backgrounds/` 即可使用，支持局内热切换、音量、显示模式与独立开关。
+Custom main-menu backgrounds with **PNG/JPG, H.264 MP4 and BIK**, including hot switching and display/audio controls.
+
+【Skeeto Career Archive】
+
+直接在游戏内查看自己的 Steam 对局与生涯统计，方便总结与复盘。
+View Steam match and career statistics directly in-game.
+
+【客户端体验优化 / Client QoL】
+
+包含投掷落点/轨迹预览、尸体/布偶瞬间隐藏（无需 `-lv`）、角色描边与强制客户端 CVar、听声辨位优化、闲置接管后视角/手电/武器槽恢复、Config Override、`skt_cvar`、L4N 内存清理、导演 HUD 常开等。
+
+目标不是堆功能，而是解决实际游玩中反复出现的痛点。
+QoL features include trajectory previews, instant ragdoll hiding, glow/CVar controls, positional-audio improvements, idle takeover fixes, config override, `skt_cvar`, L4N cleanup, Director HUD and more.
+
+【本地服体验优化 / Local Server】
+
+无需 SourceMod，即可为本地听服主机提供 Tick 解锁、NextBot 刷新率、0 lerp、空中加速 AA、单人闲置/去延迟、人物切换（类 `!csm`）、视角倾斜等功能。
+
+这些功能**仅主机生效**，不作为远程服务器功能宣传。适合练枪、练特感、本地开黑与调手感。
+Host-only tools for local servers: tick unlock, NextBot update rate, 0 lerp, air acceleration, idle/latency tweaks, character switching and view controls.
+
+━━━━━━━━━━━━━━━━━━━━
+◆ 使用说明 / Usage
+━━━━━━━━━━━━━━━━━━━━
+
+· 游戏内按 **[** 打开 Skeeto 菜单
+Press **[** to open the Skeeto menu.
+
+· 也可使用：`bind xxx skeeto_menu`
+
+· 项目将持续维护，并保持纯公益性质。
+Skeeto is continuously maintained and completely non-commercial.
+
+· 问题反馈：bilibili @regoists
+
+· 进入禁用 Mod 的对抗服务器时，会自动隔离全部功能，避免公平性风险。
+All features are automatically isolated on Mod-restricted competitive servers.
+
+Skeeto is designed to be compatible with other similar platforms by default (such as Left 4 Neko).
+
+感谢使用 Skeeto。
+**Hope Skeeto brings you the same satisfying feeling as landing a clean skeet.**

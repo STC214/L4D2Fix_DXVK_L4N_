@@ -1,0 +1,22 @@
+{
+  "snapshot_utc": "2026-10-25T15:30:22.662818Z",
+  "source": "Existing user-workspace Steam official API description snapshots; HTML fetch unsuccessful",
+  "descriptions": [
+    {
+      "id": "3787239937",
+      "name": "Skeeto",
+      "page": "https://steamcommunity.com/sharedfiles/filedetails/?id=3787239937",
+      "file": "3787239937-description.txt",
+      "sha256": "d0230c9d7d90da4fee6abfe2537b8fccf4d528a83dc863de7dfa62de0a4636bf",
+      "bytes": 7413
+    },
+    {
+      "id": "3785109042",
+      "name": "L4D2Evolved（Evo）",
+      "page": "https://steamcommunity.com/sharedfiles/filedetails/?id=3785109042",
+      "file": "3785109042-description.txt",
+      "sha256": "5a85bad6bc72c53ae096e731a4c7c280a066aca69f9267d1a88651e4af7fe8ba",
+      "bytes": 7496
+    }
+  ]
+}

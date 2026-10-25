@@ -27,4 +27,14 @@ func TestWindowsJunctionAndLexicalPaths(t *testing.T) {
 	if err := Within(root, filepath.Join(root, "new", "file")); err != nil {
 		t.Fatal(err)
 	}
+	if err := Within(link, filepath.Join(link, "file")); err == nil {
+		t.Fatal("junction used as root was accepted")
+	}
+	plain := filepath.Join(r, "plain-file")
+	if err := os.WriteFile(plain, []byte("x"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := Within(plain, filepath.Join(plain, "child")); err == nil {
+		t.Fatal("file used as root was accepted")
+	}
 }

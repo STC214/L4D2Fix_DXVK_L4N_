@@ -83,24 +83,44 @@ func runCheckUpdates() error {
 	platformReady = map[string]workshopResource{}
 	platformReadyMu.Unlock()
 	invokeUI(refreshPlatformChoices)
-	ctx, cancel := context.WithTimeout(context.Background(), 16*time.Minute)
-	defer cancel()
-	return checkWorkshopUpdates(ctx, workshopClient(), workshopAPI, resourceRoot(root), func(r workshopResource) {
-		platformReadyMu.Lock()
-		platformReady[r.Platform] = r
-		platformReadyMu.Unlock()
-		invokeUI(func() {
-			if r.Platform == "l4n" {
-				loadL4nOptionsIntoCombo()
-				for i, opt := range l4nOptions {
-					if strings.EqualFold(filepath.Clean(opt.Dir), filepath.Join(resourceRoot(root), r.Archive)) {
-						procSendMessageW.Call(comboL4n, cbSetCurSel, uintptr(i), 0)
+	workshop := func() error {
+		ctx, cancel := context.WithTimeout(context.Background(), 16*time.Minute)
+		defer cancel()
+		return checkWorkshopUpdates(ctx, workshopClient(), workshopAPI, resourceRoot(root), func(r workshopResource) {
+			platformReadyMu.Lock()
+			platformReady[r.Platform] = r
+			platformReadyMu.Unlock()
+			invokeUI(func() {
+				if r.Platform == "l4n" {
+					loadL4nOptionsIntoCombo()
+					for i, opt := range l4nOptions {
+						if strings.EqualFold(filepath.Clean(opt.Dir), filepath.Join(resourceRoot(root), r.Archive)) {
+							procSendMessageW.Call(comboL4n, cbSetCurSel, uintptr(i), 0)
+						}
 					}
 				}
-			}
-			refreshPlatformChoices()
+				refreshPlatformChoices()
+			})
 		})
-	})
+	}
+	dxvk := func() error {
+		ctx, cancel := context.WithTimeout(context.Background(), 6*time.Minute)
+		defer cancel()
+		r, err := checkDXVKUpdate(ctx, dxvkReleaseClient(), dxvkReleaseAPI, resourceRoot(root))
+		if err != nil {
+			return err
+		}
+		invokeUI(func() {
+			loadDxvkOptionsIntoCombo()
+			for i, opt := range dxvkOptions {
+				if strings.EqualFold(filepath.Clean(opt.Dir), filepath.Join(resourceRoot(root), r.Archive)) {
+					procSendMessageW.Call(comboDxvk, cbSetCurSel, uintptr(i), 0)
+				}
+			}
+		})
+		return nil
+	}
+	return checkUpdateSources(workshop, dxvk)
 }
 func runDeployPlatform() error {
 	// Controls are frozen by guarded while the worker reads the selection.

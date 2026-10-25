@@ -56,6 +56,15 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 	if !strings.Contains(usageGuideURL, "/docs/") {
 		t.Fatal("repository usage link missing")
 	}
+	// Refreshing after a download must clear stale entries rather than append
+	// duplicate version choices, including when no valid resources remain.
+	procSendMessageW.Call(comboDxvk, cbAddString, 0, uintptr(unsafe.Pointer(utf16Ptr("stale-placeholder"))))
+	loadDxvkOptionsIntoCombo()
+	loadDxvkOptionsIntoCombo()
+	count, _, _ := procSendMessageW.Call(comboDxvk, 0x0146, 0, 0) // CB_GETCOUNT
+	if int(count) != len(dxvkOptions) {
+		t.Fatalf("DXVK refresh left stale/duplicate choices: %d / %d", count, len(dxvkOptions))
+	}
 	// Exercise the real native LPARAM callback using Windows-owned memory.
 	hdc, _, _ := user32.NewProc("GetDC").Call(btnRefreshVersion)
 	defer user32.NewProc("ReleaseDC").Call(btnRefreshVersion, hdc)
@@ -69,5 +78,5 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 	if result, _, _ := procSendMessageW.Call(hwnd, wmDrawItem, idRefreshVersion, mem); result != 1 {
 		t.Fatal("owner draw callback not handled")
 	}
-	t.Log("hidden native UI: controls/captions/guide scroll/owner draw callback PASS; deployment buttons not clicked")
+	t.Log("hidden native UI: controls/captions/DXVK refresh/owner draw callback PASS; deployment buttons not clicked")
 }

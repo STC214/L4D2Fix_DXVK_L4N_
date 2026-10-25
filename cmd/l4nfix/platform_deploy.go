@@ -151,6 +151,7 @@ func evolvedNavigationConfig(b []byte) []byte {
 	var out []string
 	for _, l := range lines {
 		k, _, ok := strings.Cut(strings.TrimSpace(l), "=")
+		k = strings.TrimSpace(k)
 		if ok && (strings.EqualFold(k, "NoHmdMinimapEnabled") || strings.EqualFold(k, "NoHmdWorldNavigationEnabled")) {
 			continue
 		}
@@ -159,7 +160,7 @@ func evolvedNavigationConfig(b []byte) []byte {
 	return []byte(strings.TrimRight(strings.Join(out, "\r\n"), "\r\n") + "\r\nNoHmdMinimapEnabled=true\r\nNoHmdWorldNavigationEnabled=true\r\n")
 }
 
-func restoreModifiedPlatformAutoexec(m *manifest, f fileEntry) (bool, error) {
+func restoreModifiedPlatformAutoexec(m *manifest, f fileEntry, apply bool) (bool, error) {
 	if m.Platform != "skeeto" || !strings.EqualFold(filepath.ToSlash(f.Rel), "left4dead2/cfg/autoexec.cfg") || !exists(f.Target) {
 		return false, nil
 	}
@@ -182,6 +183,15 @@ func restoreModifiedPlatformAutoexec(m *manifest, f fileEntry) (bool, error) {
 	if a < 0 || z < a || strings.Count(s, skeetoNavBegin) != 1 || strings.Count(s, skeetoNavEnd) != 1 {
 		return true, fmt.Errorf("autoexec 导航块不完整，请核对留档后重试")
 	}
+	for _, marker := range []struct {
+		start int
+		text  string
+	}{{a, skeetoNavBegin}, {z, skeetoNavEnd}} {
+		end := marker.start + len(marker.text)
+		if (marker.start > 0 && s[marker.start-1] != '\n') || (end < len(s) && s[end] != '\r' && s[end] != '\n') {
+			return true, fmt.Errorf("autoexec 导航标记必须独占一行，请核对留档后重试")
+		}
+	}
 	end := z + len(skeetoNavEnd)
 	if strings.HasPrefix(s[end:], "\r\n") {
 		end += 2
@@ -190,6 +200,9 @@ func restoreModifiedPlatformAutoexec(m *manifest, f fileEntry) (bool, error) {
 	}
 	if a >= 2 && s[a-2:a] == "\r\n" {
 		a -= 2
+	}
+	if !apply {
+		return true, nil
 	}
 	return true, writeFileAtomic(f.Target, []byte(s[:a]+s[end:]), 0644)
 }

@@ -28,6 +28,16 @@ func Within(root, path string) error {
 		return fmt.Errorf("target outside root: %s", path)
 	}
 	current := filepath.Clean(root)
+	// The root itself is also a component: accepting a junction here would
+	// bypass every later relative-path check (for example resources -> elsewhere).
+	info, err := os.Lstat(current)
+	if err == nil {
+		if Linked(info) || !info.IsDir() {
+			return fmt.Errorf("root must be a plain directory: %s", root)
+		}
+	} else if !os.IsNotExist(err) {
+		return err
+	}
 	for _, part := range strings.Split(rel, string(filepath.Separator)) {
 		current = filepath.Join(current, part)
 		info, err := os.Lstat(current)
