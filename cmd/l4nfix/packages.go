@@ -440,8 +440,20 @@ func normalizedMappings(kind, root string) ([]packageMapping, error) {
 			}
 		}
 		if !foundConfig {
-			return nil, fmt.Errorf("L4N 缺少 left4dead2/neko/config.vdf 或 neko/config.vdf；目录层级有歧义时请整理资源包")
+			// Official Workshop archives ship a template, not a live config.
+			for _, m := range mappings {
+				if strings.EqualFold(filepath.ToSlash(m.Relative), "left4dead2/neko/config_template.vdf") {
+					mappings = append(mappings, packageMapping{Source: m.Source, Relative: filepath.FromSlash(configRelativePath)})
+					foundConfig = true
+					break
+				}
+			}
+			if !foundConfig {
+				return nil, fmt.Errorf("L4N 缺少 config.vdf 或 config_template.vdf；请检查资源包")
+			}
 		}
+	} else if kind == "skeeto" || kind == "evolved" {
+		return platformMappings(kind, root, files)
 	} else {
 		return nil, fmt.Errorf("未知资源类型: %s", kind)
 	}

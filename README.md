@@ -20,17 +20,17 @@
 
 界面顶部显示当前游戏的 DXVK、L4N 已安装版本（按实际 DLL SHA256 匹配安装记录或资源包；L4N 还读取已确认产品名称的 DLL 内嵌版本信息，不使用下拉框选择值）。没有相关文件显示“未使用”，已检测到但未匹配的文件显示“版本未知”，多个包使用相同 DLL 时列出候选。启动和每次操作后自动刷新，也可点击“刷新版本”。检测在后台进行，不加载游戏 DLL；这里只检查磁盘文件，不等同于验证游戏进程已启用补丁。
 
-| 类别 | 能力 |
-| --- | --- |
-| 补丁处理 | 从 `dxvk/` 自动读取所有 DXVK 子目录，选择版本后一键安装 L4N 与对应 DXVK 文件。 |
-| 自动定位 | 从 Steam 库自动定位 L4D2，找不到时使用 Everything 辅助搜索。 |
-| 运行环境 | 自动安装 `VC_redist.x86.exe` / `VC_redist.x64.exe`。 |
-| 安全回滚 | 覆盖前逐文件备份，记录到 exe 同级 `.l4n_auto_backup/`。 |
-| 一键清理 | 可恢复游戏文件和 Steam 配置。 |
-| MOD 管理 | 可备份/恢复 `left4dead2/addons`，并同步处理 `left4dead2/cfg/video.txt`。 |
-| 启动项 | 从 L4N 资源中的启动指令 TXT 提取并写入 Steam AppID `550`，缺少此类文件时使用公共文件或默认参数。 |
-| 字体工具 | 提供 L4N 字体切换和旧版 `Font_change` 字体切换工具。 |
-| 使用说明 | UI 内置中文使用说明、启动项和验证指令。 |
+| 类别     | 能力                                                             |
+| ------ | -------------------------------------------------------------- |
+| 补丁处理   | 从 `dxvk/` 自动读取所有 DXVK 子目录，选择版本后一键安装 L4N 与对应 DXVK 文件。           |
+| 自动定位   | 从 Steam 库自动定位 L4D2，找不到时使用 Everything 辅助搜索。                     |
+| 运行环境   | 自动安装 `VC_redist.x86.exe` / `VC_redist.x64.exe`。                |
+| 安全回滚   | 覆盖前逐文件备份，记录到 exe 同级 `.l4n_auto_backup/`。                       |
+| 一键清理   | 可恢复游戏文件和 Steam 配置。                                             |
+| MOD 管理 | 可备份/恢复 `left4dead2/addons`，并同步处理 `left4dead2/cfg/video.txt`。   |
+| 启动项    | 从 L4N 资源中的启动指令 TXT 提取并写入 Steam AppID `550`，缺少此类文件时使用公共文件或默认参数。 |
+| 字体工具   | 提供 L4N 字体切换和旧版 `Font_change` 字体切换工具。                           |
+| 使用说明   | UI 内置中文使用说明、启动项和验证指令。                                          |
 
 ## 快速使用
 
@@ -56,14 +56,14 @@ L4N_Go_Win32_Portable/L4N_Go_Win32.exe
   备份MOD     恢复MOD    一键清理    系统字体/游戏默认
 ```
 
-| 控件 | 作用 |
-| --- | --- |
-| `DXVK版本` | 自动列出 `dxvk/` 下所有可用子目录名，例如 `dxvk-2.3`、`dxvk-2.7.1`。 |
-| `一键处理` | 使用所选 L4N 目录或压缩包作为基础补丁（默认保留原有 `resources/l4n/L4N_dxvk2.7.1`），并将所选 DXVK 版本映射为 `dxgi.dll`、`dxvk_d3d9.dll`、`bin/dxvk_d3d9.dll` 后覆盖到游戏目录。 |
-| `备份MOD` | 复制游戏 `left4dead2/addons` 到 `resources/addons_backup`，并备份 `left4dead2/cfg/video.txt`。 |
-| `恢复MOD` | 复制 `resources/addons_backup` 回游戏 `left4dead2/addons`，同名文件会覆盖，并恢复 `left4dead2/cfg/video.txt`。 |
-| `一键清理` | 按 `.l4n_auto_backup/manifest.json` 还原游戏文件和 Steam 配置。 |
-| `系统字体/游戏默认` | 一键处理后切换 `left4dead2/neko/config.vdf` 中的 `Tahoma` 字体替换行；未执行一键处理时会提示先进行一键处理。 |
+| 控件          | 作用                                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `DXVK版本`    | 自动列出 `dxvk/` 下所有可用子目录名，例如 `dxvk-2.3`、`dxvk-2.7.1`。                                                                                   |
+| `一键处理`      | 使用所选 L4N 目录或压缩包作为基础补丁（默认保留原有 `resources/l4n/L4N_dxvk2.7.1`），并将所选 DXVK 版本映射为 `dxgi.dll`、`dxvk_d3d9.dll`、`bin/dxvk_d3d9.dll` 后覆盖到游戏目录。 |
+| `备份MOD`     | 复制游戏 `left4dead2/addons` 到 `resources/addons_backup`，并备份 `left4dead2/cfg/video.txt`。                                                 |
+| `恢复MOD`     | 复制 `resources/addons_backup` 回游戏 `left4dead2/addons`，同名文件会覆盖，并恢复 `left4dead2/cfg/video.txt`。                                         |
+| `一键清理`      | 按 `.l4n_auto_backup/manifest.json` 还原游戏文件和 Steam 配置。                                                                                 |
+| `系统字体/游戏默认` | 一键处理后切换 `left4dead2/neko/config.vdf` 中的 `Tahoma` 字体替换行；未执行一键处理时会提示先进行一键处理。                                                           |
 
 右侧说明会提示 DXVK 版本来源和支持的目录结构：
 
@@ -76,9 +76,9 @@ dxvk/dxvk-x.x/dxvk-x.x/x32/
 
 便携目录根部包含两个单独的字体工具。两个工具都带有字体下拉框、字体预览、浏览字体文件、更换字体和恢复默认字体按钮。
 
-| 程序 | 适用场景 | 修改位置 |
-| --- | --- | --- |
-| `L4N_Font_Change.exe` | 游戏已经使用 L4N 平台。 | `left4dead2/neko/config.vdf` |
+| 程序                     | 适用场景                     | 修改位置                                  |
+| ---------------------- | ------------------------ | ------------------------------------- |
+| `L4N_Font_Change.exe`  | 游戏已经使用 L4N 平台。           | `left4dead2/neko/config.vdf`          |
 | `L4D2_Font_Change.exe` | 旧的 `Font_change` 文件复制方式。 | `Font_change/FontMod.yaml` 和游戏根目录同名文件 |
 
 ### L4N_Font_Change.exe
@@ -89,10 +89,10 @@ dxvk/dxvk-x.x/dxvk-x.x/x32/
 left4dead2/neko/config.vdf
 ```
 
-| 操作 | 行为 |
-| --- | --- |
-| `更换字体` | 读取下拉框最终确认的字体名，只修改 `config.vdf` 中生效的 `"Tahoma" "字体名"` 替换行。 |
-| `恢复默认字体` | 将整个 `font` 配置块用 `//` 注释掉，使游戏回到默认字体。 |
+| 操作       | 行为                                                        |
+| -------- | --------------------------------------------------------- |
+| `更换字体`   | 读取下拉框最终确认的字体名，只修改 `config.vdf` 中生效的 `"Tahoma" "字体名"` 替换行。 |
+| `恢复默认字体` | 将整个 `font` 配置块用 `//` 注释掉，使游戏回到默认字体。                       |
 | `浏览字体文件` | 选择用户自备字体文件并自动安装到当前 Windows 用户字体目录。安装后仍需在下拉框中确认字体，再点击更换字体。 |
 
 注意事项：
@@ -108,11 +108,11 @@ left4dead2/neko/config.vdf
 
 用于旧的 `Font_change` 文件复制方式。游戏使用 L4N 平台时此方式无效，L4N 平台请使用 `L4N_Font_Change.exe` 或主程序中的 `系统字体/游戏默认`。
 
-| 操作 | 行为 |
-| --- | --- |
-| `更换字体` | 读取下拉框最终确认的字体名，写入 `Font_change/FontMod.yaml` 中 `fonts.Tahoma.name`，然后把 `Font_change` 目录内的文件按原相对路径复制到 L4D2 游戏根目录。 |
-| `恢复默认字体` | 扫描 `Font_change` 目录内的文件列表，只删除游戏目录中与 `Font_change` 内相同相对路径的文件，不删除项目内的 `Font_change` 文件。 |
-| `浏览字体文件` | 选择用户自备字体文件并自动安装。安装后仍需在下拉框中确认字体，再点击更换字体。 |
+| 操作       | 行为                                                                                                              |
+| -------- | --------------------------------------------------------------------------------------------------------------- |
+| `更换字体`   | 读取下拉框最终确认的字体名，写入 `Font_change/FontMod.yaml` 中 `fonts.Tahoma.name`，然后把 `Font_change` 目录内的文件按原相对路径复制到 L4D2 游戏根目录。 |
+| `恢复默认字体` | 扫描 `Font_change` 目录内的文件列表，只删除游戏目录中与 `Font_change` 内相同相对路径的文件，不删除项目内的 `Font_change` 文件。                          |
+| `浏览字体文件` | 选择用户自备字体文件并自动安装。安装后仍需在下拉框中确认字体，再点击更换字体。                                                                         |
 
 为避免字体授权和再分发问题，便携包不再内置字体文件。`Font_change/fonts/` 内的字体文件是可选资源，不再是便携包运行条件；默认配置使用系统常见字体 `Microsoft YaHei`。
 
@@ -261,3 +261,7 @@ https://www.bilibili.com/video/BV1oHoMBbE7m/?spm_id_from=333.337.search-card.all
 https://www.bilibili.com/video/BV1JpCjB9Ewp/?spm_id_from=333.337.search-card.all.click&vd_source=7fbb056ce8209fd91e3f904175a597fa
 
 本工具将视频中的 L4N 字体替换思路整理为按钮操作：检测一键处理生成的 `left4dead2/neko/config.vdf`，并在系统字体与游戏默认字体之间切换。
+
+
+
+https://steamcommunity.com/sharedfiles/filedetails/?id=3558049615

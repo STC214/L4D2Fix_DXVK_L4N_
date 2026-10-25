@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 	"syscall"
 	"testing"
 	"unsafe"
@@ -47,13 +48,13 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 	if readText(btnRefreshVersion) != "刷新版本" {
 		t.Fatal("refresh caption missing")
 	}
-	guide, _, _ := user32.NewProc("FindWindowExW").Call(hwnd, 0, uintptr(unsafe.Pointer(utf16Ptr("EDIT"))), uintptr(unsafe.Pointer(utf16Ptr(usageInstructions))))
-	if guide == 0 {
-		t.Fatal("usage guide missing")
+	for handle, want := range map[uintptr]string{btnCheckUpdates: "检查最新版并下载", btnDeployPlatform: "部署所选平台", btnCleanPlatform: "清理已部署平台", btnHelp: "使用说明（在线）"} {
+		if handle == 0 || readText(handle) != want {
+			t.Fatalf("platform control missing: %s", want)
+		}
 	}
-	style, _, _ := user32.NewProc("GetWindowLongW").Call(guide, ^uintptr(15))
-	if style&wsVScroll == 0 {
-		t.Fatal("usage guide is not scrollable")
+	if !strings.Contains(usageGuideURL, "/docs/") {
+		t.Fatal("repository usage link missing")
 	}
 	// Exercise the real native LPARAM callback using Windows-owned memory.
 	hdc, _, _ := user32.NewProc("GetDC").Call(btnRefreshVersion)

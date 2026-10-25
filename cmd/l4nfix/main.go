@@ -33,7 +33,6 @@ const (
 	displaySettingsBackupDirName = "display_settings_backup"
 	videoSettingsRelativePath    = "left4dead2/cfg/video.txt"
 	configRelativePath           = "left4dead2/neko/config.vdf"
-	usageInstructions            = "使用步骤\r\n1. 先关闭 Steam 和游戏\r\n2. 在 DXVK版本 中选择要安装的版本\r\n3. 点击 一键处理，程序会安装 L4N 基础文件和所选 DXVK\r\n4. 需要保留 MOD 时，可先备份MOD，再恢复MOD\r\n5. 系统字体/游戏默认：切换 config.vdf 中 font 配置块\r\n6. 一键清理：按 .l4n_auto_backup 还原补丁和 Steam 配置\r\n7. 更换dxvk和l4n版本需先清理再一键部署\r\n\r\n版本来源\r\nDXVK 放在 resources/dxvk，L4N 放在 resources/l4n。目录与压缩包、新旧版本统一存放。\r\n支持 ZIP/TAR/TAR.GZ/TGZ；选择后解压到 resources/.package_tmp。\r\n自动剥离外层目录、识别32位DLL并整理路径。\r\n新增后重启刷新；缺失或多组关键文件会报错。\r\nL4N 内文件名同时含启动/指令的 TXT 自动提取 Steam 参数。\r\n\r\nSteam 启动项（内置回退）\r\n-heapsize 2097152 -processheap -high -novid -nojoy -steam -lv -vulkan\r\n\r\n验证\r\nmat_info -> ShaderAPI: shaderapivk\r\nmem_dump -> 2,048.00MB"
 )
 
 var (
@@ -243,6 +242,8 @@ type drawItemStruct struct {
 }
 
 type manifest struct {
+	Platform          string           `json:"platform,omitempty"`
+	PlatformVersion   string           `json:"platformVersion,omitempty"`
 	CreatedAt         string           `json:"createdAt"`
 	GameRoot          string           `json:"gameRoot"`
 	Files             []fileEntry      `json:"files"`
@@ -377,6 +378,14 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 		code := uint16(wParam >> 16)
 		if code == bnClicked {
 			switch id {
+			case idCheckUpdates:
+				go guarded("检查平台更新", runCheckUpdates)
+			case idDeployPlatform:
+				go guarded("部署平台", runDeployPlatform)
+			case idCleanPlatform:
+				go guarded("清理平台", runCleanPlatform)
+			case idHelp:
+				openUsageGuide()
 			case idRefreshVersion:
 				refreshInstalledVersions()
 			case idRun:
@@ -452,10 +461,7 @@ func createControls(hwnd uintptr) {
 	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 22, 386, 594, 130, hwnd, 0)
 	procSendMessageW.Call(logCtl, wmSetFont, textFont, 1)
 
-	guideTitle := label(hwnd, "使用说明", 630, 22, 280, 24)
-	procSendMessageW.Call(guideTitle, wmSetFont, titleFont, 1)
-	guideCtl := create("EDIT", usageInstructions, wsChild|wsVisible|wsBorder|esMultiline|esReadOnly|wsVScroll|esAutovScroll, 630, 50, 300, 466, hwnd, 0)
-	procSendMessageW.Call(guideCtl, wmSetFont, guideFont, 1)
+	createPlatformControls(hwnd)
 
 	loadDxvkOptionsIntoCombo()
 	loadL4nOptionsIntoCombo()
@@ -553,6 +559,14 @@ func drawButton(dis *drawItemStruct) {
 
 func buttonText(id uint32) string {
 	switch id {
+	case idCheckUpdates:
+		return "检查最新版并下载"
+	case idDeployPlatform:
+		return "部署所选平台"
+	case idCleanPlatform:
+		return "清理已部署平台"
+	case idHelp:
+		return "使用说明（在线）"
 	case idRefreshVersion:
 		return "刷新版本"
 	case idRun:
@@ -649,7 +663,7 @@ func guarded(name string, fn func() error) {
 	setStatus(name + "中...")
 	appendLog("")
 	appendLog("[start] " + name)
-	err := fn()
+	err := withPortableOperationLock(fn)
 	if err != nil {
 		appendLog("[error] " + err.Error())
 		setStatus("失败 - 查看日志")
@@ -679,6 +693,12 @@ func setBusy(v bool) {
 		procEnableWindow.Call(btnClean, en)
 		procEnableWindow.Call(btnClose, en)
 		procEnableWindow.Call(btnRefreshVersion, en)
+		for _, h := range []uintptr{btnCheckUpdates, btnDeployPlatform, btnCleanPlatform, comboPlatform} {
+			procEnableWindow.Call(h, en)
+		}
+		if len(platformChoices) == 0 {
+			procEnableWindow.Call(btnDeployPlatform, 0)
+		}
 	})
 }
 
@@ -791,6 +811,9 @@ func runInstallWithDxvk(opt dxvkOption) error {
 	if err != nil {
 		return err
 	}
+	if platformInstalled(root) {
+		return fmt.Errorf("请先清理已部署的平台，再更换 L4N＋DXVK")
+	}
 	resRoot := resourceRoot(root)
 	appendLog("[prepare] exe root: " + root)
 	appendLog("[prepare] resource root: " + resRoot)
@@ -832,6 +855,11 @@ func runInstallWithDxvk(opt dxvkOption) error {
 	}
 	gameRoot := filepath.Dir(gameExe)
 	appendLog("[steam] game: " + gameExe)
+	release, err := acquireOperationLock(gameRoot, ".l4n-game-operation.lock")
+	if err != nil {
+		return err
+	}
+	defer release()
 
 	backupRoot := filepath.Join(root, ".l4n_auto_backup")
 	man, err := checkedInstallManifest(backupRoot, gameRoot)
@@ -881,6 +909,9 @@ func runRestore() error {
 	if err != nil {
 		return err
 	}
+	if platformInstalled(root) {
+		return fmt.Errorf("请先清理已部署的平台，再清理 L4N＋DXVK")
+	}
 	return restoreFromBackup(filepath.Join(root, ".l4n_auto_backup"))
 }
 
@@ -893,6 +924,13 @@ func restoreFromBackup(backupRoot string) error {
 	var man manifest
 	if err := json.Unmarshal(data, &man); err != nil {
 		return err
+	}
+	if man.Platform == "" && len(man.Files) > 0 {
+		release, err := acquireOperationLock(man.GameRoot, ".l4n-game-operation.lock")
+		if err != nil {
+			return err
+		}
+		defer release()
 	}
 	if err := resolveBackupLocations(&man, backupRoot); err != nil {
 		return err
@@ -907,7 +945,7 @@ func restoreFromBackup(backupRoot string) error {
 	if err := validateOriginalBackups(&man); err != nil {
 		return err
 	}
-	if archived, err := archiveL4nConfigIfChanged(man.GameRoot, resourceRoot(filepath.Dir(backupRoot)), "", &man); err != nil {
+	if archived, err := archiveConfigBeforeRestore(backupRoot, &man); err != nil {
 		return fmt.Errorf("清理前配置留档失败，已停止还原: %w", err)
 	} else if archived != "" {
 		appendLog("[config] 清理前保留现有配置: " + archived)
@@ -915,6 +953,12 @@ func restoreFromBackup(backupRoot string) error {
 	var restoreErrs []string
 	setProgress(15)
 	for i, e := range man.Files {
+		if handled, err := restoreModifiedPlatformAutoexec(&man, e); handled {
+			if err != nil {
+				restoreErrs = append(restoreErrs, err.Error())
+			}
+			continue
+		}
 		if e.Existed {
 			if e.Backup == "" {
 				msg := "missing backup path: " + e.Target
@@ -1698,11 +1742,7 @@ func saveManifest(m *manifest, root string) error {
 		return err
 	}
 	path := filepath.Join(root, "manifest.json")
-	tmp := path + ".tmp"
-	if err := os.WriteFile(tmp, data, 0644); err != nil {
-		return err
-	}
-	return os.Rename(tmp, path)
+	return writeFileAtomic(path, data, 0644)
 }
 
 func copyFile(src, dst string) error {
@@ -1731,7 +1771,7 @@ func copyFile(src, dst string) error {
 	if err := in.Close(); err != nil {
 		return err
 	}
-	return os.Rename(tmp, dst)
+	return renameFileRetry(tmp, dst)
 }
 
 func copyDirContents(srcRoot, dstRoot string, progressStart, progressSpan int) error {
@@ -2165,6 +2205,7 @@ func loadL4nOptionsIntoCombo() {
 	if err != nil {
 		return
 	}
+	procSendMessageW.Call(comboL4n, 0x014B, 0, 0)
 	l4nOptions = discoverL4nOptions(root, resourceRoot(root))
 	selected := 0
 	for i, opt := range l4nOptions {
