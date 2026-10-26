@@ -15,7 +15,9 @@ if ($LASTEXITCODE -ne 0) { throw "Companion/internal tests failed: exit=$LASTEXI
 $previousArch = $env:GOARCH
 try {
     $env:GOARCH = '386'
-    & go -C $project test @options ./cmd/workshopsubscribe ./internal/steamsubscription
+    # Go's race detector does not support windows/386. Keep race coverage on
+    # the main/internal amd64 run above, then run the x86 ABI fixtures normally.
+    & go -C $project test "-count=$Count" ./cmd/workshopsubscribe ./internal/steamsubscription
     if ($LASTEXITCODE -ne 0) { throw "x86 Steam bridge tests/build failed: exit=$LASTEXITCODE" }
 } finally {
     $env:GOARCH = $previousArch
