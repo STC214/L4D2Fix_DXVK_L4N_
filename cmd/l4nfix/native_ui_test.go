@@ -150,6 +150,12 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 		t.Fatalf("numbered sections: %d", groups)
 	}
 	// Execute posted log updates on this UI thread without showing the window.
+	for i := 0; i < 60; i++ {
+		appendLog(fmt.Sprintf("[network] %d · %s", i, strings.Repeat("下载链路通过；不保证完整下载速度或后续稳定性。", i%4+1)))
+		if i%10 == 0 {
+			appendLog("")
+		}
+	}
 	appendLog("native-log-old")
 	appendLog("native-log-new")
 	uiMu.Lock()
@@ -168,6 +174,22 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 	first, _, _ := procSendMessageW.Call(logCtl, 0x00CE, 0, 0) // EM_GETFIRSTVISIBLELINE
 	if first != 0 {
 		t.Fatal("log not scrolled to top")
+	}
+	logDC, _, _ := user32.NewProc("GetDC").Call(logCtl)
+	for _, message := range []uintptr{wmCtlColorStatic, wmCtlColorEdit} {
+		procSetBkMode.Call(logDC, transparent)
+		gdi32.NewProc("SetBkColor").Call(logDC, colorWhite)
+		procSendMessageW.Call(hwnd, message, logDC, logCtl)
+		mode, _, _ := gdi32.NewProc("GetBkMode").Call(logDC)
+		bg, _, _ := gdi32.NewProc("GetBkColor").Call(logDC)
+		fg, _, _ := gdi32.NewProc("GetTextColor").Call(logDC)
+		if mode != 2 || bg != colorBlack || fg != colorWhite {
+			t.Fatal("log drawing uses transparent or mismatched background")
+		}
+	}
+	user32.NewProc("ReleaseDC").Call(logCtl, logDC)
+	if path := os.Getenv("L4N_UI_LOG_CAPTURE_PATH"); path != "" {
+		captureNativeTestWindow(t, hwnd, path)
 	}
 	setState(oldWorkflow, false)
 	// Refreshing after a download must clear stale entries rather than append

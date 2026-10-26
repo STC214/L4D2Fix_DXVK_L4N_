@@ -410,9 +410,12 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 		hdc := wParam
 		procSetBkMode.Call(hdc, transparent)
 		procSetTextColor.Call(hdc, colorWhite)
-		if id, _, _ := procGetDlgCtrlID.Call(lParam); id == idSectionHeading {
+		id, _, _ := procGetDlgCtrlID.Call(lParam)
+		if lParam == logCtl || id == idSectionHeading {
 			// An opaque, high-contrast caption masks only the original left
 			// border gap. Native themed group-box captions can ignore colors.
+			// Read-only EDIT sends WM_CTLCOLORSTATIC too. Its background must
+			// also be opaque: prepending/scrolling otherwise leaves old glyphs.
 			procSetBkMode.Call(hdc, 2) // OPAQUE
 			gdi32.NewProc("SetBkColor").Call(hdc, colorBlack)
 		}
@@ -753,6 +756,9 @@ func appendLog(s string) {
 		}
 	}
 	invokeUI(func() {
+		// Treat prepend + tail trimming + scroll-to-top as one paint update.
+		// Repaint the EDIT itself, including background, after restoring draw.
+		procSendMessageW.Call(logCtl, 0x000B, 0, 0) // WM_SETREDRAW(FALSE)
 		line := s + "\r\n"
 		procSendMessageW.Call(logCtl, emSetSel, 0, 0)
 		procSendMessageW.Call(logCtl, emReplaceSel, 0, uintptr(unsafe.Pointer(utf16Ptr(line))))
@@ -764,7 +770,9 @@ func appendLog(s string) {
 			procSendMessageW.Call(logCtl, emReplaceSel, 0, uintptr(unsafe.Pointer(utf16Ptr(""))))
 		}
 		procSendMessageW.Call(logCtl, emSetSel, 0, 0)
-		procSendMessageW.Call(logCtl, 0x00B7, 0, 0) // EM_SCROLLCARET
+		procSendMessageW.Call(logCtl, 0x00B7, 0, 0)                             // EM_SCROLLCARET
+		procSendMessageW.Call(logCtl, 0x000B, 1, 0)                             // WM_SETREDRAW(TRUE)
+		user32.NewProc("RedrawWindow").Call(logCtl, 0, 0, 0x0001|0x0004|0x0100) // INVALIDATE|ERASE|UPDATENOW
 	})
 }
 
