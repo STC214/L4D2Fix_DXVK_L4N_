@@ -10,8 +10,10 @@ import (
 	"time"
 )
 
-var l4nOptionVersion = regexp.MustCompile(`(?i)^l4n[-_ ]v?(\d+(?:\.\d+){1,3})`)
-var dxvkOptionVersion = regexp.MustCompile(`(?i)^dxvk-(?:async-)?v?(\d+(?:\.\d+){1,3})`)
+// A kind-specific resource directory already identifies the component, so
+// manually imported archives may contain only a version, without a prefix.
+var l4nOptionVersion = regexp.MustCompile(`(?i)^(?:l4n[-_ ]?)?v?(\d+(?:\.\d+){1,3})`)
+var dxvkOptionVersion = regexp.MustCompile(`(?i)^(?:dxvk[-_ ](?:async[-_ ])?)?v?(\d+(?:\.\d+){1,3})`)
 
 func optionVersionParts(kind, name string) []string {
 	re := l4nOptionVersion

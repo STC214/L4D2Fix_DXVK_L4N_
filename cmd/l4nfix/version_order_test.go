@@ -72,3 +72,16 @@ func TestVersionOrderTimeTieBreakAndUnknownFallback(t *testing.T) {
 		t.Fatal("equivalent components differ")
 	}
 }
+
+func TestVersionOrderPrefixlessManualImports(t *testing.T) {
+	for _, kind := range []string{"l4n", "dxvk"} {
+		options := []dxvkOption{{Name: kind + "-2.9.0.zip", Dir: "old"}, {Name: "v2.11.0.zip", Dir: "new"}, {Name: "2.10.0.zip", Dir: "middle"}}
+		sortVersionOptionsNewestFirst(kind, options)
+		if options[0].Dir != "new" || options[1].Dir != "middle" || options[2].Dir != "old" {
+			t.Fatalf("%s: %v", kind, options)
+		}
+	}
+	if optionVersionParts("l4n", "L4N_dxvk2.7.1.zip") != nil {
+		t.Fatal("DXVK version treated as L4N version")
+	}
+}
