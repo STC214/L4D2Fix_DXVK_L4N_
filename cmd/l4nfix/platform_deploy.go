@@ -66,6 +66,9 @@ func platformMappings(kind, root string, files []string) ([]packageMapping, erro
 	var out []packageMapping
 	for key, f := range byPath {
 		allow := platformOwnedRelative(kind, key) && key != "left4dead2/cfg/autoexec.cfg"
+		if kind == "skeeto" && (key == skeetoAddonListRel || isSkeetoModRelative(key)) {
+			allow = false
+		}
 		if allow {
 			out = append(out, packageMapping{Source: filepath.Join(root, f), Relative: f})
 		}
@@ -77,7 +80,7 @@ func platformMappings(kind, root string, files []string) ([]packageMapping, erro
 func platformOwnedRelative(kind, relative string) bool {
 	key := strings.ToLower(filepath.ToSlash(relative))
 	if kind == "skeeto" {
-		return key == "skeeto.dll" || key == "bin/wininet.dll" || key == "version.txt" || key == "skeeto_workshop.txt" || key == "skeeto_apply_update.bat" || key == "left4dead2/cfg/autoexec.cfg" || strings.HasPrefix(key, "skeeto/")
+		return key == "skeeto.dll" || key == "bin/wininet.dll" || key == "version.txt" || key == "skeeto_workshop.txt" || key == "skeeto_apply_update.bat" || key == "left4dead2/cfg/autoexec.cfg" || key == skeetoAddonListRel || isSkeetoModRelative(key) || strings.HasPrefix(key, "skeeto/")
 	}
 	if kind == "evolved" {
 		return key == "bin/neko/plugins/l4d2evolved.dll" || key == "bin/neko/plugins/l4d2evomodel.dll" || (strings.HasPrefix(key, "evolved/") && key != "evolved/d3d9.dll") || strings.HasPrefix(key, "left4dead2/addons/") || strings.HasPrefix(key, "left4dead2/sound/vrmod/")
@@ -300,6 +303,13 @@ func deployPlatformLocked(exeRoot, res, game, kind, version string) (err error) 
 		return e
 	}
 	files = append(files, nav...)
+	if kind == "skeeto" {
+		mods, e := skeetoPreparedModFiles(res, source.TemporaryDir, game, record)
+		if e != nil {
+			return e
+		}
+		files = append(files, mods...)
+	}
 	// No enhancement package may take ownership of files in the base manifest.
 	seen := map[string]bool{}
 	for _, f := range files {
@@ -341,6 +351,9 @@ func deployPlatformLocked(exeRoot, res, game, kind, version string) (err error) 
 		setProgress(10 + (i+1)*80/max(1, len(files)))
 	}
 	appendLog("[platform] " + kind + " " + record.Version + " 部署完成，小地图/导航已写为开启；请进图验证")
+	if kind == "skeeto" {
+		appendLog("[platform] 两个原始 VPK 已从缓存预置到 addons/workshop，addonlist 仅启用对应两项；Steam 仍可能校验或同步")
+	}
 	return nil
 }
 

@@ -11,12 +11,16 @@ import (
 const steamIntegrityReminder = "请使用 Steam 平台检查求生之路 2 的文件完整性：\nSteam 库 → 求生之路 2 → 属性 → 已安装文件 → 验证游戏文件的完整性。\n手动部署没有原文件备份，校验完成前请勿启动游戏。"
 
 func checkCleanupGameStopped() error {
+	return checkGameStoppedFor("清理")
+}
+
+func checkGameStoppedFor(action string) error {
 	running, e := processNamesRunning([]string{"left4dead2.exe", "left4dead2_skeeto.exe", "left4dead2_necola.exe"})
 	if e != nil {
 		return e
 	}
 	if running {
-		return fmt.Errorf("请先退出游戏和旧平台启动器，再清理")
+		return fmt.Errorf("请先退出游戏和旧平台启动器，再%s", action)
 	}
 	return nil
 }

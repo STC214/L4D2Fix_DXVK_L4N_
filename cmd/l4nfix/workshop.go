@@ -76,8 +76,12 @@ func workshopClient() *http.Client {
 	}}
 }
 func fetchWorkshopDetails(ctx context.Context, c *http.Client, endpoint string) ([]workshopDetail, error) {
-	form := url.Values{"itemcount": {"3"}}
-	for i, p := range workshopPlatforms {
+	return fetchWorkshopDetailsFor(ctx, c, endpoint, workshopPlatforms)
+}
+
+func fetchWorkshopDetailsFor(ctx context.Context, c *http.Client, endpoint string, platforms []workshopPlatform) ([]workshopDetail, error) {
+	form := url.Values{"itemcount": {strconv.Itoa(len(platforms))}}
+	for i, p := range platforms {
 		form.Set(fmt.Sprintf("publishedfileids[%d]", i), p.ID)
 	}
 	req, e := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(form.Encode()))

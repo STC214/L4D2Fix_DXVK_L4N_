@@ -77,6 +77,9 @@ func cleanupScopePath(scope, rel string) bool {
 		}
 	}
 	if scope == "base" {
+		if r == skeetoAddonListRel || isSkeetoModRelative(r) {
+			return false
+		}
 		if strings.HasPrefix(r, "bin/neko/plugins/") && r != "bin/neko/plugins/l4n_plugin.h" {
 			return false
 		}
@@ -211,6 +214,10 @@ func rememberCleanupPackage(res, kind, input string) error {
 	if e != nil {
 		return e
 	}
+	return rememberCleanupRows(res, rows)
+}
+
+func rememberCleanupRows(res string, rows []cleanupSignature) error {
 	// Serialize the read/merge/write transaction; atomic rename alone prevents
 	// torn JSON, but simultaneous preparations could still lose newer entries.
 	cleanupCatalogMu.Lock()

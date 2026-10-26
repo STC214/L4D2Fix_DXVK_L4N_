@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -23,6 +24,7 @@ const (
 const usageGuideURL = "https://github.com/STC214/L4D2Fix_DXVK_L4N_/blob/HEAD/docs/%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B.md"
 
 var btnCheckUpdates, btnDeployPlatform, btnCleanPlatform, btnHelp, comboPlatform, platformStatusCtl uintptr
+var installedPlatformCtl uintptr
 var platformReadyMu sync.Mutex
 var platformReady = map[string]workshopResource{}
 var platformChoices []string
@@ -37,6 +39,8 @@ func createPlatformControls(hwnd uintptr) {
 	btnDeployPlatform = button(hwnd, "部署所选平台", idDeployPlatform, 646, 220, 268, 36)
 	btnCleanPlatform = button(hwnd, "清理已部署平台", idCleanPlatform, 646, 272, 268, 36)
 	btnHelp = button(hwnd, "使用说明（在线）", idHelp, 646, 356, 268, 36)
+	installedPlatformCtl = label(hwnd, "增强平台：正在检测…", 646, 406, 268, 108)
+	procSendMessageW.Call(installedPlatformCtl, wmSetFont, textFont, 1)
 	for _, h := range []uintptr{btnCheckUpdates, comboPlatform, platformStatusCtl, btnDeployPlatform, btnCleanPlatform, btnHelp} {
 		procSendMessageW.Call(h, wmSetFont, textFont, 1)
 	}
@@ -88,7 +92,16 @@ func runCheckUpdates() error {
 	workshop := func() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 16*time.Minute)
 		defer cancel()
-		return checkWorkshopUpdates(ctx, workshopClient(), workshopAPI, resourceRoot(root), func(r workshopResource) {
+		var modErrors []error
+		client := workshopClient()
+		err := checkWorkshopUpdates(ctx, client, workshopAPI, resourceRoot(root), func(r workshopResource) {
+			if r.Platform == "skeeto" {
+				if err := prepareSkeetoModCache(ctx, client, workshopAPI, resourceRoot(root), r); err != nil {
+					appendLog("[update] Skeeto 工坊 MOD 准备失败: " + err.Error())
+					modErrors = append(modErrors, err)
+					return
+				}
+			}
 			platformReadyMu.Lock()
 			platformReady[r.Platform] = r
 			platformReadyMu.Unlock()
@@ -104,6 +117,7 @@ func runCheckUpdates() error {
 				refreshPlatformChoices()
 			})
 		})
+		return errors.Join(append(modErrors, err)...)
 	}
 	dxvk := func() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 6*time.Minute)
@@ -146,8 +160,8 @@ func runDeployPlatform() error {
 	if e != nil {
 		return e
 	}
-	if processExists("left4dead2.exe") {
-		return fmt.Errorf("请先退出游戏再部署平台")
+	if e := checkGameStoppedFor("部署平台"); e != nil {
+		return e
 	}
 	// Pin to the exact content verified in this check, even if another process
 	// updates the on-disk index before deployment.

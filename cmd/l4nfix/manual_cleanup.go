@@ -156,6 +156,7 @@ func buildManualCleanupPlan(game, scope string, signatures []cleanupSignature) (
 			}
 		}
 		add("left4dead2/cfg/autoexec.cfg", "skeeto")
+		add(skeetoAddonListRel, "skeeto")
 	}
 	for _, r := range privateFiles {
 		add(r, cleanupPrivateKind(r))
@@ -218,7 +219,23 @@ func buildManualCleanupPlan(game, scope string, signatures []cleanupSignature) (
 			return nil, e
 		}
 		f := manualCleanupFile{Rel: rel, Kind: kind, BeforeSHA256: h}
-		if rel == "left4dead2/cfg/autoexec.cfg" {
+		if rel == skeetoAddonListRel {
+			b, e := os.ReadFile(p)
+			if e != nil {
+				return nil, e
+			}
+			original := ""
+			after, e := editSkeetoAddonList(string(b), &original)
+			if e != nil {
+				return nil, e
+			}
+			if string(b) == after {
+				continue
+			}
+			f.Rewrite = true
+			f.After = []byte(after)
+			f.AfterSHA256 = cleanupHash(f.After)
+		} else if rel == "left4dead2/cfg/autoexec.cfg" {
 			b, e := os.ReadFile(p)
 			if e != nil {
 				return nil, e
@@ -271,7 +288,7 @@ func validateManualCleanupPlan(plan *manualCleanupPlan) error {
 		if e != nil || len(before) != 32 {
 			return fmt.Errorf("invalid cleanup snapshot hash")
 		}
-		if f.Rewrite && (f.Rel != "left4dead2/cfg/autoexec.cfg" || f.Kind != "skeeto" || cleanupHash(f.After) != f.AfterSHA256) {
+		if f.Rewrite && ((f.Rel != "left4dead2/cfg/autoexec.cfg" && f.Rel != skeetoAddonListRel) || f.Kind != "skeeto" || cleanupHash(f.After) != f.AfterSHA256) {
 			return fmt.Errorf("invalid cleanup rewrite snapshot")
 		}
 		r, e := packageRelative(f.Rel)

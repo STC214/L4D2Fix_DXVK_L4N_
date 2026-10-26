@@ -1,0 +1,18 @@
+[
+  {
+    "kind": "skeeto",
+    "version": "2.2.3",
+    "hashes": {
+      "wininet.dll": "ea58e4a1232e3cc4246613f3a6166be743baf99f157760b6c3538250dda7b72b",
+      "skeeto.dll": "794ffc2dd3a65a26126f57d990a29750999e05b65b00aac2d7662e0d34ace326"
+    }
+  },
+  {
+    "kind": "evolved",
+    "version": "1.2.5",
+    "hashes": {
+      "l4d2evolved.dll": "05819c701943781c9d7868502f7926fbfa763b600be4bfe8c88fa3b4892fcd6d",
+      "l4d2evomodel.dll": "a21ddb162076163aad18dd9d7e3927784eeb918a8a2ebdbb4b0c7f5979e17039"
+    }
+  }
+]

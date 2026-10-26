@@ -56,6 +56,12 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 	if !strings.Contains(usageGuideURL, "/docs/") {
 		t.Fatal("repository usage link missing")
 	}
+	if installedPlatformCtl == 0 || readText(installedPlatformCtl) != "增强平台：正在检测…" {
+		t.Fatal("installed platform status control missing")
+	}
+	if font, _, _ := procSendMessageW.Call(installedPlatformCtl, 0x0031, 0, 0); font != textFont {
+		t.Fatal("platform version label uses inconsistent font")
+	}
 	// Refreshing after a download must clear stale entries rather than append
 	// duplicate version choices, including when no valid resources remain.
 	procSendMessageW.Call(comboDxvk, cbAddString, 0, uintptr(unsafe.Pointer(utf16Ptr("stale-placeholder"))))

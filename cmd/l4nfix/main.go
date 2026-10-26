@@ -808,8 +808,8 @@ func runToggleFont() error {
 }
 
 func runInstallWithDxvk(opt dxvkOption) error {
-	if processExists("left4dead2.exe") {
-		return fmt.Errorf("请先退出游戏再部署 L4N＋DXVK")
+	if e := checkGameStoppedFor("部署 L4N＋DXVK"); e != nil {
+		return e
 	}
 	root, err := packageRoot()
 	if err != nil {
@@ -970,6 +970,9 @@ func restoreFromBackup(backupRoot string) error {
 	// Validate all editable navigation blocks before restoring/removing any
 	// platform file; malformed user edits must not leave a partial cleanup.
 	for _, entry := range man.Files {
+		if _, err := restoreModifiedSkeetoAddonList(&man, entry, false); err != nil {
+			return err
+		}
 		if _, err := restoreModifiedPlatformAutoexec(&man, entry, false); err != nil {
 			return err
 		}
@@ -982,6 +985,12 @@ func restoreFromBackup(backupRoot string) error {
 	var restoreErrs []string
 	setProgress(15)
 	for i, e := range man.Files {
+		if handled, err := restoreModifiedSkeetoAddonList(&man, e, true); handled {
+			if err != nil {
+				restoreErrs = append(restoreErrs, err.Error())
+			}
+			continue
+		}
 		if handled, err := restoreModifiedPlatformAutoexec(&man, e, true); handled {
 			if err != nil {
 				restoreErrs = append(restoreErrs, err.Error())

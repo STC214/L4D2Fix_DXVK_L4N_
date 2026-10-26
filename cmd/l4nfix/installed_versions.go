@@ -97,6 +97,12 @@ type resourceIdentity struct {
 
 func identityPath(kind, name string) bool {
 	name = strings.ToLower(filepath.ToSlash(name))
+	if kind == "skeeto" {
+		return strings.HasSuffix("/"+name, "/skeeto.dll") || strings.HasSuffix("/"+name, "/wininet.dll")
+	}
+	if kind == "evolved" {
+		return strings.HasSuffix("/"+name, "/l4d2evolved.dll") || strings.HasSuffix("/"+name, "/l4d2evomodel.dll")
+	}
 	if kind == "l4n" {
 		return strings.HasSuffix("/"+name, "/left4neko.dll")
 	}
@@ -310,11 +316,22 @@ func refreshInstalledVersions() {
 	id := versionRefreshID.Add(1)
 	invokeUI(func() {
 		procSetWindowTextW.Call(installedVersionCtl, uintptr(unsafe.Pointer(utf16Ptr("当前游戏：正在检测版本…"))))
+		procSetWindowTextW.Call(installedPlatformCtl, uintptr(unsafe.Pointer(utf16Ptr("增强平台：正在检测…"))))
 	})
 	go func() {
 		text := "当前游戏：未定位到游戏目录"
+		platformText := "增强平台：未定位到游戏目录"
 		if root, e := packageRoot(); e == nil {
 			if exe, e := resolveGameExe(root); e == nil {
+				if detected, e := installedPlatformText(filepath.Dir(exe), resourceRoot(root), filepath.Join(root, platformBackupName)); e == nil {
+					platformText = detected
+				} else {
+					platformText = detected
+					if platformText == "" {
+						platformText = "增强平台：检测失败（文件不可读）"
+					}
+					appendLog("[version/platform] " + e.Error())
+				}
 				if detected, e := installedVersionText(filepath.Dir(exe), resourceRoot(root), filepath.Join(root, ".l4n_auto_backup")); e == nil {
 					text = detected
 				} else {
@@ -329,6 +346,7 @@ func refreshInstalledVersions() {
 		invokeUI(func() {
 			if versionRefreshID.Load() == id {
 				procSetWindowTextW.Call(installedVersionCtl, uintptr(unsafe.Pointer(utf16Ptr(text))))
+				procSetWindowTextW.Call(installedPlatformCtl, uintptr(unsafe.Pointer(utf16Ptr(platformText))))
 			}
 		})
 	}()

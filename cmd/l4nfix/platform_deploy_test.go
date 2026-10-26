@@ -32,12 +32,13 @@ func platformTestEnvironment(t *testing.T) (root, res, game string) {
 		testZip(t, filepath.Join(res, archive), workshopFixture(p.Kind))
 		st, _ := os.Stat(filepath.Join(res, archive))
 		h, _ := fileHash(filepath.Join(res, archive))
-		idx.Resources = append(idx.Resources, workshopResource{Platform: p.Kind, Detail: workshopDetail{ID: p.ID, Content: "123", Updated: int64(100 + i), Size: steamInt(st.Size())}, Version: "test", Archive: archive, SHA256: h})
+		idx.Resources = append(idx.Resources, workshopResource{Platform: p.Kind, Detail: workshopDetail{ID: p.ID, Result: 1, AppID: 550, URL: "https://cdn.steamusercontent.com/fixture", Content: "123", Updated: int64(100 + i), Size: steamInt(st.Size())}, Version: "test", Archive: archive, SHA256: h})
 	}
 	b, _ := json.Marshal(idx)
 	if e := os.WriteFile(filepath.Join(res, "workshop-index.json"), b, 0644); e != nil {
 		t.Fatal(e)
 	}
+	cacheSkeetoFixtureMods(t, res, idx)
 	return
 }
 func TestPlatformDeployMutualExclusionNavigationAndRollback(t *testing.T) {

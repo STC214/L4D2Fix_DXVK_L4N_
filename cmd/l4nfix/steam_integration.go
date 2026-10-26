@@ -232,7 +232,11 @@ func updateSkeetoSubscriptions(root, gameRoot string, subscribe bool) {
 			out, err := cmd.CombinedOutput()
 			confirmed := "SKEETO_" + action + "_CONFIRMED:3782512354,3787239937"
 			if err == nil && subscriptionConfirmed(string(out), confirmed) {
-				appendLog("[steam] 已确认两个 MOD 均已" + title + "；工坊下载/更新由 Steam 管理")
+				note := "；后续工坊校验/更新由 Steam 管理"
+				if subscribe {
+					note = "；本次 MOD 文件已由部署阶段预置，后续校验/更新由 Steam 管理"
+				}
+				appendLog("[steam] 已确认两个 MOD 均已" + title + note)
 				return
 			}
 			operationErr = fmt.Errorf("%v: %s", err, strings.TrimSpace(string(out)))
