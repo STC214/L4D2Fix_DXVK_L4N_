@@ -69,6 +69,24 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 	oldWorkflow := workflowSnapshot()
 	oldChoices := platformChoices
 	defer func() { workflowMu.Lock(); workflow = oldWorkflow; workflowMu.Unlock(); platformChoices = oldChoices }()
+	platformReadyMu.Lock()
+	oldPlatformReady := platformReady
+	platformReady = map[string]workshopResource{"skeeto": {Version: "2.2.3"}, "evolved": {Version: "1.2.5"}}
+	platformReadyMu.Unlock()
+	defer func() { platformReadyMu.Lock(); platformReady = oldPlatformReady; platformReadyMu.Unlock() }()
+	refreshPlatformChoices()
+	selected, _, _ := procSendMessageW.Call(comboPlatform, cbGetCurSel, 0, 0)
+	if len(platformChoices) != 2 || platformChoices[int(selected)] != "evolved" {
+		t.Fatal("EVO not selected by default")
+	}
+	platformReadyMu.Lock()
+	delete(platformReady, "evolved")
+	platformReadyMu.Unlock()
+	refreshPlatformChoices()
+	selected, _, _ = procSendMessageW.Call(comboPlatform, cbGetCurSel, 0, 0)
+	if len(platformChoices) != 1 || selected != 0 || platformChoices[0] != "skeeto" {
+		t.Fatal("Skeeto fallback missing")
+	}
 	setState := func(s workflowState, working bool) {
 		workflowMu.Lock()
 		workflow = s

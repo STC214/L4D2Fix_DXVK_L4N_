@@ -48,7 +48,7 @@ func refreshPlatformChoices() {
 	procSendMessageW.Call(comboPlatform, 0x014B, 0, 0)
 	platformChoices = nil
 	platformReadyMu.Lock()
-	for _, kind := range []string{"skeeto", "evolved"} {
+	for _, kind := range []string{"evolved", "skeeto"} {
 		if r, ok := platformReady[kind]; ok {
 			platformChoices = append(platformChoices, kind)
 			name := "Skeeto"

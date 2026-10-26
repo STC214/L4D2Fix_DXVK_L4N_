@@ -641,7 +641,7 @@ func loadDxvkOptionsIntoCombo() {
 	for _, opt := range dxvkOptions {
 		procSendMessageW.Call(comboDxvk, cbAddString, 0, uintptr(unsafe.Pointer(utf16Ptr(opt.Name))))
 	}
-	procSendMessageW.Call(comboDxvk, cbSetCurSel, uintptr(len(dxvkOptions)-1), 0)
+	procSendMessageW.Call(comboDxvk, cbSetCurSel, 0, 0)
 	appendLog(fmt.Sprintf("[prepare] loaded %d DXVK versions", len(dxvkOptions)))
 }
 
@@ -2292,15 +2292,11 @@ func loadL4nOptionsIntoCombo() {
 	}
 	procSendMessageW.Call(comboL4n, 0x014B, 0, 0)
 	l4nOptions = discoverL4nOptions(root, resourceRoot(root))
-	selected := 0
-	for i, opt := range l4nOptions {
+	for _, opt := range l4nOptions {
 		procSendMessageW.Call(comboL4n, cbAddString, 0, uintptr(unsafe.Pointer(utf16Ptr(opt.Name))))
-		if opt.Name == genericPatchDirName {
-			selected = i
-		}
 	}
 	if len(l4nOptions) > 0 {
-		procSendMessageW.Call(comboL4n, cbSetCurSel, uintptr(selected), 0)
+		procSendMessageW.Call(comboL4n, cbSetCurSel, 0, 0)
 	}
 	appendLog(fmt.Sprintf("[prepare] loaded %d L4N versions", len(l4nOptions)))
 }

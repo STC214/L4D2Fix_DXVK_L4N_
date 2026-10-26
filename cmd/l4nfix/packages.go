@@ -608,6 +608,6 @@ func discoverVersionOptions(resRoot, folder, kind string) []dxvkOption {
 		}
 		options = append(options, dxvkOption{Name: entry.Name(), Dir: source})
 	}
-	sort.Slice(options, func(i, j int) bool { return strings.ToLower(options[i].Name) < strings.ToLower(options[j].Name) })
+	sortVersionOptionsNewestFirst(kind, options)
 	return options
 }
