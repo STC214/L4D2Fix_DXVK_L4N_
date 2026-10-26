@@ -31,6 +31,7 @@ L4N_单文件便携版/
 .l4n_auto_backup/
 .platform_auto_backup/
 **/platform_cleanup_backups/
+**/manual_cleanup_backups/
 .platform_auto_backup/
 **/platform_cleanup_backups/
 addons_backup/

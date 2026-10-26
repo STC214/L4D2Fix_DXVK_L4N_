@@ -571,6 +571,9 @@ func preparePackage(source, resRoot, kind string) (info packageSource, err error
 		return info, err
 	}
 	err = os.WriteFile(filepath.Join(temp, "prepared.json"), data, 0644)
+	if err == nil {
+		err = rememberCleanupPackage(resRoot, kind, input)
+	}
 	return info, err
 }
 

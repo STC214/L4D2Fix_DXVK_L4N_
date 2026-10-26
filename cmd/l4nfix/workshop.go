@@ -276,6 +276,9 @@ func downloadWorkshopResource(ctx context.Context, c *http.Client, res string, p
 	if _, e = normalizedMappings(p.Kind, probe); e != nil {
 		return record, e
 	}
+	if e = rememberCleanupPackage(res, p.Kind, probe); e != nil {
+		return record, fmt.Errorf("清理特征登记失败: %w", e)
+	}
 	v := packageVersion(p.Kind, probe)
 	if v == "" {
 		v = "content-" + d.Content

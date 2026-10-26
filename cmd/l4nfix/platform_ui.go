@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -167,12 +168,15 @@ func runCleanPlatform() error {
 	if e != nil {
 		return e
 	}
-	if processExists("left4dead2.exe") {
-		return fmt.Errorf("请先退出游戏再清理平台")
+	if e := checkCleanupGameStopped(); e != nil {
+		return e
 	}
 	// Use the recorded game, not a newly auto-detected installation.
 	data, e := readPlatformManifest(root)
 	if e != nil {
+		if os.IsNotExist(e) {
+			return runManualCleanupUI(root, "platform")
+		}
 		return e
 	}
 	return withPlatformSubscriptions(data.Platform, func() error {

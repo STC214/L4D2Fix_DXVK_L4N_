@@ -915,12 +915,24 @@ func runInstallWithDxvk(opt dxvkOption) error {
 }
 
 func runRestore() error {
+	if err := checkCleanupGameStopped(); err != nil {
+		return err
+	}
 	root, err := packageRoot()
 	if err != nil {
 		return err
 	}
 	if platformInstalled(root) {
 		return fmt.Errorf("请先清理已部署的平台，再清理 L4N＋DXVK")
+	}
+	manifestPath := filepath.Join(root, ".l4n_auto_backup", "manifest.json")
+	if err := pathguard.Within(root, manifestPath); err != nil {
+		return err
+	}
+	if _, err := os.Lstat(manifestPath); os.IsNotExist(err) {
+		return runManualCleanupUI(root, "base")
+	} else if err != nil {
+		return err
 	}
 	return restoreFromBackup(filepath.Join(root, ".l4n_auto_backup"))
 }

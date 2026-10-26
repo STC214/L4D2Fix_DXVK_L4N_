@@ -91,6 +91,10 @@ func steamChoiceDialog() (bool, error) {
 
 // Process enumeration errors must not be interpreted as "Steam is closed".
 func steamProcessesRunning() (bool, error) {
+	return processNamesRunning([]string{"steam.exe", "steamwebhelper.exe"})
+}
+
+func processNamesRunning(names []string) (bool, error) {
 	h, err := syscall.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPPROCESS, 0)
 	if err != nil {
 		return false, err
@@ -100,8 +104,10 @@ func steamProcessesRunning() (bool, error) {
 	err = syscall.Process32First(h, &p)
 	for err == nil {
 		name := syscall.UTF16ToString(p.ExeFile[:])
-		if strings.EqualFold(name, "steam.exe") || strings.EqualFold(name, "steamwebhelper.exe") {
-			return true, nil
+		for _, wanted := range names {
+			if strings.EqualFold(name, wanted) {
+				return true, nil
+			}
 		}
 		err = syscall.Process32Next(h, &p)
 	}

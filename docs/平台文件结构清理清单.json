@@ -1,0 +1,2962 @@
+{
+  "schema": 1,
+  "snapshot_date": "2026-10-26",
+  "policy": "Private namespaces are archived then removed. Shared paths require matching SHA256. Unknown contents are retained. Future packages extend the catalog after successful validation.",
+  "packages": [
+    {
+      "kind": "l4n",
+      "source": "L4N_dxvk2.7.1.zip",
+      "sha256": "eae7728a2e6abef6c136b47970c26abb52650d5515f54080844eaac4c39c0d4b",
+      "files": [
+        {
+          "path": "L4N_dxvk2.7.1/bin/dxvk_d3d9.dll",
+          "sha256": "00ecd422b3b12e9d3b309785f3f19431405389d80eb4a37018ebc63e2d87d900",
+          "bytes": 4493326
+        },
+        {
+          "path": "L4N_dxvk2.7.1/bin/left4neko.dll",
+          "sha256": "14cce82695797064f07c13fb65e6740b89882bf5666f753bb1901fb9f9305f27",
+          "bytes": 4460032
+        },
+        {
+          "path": "L4N_dxvk2.7.1/bin/neko/build_sound_cache.bat",
+          "sha256": "a6f7a6674fd608ca5959a037f99d70bbaac456cbc2bb3a675ffcead6b2bad4a8",
+          "bytes": 285
+        },
+        {
+          "path": "L4N_dxvk2.7.1/bin/neko/copy_sentence.bat",
+          "sha256": "928a373729905ef74dfc254f46373a9745c2e520a73e6c4bba690d5242e509a7",
+          "bytes": 1556
+        },
+        {
+          "path": "L4N_dxvk2.7.1/bin/neko/other_tools.7z",
+          "sha256": "f6f5e49b85fc35b9fcb504a6edf8a22075da6da82cd1b91bf29680d7006b47c2",
+          "bytes": 6083814
+        },
+        {
+          "path": "L4N_dxvk2.7.1/bin/neko/source_nekomimi.exe",
+          "sha256": "6c9c1fc062eed6a6bace4fafd7bce3d79c9f23ef0000a3343c630d10703700f7",
+          "bytes": 2552832
+        },
+        {
+          "path": "L4N_dxvk2.7.1/dxgi.dll",
+          "sha256": "53defc65dd2e53d05924a960c0891e15692ca8780ed0509a1a7efda71f4d631e",
+          "bytes": 3194894
+        },
+        {
+          "path": "L4N_dxvk2.7.1/dxvk_d3d9.dll",
+          "sha256": "00ecd422b3b12e9d3b309785f3f19431405389d80eb4a37018ebc63e2d87d900",
+          "bytes": 4493326
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/bin/game_shader_generic_neko",
+          "sha256": "353d15ed5d5f5b191905cf7b0429e3c49ece8901163baba11d32269e7b4eabc4",
+          "bytes": 28
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/bin/game_shader_generic_neko.dll",
+          "sha256": "37e4f6546615504dec47db8f170d75a15dfd7462227f6aa4a92f191b61fff336",
+          "bytes": 991232
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/neko/config.vdf",
+          "sha256": "3be690cb3305c834cd181585a657d0ab7750274e1ea572a527a28441042e304c",
+          "bytes": 4796
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/neko/l4ngui_english.vdf",
+          "sha256": "1f6be47209bf430ece3c2859f83e8d9db12ecb3a06067965b78650596b52c830",
+          "bytes": 12412
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/neko/l4ngui_schinese.vdf",
+          "sha256": "b131d48ac367b59462392fbdd17468213b27441826b31cbfb1438334732ac7c4",
+          "bytes": 9166
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/neko/localize_overrides_template.vdf",
+          "sha256": "db906c8f63a956d95595a4be43ba29f0dca3c8b9621e314cd3f09521e505edbe",
+          "bytes": 1083
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/neko/mdl_extension.qc",
+          "sha256": "4fe6712ccca39f80c91f0724865099201ce38a733cb58c689705df6d19387d72",
+          "bytes": 2537
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/neko/neko_proxy.vmt",
+          "sha256": "6b88db9a85d9031d4f1d4de44abcffb1f03405c5970798da910c51326c86d68e",
+          "bytes": 2030
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/digital_display.vmt",
+          "sha256": "f194676b020a38afbb742c1e787193989b19bfd95f74e9a4c629eaac1cb2e4b2",
+          "bytes": 783
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/digital_display_ps30.vcs",
+          "sha256": "7e96e08cbca80dc767e223d82094b6fc2fbdea69eacf39c23ae401968e8f4533",
+          "bytes": 705
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/digital_display_vs30.vcs",
+          "sha256": "61d4a18d12bc5577a01a585b86c263fbf990e64391b931324adeba52346903e5",
+          "bytes": 1126
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/NekoBloom_ps30.vcs",
+          "sha256": "72c08352987850b27bb07dfc327c4f9bbfc4a31bf0f9dad95001b868fe20c267",
+          "bytes": 1329
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/NekoBloom_vs30.vcs",
+          "sha256": "698d69aaf66a78498d94ac187256b70255b5d436e000d18970b6da85d4fe1995",
+          "bytes": 584
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/NekoBlurFilter_ps30.vcs",
+          "sha256": "52bcd78880cc05b555f9b836663e72b364e1172da456209aabc41eaec8c7ee36",
+          "bytes": 5947
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/NekoBlurFilter_vs30.vcs",
+          "sha256": "2640588bf47e2f34b33725850aca26a06d7ccaa5028263c1cf30fc3e8f0e520a",
+          "bytes": 448
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/nekotoon.vmt",
+          "sha256": "7245d829f0feb9b7c1e45fe02edb4e72f61910f87a8abee20cc3aa8192e2ec75",
+          "bytes": 8871
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/Neko_Downsample_nohdr_ps30.vcs",
+          "sha256": "e44285a6fee020d6da0507a4586289b131a2f48ba9cac8fd0bbcd076414a57f4",
+          "bytes": 2272
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/Neko_Downsample_vs30.vcs",
+          "sha256": "0efe8aca2e50ba87440a82e6f3461280f9639e938e1919f97966d442b2fa3877",
+          "bytes": 264
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_engine_post_ps30.vcs",
+          "sha256": "3090425bf2c3d2871263113a60880d93d4c22f503bd81f8f9738bd4879158647",
+          "bytes": 3192214
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_engine_post_vs30.vcs",
+          "sha256": "c8ae9820c8f9e6e284603c885f63b4914cc426694d27e3ed7b07cc04420a3501",
+          "bytes": 424
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_glow_color_ps30.vcs",
+          "sha256": "b251b4a4990d7c6a6359b38f5eb2144bc050a6670ea35471f07c6ce7475ef990",
+          "bytes": 208
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_glow_color_vs30.vcs",
+          "sha256": "92b1bb9fa6b31583cf16f3c823296effcb3f55158014a9eae895f2b5c99fd54b",
+          "bytes": 542
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_luminance_compare_ps20b.vcs",
+          "sha256": "55be85c0cdb6e4dd435b07f92eca6fa2ae78a0ec977bda06d1d6e1eb520cf2d5",
+          "bytes": 326
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_refract_ps30.vcs",
+          "sha256": "d8f64cf7521e4d02710fb018046a39ae223f658a4216579f46a4dbcd6090104a",
+          "bytes": 242589
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_refract_vs30.vcs",
+          "sha256": "c84f3bb979ca03323f105d2b414f20bff612169cf7667a47226ff36604b0367a",
+          "bytes": 3431
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_screenspaceeffect_vs20.vcs",
+          "sha256": "9b7f46ebc36005f6fb511b28344ddaaddb97fdc4ff954616ea648e1795221262",
+          "bytes": 818
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_sky_ps30.vcs",
+          "sha256": "92dbf233ee4e89f3fd67cd006180e9aade65dc23609d7189028d1c10b64452fd",
+          "bytes": 1537
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_sky_vs30.vcs",
+          "sha256": "2d09e243287ad1e52820babafb940d355519fc1961fffb1cbc6de73588294648",
+          "bytes": 407
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_sprite_ps30.vcs",
+          "sha256": "5219b3d75d132a3fe734975651556155fb897ea5110b4e98247d22de6cc67c46",
+          "bytes": 14362
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_sprite_vs30.vcs",
+          "sha256": "94f30606e0c0cabc5fe20c3dd34ea74ff93c4f569a778b3ab12ad23d2fd6865f",
+          "bytes": 912
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_toon_ps30.vcs",
+          "sha256": "87764c15a55fac7e1ca9ced6608b76b812b521d988ef74a35d04e2faac65feb3",
+          "bytes": 5973393
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/neko_toon_vs30.vcs",
+          "sha256": "d63864a4b1864d8f9a1e8854f208c232a494d6b0d32af1ed88a81739ef5bb839",
+          "bytes": 349417
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/outline_ps30.vcs",
+          "sha256": "d4a129da31a3244afe932367b9eb047a627de710039f5c047c47148609bd0e61",
+          "bytes": 4263
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/outline_vs30.vcs",
+          "sha256": "d9ed62c34695ff17d43cc04573a47570096beb15751ed60c9974488b2aca04a4",
+          "bytes": 30026
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/pbr.vmt",
+          "sha256": "35b37f5f6cf1cfe5cb23a332424ed7219bc100fa649192bb0525e376d244bbc5",
+          "bytes": 3013
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/pbr_ps30.vcs",
+          "sha256": "1888376e4c56952aed4415da1516af369884dca521d35fa50caedc9126b00690",
+          "bytes": 1904927
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2/shaders/fxc/pbr_vs30.vcs",
+          "sha256": "2819e047a06e1683db846f06ac7ce43ce155aafada76158e05ee0474037cd86a",
+          "bytes": 31079
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2 no-insecure.bat",
+          "sha256": "67e20f54caf4ee5574588c7fba0c92df3d980095d171dbe3cdb70ba738fa2510",
+          "bytes": 373
+        },
+        {
+          "path": "L4N_dxvk2.7.1/left4dead2.exe",
+          "sha256": "edb89c39cb21f4b14574f807926181416041fcfde1e9b0562f97c4f46581cbff",
+          "bytes": 621568
+        },
+        {
+          "path": "L4N_dxvk2.7.1/readme_l4n.txt",
+          "sha256": "eacd52d7f27bcc51bede8427277825562eb664b3b76d95afae0e64caebf50bbf",
+          "bytes": 65715
+        },
+        {
+          "path": "L4N_dxvk2.7.1/to_l4n_survivor.exe",
+          "sha256": "741cdc0ea44c2708f41cb59aaccced218ea62966676147302a97c6948a16ba8c",
+          "bytes": 5186048
+        }
+      ]
+    },
+    {
+      "kind": "l4n",
+      "source": "L4N_v2.26.0.zip",
+      "sha256": "cf6aa2f5159b86752824d4eb4b11f0f42e1c9a95c825f121c05aa58c7632aec5",
+      "files": [
+        {
+          "path": "L4N_v2.26.0/bin/left4neko.dll",
+          "sha256": "14cce82695797064f07c13fb65e6740b89882bf5666f753bb1901fb9f9305f27",
+          "bytes": 4460032
+        },
+        {
+          "path": "L4N_v2.26.0/bin/neko/build_sound_cache.bat",
+          "sha256": "a6f7a6674fd608ca5959a037f99d70bbaac456cbc2bb3a675ffcead6b2bad4a8",
+          "bytes": 285
+        },
+        {
+          "path": "L4N_v2.26.0/bin/neko/copy_sentence.bat",
+          "sha256": "928a373729905ef74dfc254f46373a9745c2e520a73e6c4bba690d5242e509a7",
+          "bytes": 1556
+        },
+        {
+          "path": "L4N_v2.26.0/bin/neko/other_tools.7z",
+          "sha256": "f6f5e49b85fc35b9fcb504a6edf8a22075da6da82cd1b91bf29680d7006b47c2",
+          "bytes": 6083814
+        },
+        {
+          "path": "L4N_v2.26.0/bin/neko/source_nekomimi.exe",
+          "sha256": "6c9c1fc062eed6a6bace4fafd7bce3d79c9f23ef0000a3343c630d10703700f7",
+          "bytes": 2552832
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/bin/game_shader_generic_neko",
+          "sha256": "353d15ed5d5f5b191905cf7b0429e3c49ece8901163baba11d32269e7b4eabc4",
+          "bytes": 28
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/bin/game_shader_generic_neko.dll",
+          "sha256": "37e4f6546615504dec47db8f170d75a15dfd7462227f6aa4a92f191b61fff336",
+          "bytes": 991232
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/neko/config.vdf",
+          "sha256": "3be690cb3305c834cd181585a657d0ab7750274e1ea572a527a28441042e304c",
+          "bytes": 4796
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/neko/l4ngui_english.vdf",
+          "sha256": "1f6be47209bf430ece3c2859f83e8d9db12ecb3a06067965b78650596b52c830",
+          "bytes": 12412
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/neko/l4ngui_schinese.vdf",
+          "sha256": "b131d48ac367b59462392fbdd17468213b27441826b31cbfb1438334732ac7c4",
+          "bytes": 9166
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/neko/localize_overrides_template.vdf",
+          "sha256": "db906c8f63a956d95595a4be43ba29f0dca3c8b9621e314cd3f09521e505edbe",
+          "bytes": 1083
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/neko/mdl_extension.qc",
+          "sha256": "4fe6712ccca39f80c91f0724865099201ce38a733cb58c689705df6d19387d72",
+          "bytes": 2537
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/neko/neko_proxy.vmt",
+          "sha256": "6b88db9a85d9031d4f1d4de44abcffb1f03405c5970798da910c51326c86d68e",
+          "bytes": 2030
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/digital_display.vmt",
+          "sha256": "f194676b020a38afbb742c1e787193989b19bfd95f74e9a4c629eaac1cb2e4b2",
+          "bytes": 783
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/digital_display_ps30.vcs",
+          "sha256": "7e96e08cbca80dc767e223d82094b6fc2fbdea69eacf39c23ae401968e8f4533",
+          "bytes": 705
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/digital_display_vs30.vcs",
+          "sha256": "61d4a18d12bc5577a01a585b86c263fbf990e64391b931324adeba52346903e5",
+          "bytes": 1126
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/NekoBloom_ps30.vcs",
+          "sha256": "72c08352987850b27bb07dfc327c4f9bbfc4a31bf0f9dad95001b868fe20c267",
+          "bytes": 1329
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/NekoBloom_vs30.vcs",
+          "sha256": "698d69aaf66a78498d94ac187256b70255b5d436e000d18970b6da85d4fe1995",
+          "bytes": 584
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/NekoBlurFilter_ps30.vcs",
+          "sha256": "52bcd78880cc05b555f9b836663e72b364e1172da456209aabc41eaec8c7ee36",
+          "bytes": 5947
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/NekoBlurFilter_vs30.vcs",
+          "sha256": "2640588bf47e2f34b33725850aca26a06d7ccaa5028263c1cf30fc3e8f0e520a",
+          "bytes": 448
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/nekotoon.vmt",
+          "sha256": "7245d829f0feb9b7c1e45fe02edb4e72f61910f87a8abee20cc3aa8192e2ec75",
+          "bytes": 8871
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/Neko_Downsample_nohdr_ps30.vcs",
+          "sha256": "e44285a6fee020d6da0507a4586289b131a2f48ba9cac8fd0bbcd076414a57f4",
+          "bytes": 2272
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/Neko_Downsample_vs30.vcs",
+          "sha256": "0efe8aca2e50ba87440a82e6f3461280f9639e938e1919f97966d442b2fa3877",
+          "bytes": 264
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_engine_post_ps30.vcs",
+          "sha256": "3090425bf2c3d2871263113a60880d93d4c22f503bd81f8f9738bd4879158647",
+          "bytes": 3192214
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_engine_post_vs30.vcs",
+          "sha256": "c8ae9820c8f9e6e284603c885f63b4914cc426694d27e3ed7b07cc04420a3501",
+          "bytes": 424
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_glow_color_ps30.vcs",
+          "sha256": "b251b4a4990d7c6a6359b38f5eb2144bc050a6670ea35471f07c6ce7475ef990",
+          "bytes": 208
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_glow_color_vs30.vcs",
+          "sha256": "92b1bb9fa6b31583cf16f3c823296effcb3f55158014a9eae895f2b5c99fd54b",
+          "bytes": 542
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_luminance_compare_ps20b.vcs",
+          "sha256": "55be85c0cdb6e4dd435b07f92eca6fa2ae78a0ec977bda06d1d6e1eb520cf2d5",
+          "bytes": 326
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_refract_ps30.vcs",
+          "sha256": "d8f64cf7521e4d02710fb018046a39ae223f658a4216579f46a4dbcd6090104a",
+          "bytes": 242589
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_refract_vs30.vcs",
+          "sha256": "c84f3bb979ca03323f105d2b414f20bff612169cf7667a47226ff36604b0367a",
+          "bytes": 3431
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_screenspaceeffect_vs20.vcs",
+          "sha256": "9b7f46ebc36005f6fb511b28344ddaaddb97fdc4ff954616ea648e1795221262",
+          "bytes": 818
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_sky_ps30.vcs",
+          "sha256": "92dbf233ee4e89f3fd67cd006180e9aade65dc23609d7189028d1c10b64452fd",
+          "bytes": 1537
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_sky_vs30.vcs",
+          "sha256": "2d09e243287ad1e52820babafb940d355519fc1961fffb1cbc6de73588294648",
+          "bytes": 407
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_sprite_ps30.vcs",
+          "sha256": "5219b3d75d132a3fe734975651556155fb897ea5110b4e98247d22de6cc67c46",
+          "bytes": 14362
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_sprite_vs30.vcs",
+          "sha256": "94f30606e0c0cabc5fe20c3dd34ea74ff93c4f569a778b3ab12ad23d2fd6865f",
+          "bytes": 912
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_toon_ps30.vcs",
+          "sha256": "87764c15a55fac7e1ca9ced6608b76b812b521d988ef74a35d04e2faac65feb3",
+          "bytes": 5973393
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/neko_toon_vs30.vcs",
+          "sha256": "d63864a4b1864d8f9a1e8854f208c232a494d6b0d32af1ed88a81739ef5bb839",
+          "bytes": 349417
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/outline_ps30.vcs",
+          "sha256": "d4a129da31a3244afe932367b9eb047a627de710039f5c047c47148609bd0e61",
+          "bytes": 4263
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/outline_vs30.vcs",
+          "sha256": "d9ed62c34695ff17d43cc04573a47570096beb15751ed60c9974488b2aca04a4",
+          "bytes": 30026
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/pbr.vmt",
+          "sha256": "35b37f5f6cf1cfe5cb23a332424ed7219bc100fa649192bb0525e376d244bbc5",
+          "bytes": 3013
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/pbr_ps30.vcs",
+          "sha256": "1888376e4c56952aed4415da1516af369884dca521d35fa50caedc9126b00690",
+          "bytes": 1904927
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2/shaders/fxc/pbr_vs30.vcs",
+          "sha256": "2819e047a06e1683db846f06ac7ce43ce155aafada76158e05ee0474037cd86a",
+          "bytes": 31079
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2 no-insecure.bat",
+          "sha256": "67e20f54caf4ee5574588c7fba0c92df3d980095d171dbe3cdb70ba738fa2510",
+          "bytes": 373
+        },
+        {
+          "path": "L4N_v2.26.0/left4dead2.exe",
+          "sha256": "edb89c39cb21f4b14574f807926181416041fcfde1e9b0562f97c4f46581cbff",
+          "bytes": 621568
+        },
+        {
+          "path": "L4N_v2.26.0/readme_l4n.txt",
+          "sha256": "84f2ef350dfefc8c2bf8b8755a3e7e8bae7333ac65ce5073b145893f39c400fb",
+          "bytes": 65451
+        },
+        {
+          "path": "L4N_v2.26.0/to_l4n_survivor.exe",
+          "sha256": "741cdc0ea44c2708f41cb59aaccced218ea62966676147302a97c6948a16ba8c",
+          "bytes": 5186048
+        },
+        {
+          "path": "L4N_v2.26.0/启动项指令【四】.txt",
+          "sha256": "cf8ba4e4fe46af93487d16a652cd1f00c8e2960ac8025d9adbf2d1e24c5e94e7",
+          "bytes": 65
+        }
+      ]
+    },
+    {
+      "kind": "l4n",
+      "source": "L4N_v2.35.2 .zip",
+      "sha256": "ed3cc75b5057a3b53adc09cdb1ccdc9d3d32975578f9ff85813af472e1652e33",
+      "files": [
+        {
+          "path": "bin/left4neko.dll",
+          "sha256": "94297ae2f1c49f77a585d55c3a3b78ab51f77241a1d96d838bf8e89c34f71c5c",
+          "bytes": 4841472
+        },
+        {
+          "path": "bin/neko/build_sound_cache.bat",
+          "sha256": "a339b007e3ec528ec450f692bc4c1e6c9642d5e5cdfa5cba67d65360a3eb6c58",
+          "bytes": 325
+        },
+        {
+          "path": "bin/neko/copy_sentence.bat",
+          "sha256": "928a373729905ef74dfc254f46373a9745c2e520a73e6c4bba690d5242e509a7",
+          "bytes": 1556
+        },
+        {
+          "path": "bin/neko/l4n_magic_converter.exe",
+          "sha256": "d6c6faaa5714e66e22901a77e72828e480e6c24090061d6a433f9f3a7166bfc5",
+          "bytes": 5339648
+        },
+        {
+          "path": "bin/neko/other_tools.7z",
+          "sha256": "f6f5e49b85fc35b9fcb504a6edf8a22075da6da82cd1b91bf29680d7006b47c2",
+          "bytes": 6083814
+        },
+        {
+          "path": "bin/neko/plugins/l4n_plugin.h",
+          "sha256": "950be54e2068acadf5f1bd5f918101fd1d8b4b3bb58e0b9d1e98cb30e4d1e35b",
+          "bytes": 1093
+        },
+        {
+          "path": "bin/neko/source_nekomimi.exe",
+          "sha256": "6c9c1fc062eed6a6bace4fafd7bce3d79c9f23ef0000a3343c630d10703700f7",
+          "bytes": 2552832
+        },
+        {
+          "path": "bin/neko/survivor_convert.bat",
+          "sha256": "dce8ca6faf070e168eebc2ea6462130ff3a704b1633e9c98f1029fa3539ece96",
+          "bytes": 2428
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_biker.mdl",
+          "sha256": "7081aa03487248273a10dc6b808ea4d560eff0c0b4123ade4aa9184d57cc70fa",
+          "bytes": 319792
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_coach.mdl",
+          "sha256": "bcd185860b7ea910bccc4c90a0c30be037ae28c2321eca7856fd30236d4996ad",
+          "bytes": 286520
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_gambler.mdl",
+          "sha256": "d2f446309f87ab95f4cb68f1aaafc02937f54c0efafba14f09a86fa21483e2d3",
+          "bytes": 297188
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_manager.mdl",
+          "sha256": "5578a72aa4b677fe24bd8c806d4f1ddbeb636ddeb8c7329b9a5d2f133a55a609",
+          "bytes": 318568
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_mechanic.mdl",
+          "sha256": "97fe7f205f2ae6e8c43e93ef5421cf7582c912fc4489f0cd5e2f0da3bfec2794",
+          "bytes": 298068
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_namvet.mdl",
+          "sha256": "2ab4e166db343251075e0ea17df000d1428b8df8ee83f58eea3eb9a4e4f4b3ab",
+          "bytes": 303196
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_producer.mdl",
+          "sha256": "123a4c74236e60fdf8cfef6c6d4fd238e028617365ec9f58cbc0c5fa99697c2c",
+          "bytes": 268440
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_teenangst.mdl",
+          "sha256": "a91409ff08b7ef1a2464ff1ab0942b951b3512fbe2fd4d21323609ba95dc42b9",
+          "bytes": 264228
+        },
+        {
+          "path": "bin/neko/survivor_vpk_gen.bat",
+          "sha256": "592b852e77701ed237232c005fbd0576e0e7f0740f49e1cf01aed1b574e6f419",
+          "bytes": 185
+        },
+        {
+          "path": "bin/neko/to_l4n_survivor.bat",
+          "sha256": "b7e5ac4b36b19413db8eaafb954c9c99ba5e59c25c45b8e17ef569500ba0c66c",
+          "bytes": 73
+        },
+        {
+          "path": "left4dead2 no-insecure.bat",
+          "sha256": "67e20f54caf4ee5574588c7fba0c92df3d980095d171dbe3cdb70ba738fa2510",
+          "bytes": 373
+        },
+        {
+          "path": "left4dead2.exe",
+          "sha256": "26068978254df9a5dac3b11f7d51b43cfa04232564487ecb963d944ba71de537",
+          "bytes": 621568
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko",
+          "sha256": "353d15ed5d5f5b191905cf7b0429e3c49ece8901163baba11d32269e7b4eabc4",
+          "bytes": 28
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko.dll",
+          "sha256": "f7f8ea572acce799b1dccc0729d634057e19ad0fe9ee2ee1898132c4ad0a6a68",
+          "bytes": 1509888
+        },
+        {
+          "path": "left4dead2/materials/l4n/bloom_map.vtf",
+          "sha256": "30f70fdd55a7ffa335215bc7741ebf675619f3530be31b3baaeb0707d206015e",
+          "bytes": 1048736
+        },
+        {
+          "path": "left4dead2/materials/l4n/brdf_lut.vtf",
+          "sha256": "6cae2076919bdc2f0c884e356939c6f57c47bb990237e4a1ee9d55632bd77a18",
+          "bytes": 524512
+        },
+        {
+          "path": "left4dead2/materials/l4n/world_error.vmt",
+          "sha256": "60d6e636d452cfb4476aa905ef7eedf701fe8402b1077afd78a3c3eec9ce928a",
+          "bytes": 786
+        },
+        {
+          "path": "left4dead2/neko/config.vdf",
+          "sha256": "e0ed941f1037cffb2d4bd61e9839a7f358ed02d1eb272b7af728c05ad5506ed7",
+          "bytes": 8708
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_english.vdf",
+          "sha256": "f7e62c433642d098d6cd9c55a5c03ac05399c3ec9df7d3f841ab89ab37133385",
+          "bytes": 14778
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_schinese.vdf",
+          "sha256": "129c0a58485ba92c8be2257122aff83caa34148062847f56410ea8d0d11e2402",
+          "bytes": 10956
+        },
+        {
+          "path": "left4dead2/neko/localize_overrides_template.vdf",
+          "sha256": "ad4fd136f2f8b7f1ad2905404bb726cde02ebccb31da748f5338a6d157e479d4",
+          "bytes": 996
+        },
+        {
+          "path": "left4dead2/neko/mdl_extension.qc",
+          "sha256": "52f37b29b59b8fd639913885c602b8cf02c118b3aab53c803afc8c9a54322bb5",
+          "bytes": 3264
+        },
+        {
+          "path": "left4dead2/neko/neko_proxy.vmt",
+          "sha256": "6b88db9a85d9031d4f1d4de44abcffb1f03405c5970798da910c51326c86d68e",
+          "bytes": 2030
+        },
+        {
+          "path": "left4dead2/neko/scheme_overrides_template.vdf",
+          "sha256": "08c028a0a8fe6f12c037e58d34dde8da03a0d76b36780d163ab7fd305716af07",
+          "bytes": 609
+        },
+        {
+          "path": "left4dead2/neko/sequence_event_template.vdf",
+          "sha256": "03e5e1f374e999a48785119489f5d9e893c24c109d204abe0be698fdb5ca156f",
+          "bytes": 403
+        },
+        {
+          "path": "left4dead2/neko/server_name_filter_template.txt",
+          "sha256": "771c8b50dfeb96e0f82b77f7f01d9641b80b965f83035753b6bad8c0372f4dc3",
+          "bytes": 497
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display.vmt",
+          "sha256": "f194676b020a38afbb742c1e787193989b19bfd95f74e9a4c629eaac1cb2e4b2",
+          "bytes": 783
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_ps30.vcs",
+          "sha256": "7e96e08cbca80dc767e223d82094b6fc2fbdea69eacf39c23ae401968e8f4533",
+          "bytes": 705
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_vs30.vcs",
+          "sha256": "61d4a18d12bc5577a01a585b86c263fbf990e64391b931324adeba52346903e5",
+          "bytes": 1126
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_nohdr_ps30.vcs",
+          "sha256": "e44285a6fee020d6da0507a4586289b131a2f48ba9cac8fd0bbcd076414a57f4",
+          "bytes": 2272
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_vs30.vcs",
+          "sha256": "0efe8aca2e50ba87440a82e6f3461280f9639e938e1919f97966d442b2fa3877",
+          "bytes": 264
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_ps30.vcs",
+          "sha256": "9266683547345cb5edff2c14c14508d740d017f1e3f73f743c6a1c1585d5bf81",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_vs30.vcs",
+          "sha256": "c1067e407ca297261b24ed081cde42cfd00bef2e9859b3ad45bda23210f10483",
+          "bytes": 575
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_ps30.vcs",
+          "sha256": "964eb05a5b0b86c12deeea31edc9c119478fcf869c5b01704b4c868fe45a02b1",
+          "bytes": 199280
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_vs30.vcs",
+          "sha256": "c8ae9820c8f9e6e284603c885f63b4914cc426694d27e3ed7b07cc04420a3501",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_ps30.vcs",
+          "sha256": "b251b4a4990d7c6a6359b38f5eb2144bc050a6670ea35471f07c6ce7475ef990",
+          "bytes": 208
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_vs30.vcs",
+          "sha256": "92b1bb9fa6b31583cf16f3c823296effcb3f55158014a9eae895f2b5c99fd54b",
+          "bytes": 542
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_luminance_compare_ps20b.vcs",
+          "sha256": "f465b1f5d42960a2fdf0e31a8d4fa82e62b847a956eed68527894ac40fbfebec",
+          "bytes": 404
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract.vmt",
+          "sha256": "fbac8afc751bdffb5b5c591c1a38915ace332fa9def078c60c3277a53d5f5606",
+          "bytes": 2832
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_ps30.vcs",
+          "sha256": "9fe0cd24564b96e91c9806928f6569b3f1cb5de2083e18bd1ec84850e3e8aacc",
+          "bytes": 78327
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_vs30.vcs",
+          "sha256": "c84f3bb979ca03323f105d2b414f20bff612169cf7667a47226ff36604b0367a",
+          "bytes": 3431
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_screenspaceeffect_vs20.vcs",
+          "sha256": "9b7f46ebc36005f6fb511b28344ddaaddb97fdc4ff954616ea648e1795221262",
+          "bytes": 818
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_ps30.vcs",
+          "sha256": "92dbf233ee4e89f3fd67cd006180e9aade65dc23609d7189028d1c10b64452fd",
+          "bytes": 1537
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_vs30.vcs",
+          "sha256": "2d09e243287ad1e52820babafb940d355519fc1961fffb1cbc6de73588294648",
+          "bytes": 407
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_ps30.vcs",
+          "sha256": "5219b3d75d132a3fe734975651556155fb897ea5110b4e98247d22de6cc67c46",
+          "bytes": 14362
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_vs30.vcs",
+          "sha256": "94f30606e0c0cabc5fe20c3dd34ea74ff93c4f569a778b3ab12ad23d2fd6865f",
+          "bytes": 912
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_ps30.vcs",
+          "sha256": "948a2cf1f3944e2eac4513bd1eb32c2d1c99fa4157aa0321d0a07436ca18c7c2",
+          "bytes": 1693450
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_vs30.vcs",
+          "sha256": "562e711d5594a677bdae86466399c8fc5d995c6581482cc9e8aacbcd14ed9e09",
+          "bytes": 333190
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_ps30.vcs",
+          "sha256": "ae2e85102c82d1d6c24043b32c7d6a2cddcba07e3b488744e5d194db4f025729",
+          "bytes": 1326
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_vs30.vcs",
+          "sha256": "698d69aaf66a78498d94ac187256b70255b5d436e000d18970b6da85d4fe1995",
+          "bytes": 584
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_ps30.vcs",
+          "sha256": "52bcd78880cc05b555f9b836663e72b364e1172da456209aabc41eaec8c7ee36",
+          "bytes": 5947
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_vs30.vcs",
+          "sha256": "2640588bf47e2f34b33725850aca26a06d7ccaa5028263c1cf30fc3e8f0e520a",
+          "bytes": 448
+        },
+        {
+          "path": "left4dead2/shaders/fxc/nekotoon.vmt",
+          "sha256": "a823a8004a5484362d592306c65eaafdecf17e36def330787919fef86e1fb90b",
+          "bytes": 9074
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_ps30.vcs",
+          "sha256": "cd5a04370ddfaf4233313007f49f7cddbd83f167d9bd60b34813b222247edba4",
+          "bytes": 4263
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_vs30.vcs",
+          "sha256": "71c54f1460f45124a7534c3d4cefcc966c98201dd968aceb9ad6982f6c29c9d5",
+          "bytes": 31674
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr.vmt",
+          "sha256": "deca79bdaa28b96c38ee0c3566c386adc7232f82c2968e65876bc97e99687cf9",
+          "bytes": 3289
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_ps30.vcs",
+          "sha256": "ce65434fdcf965584e7719ebbba540480cdb976ce515be75d9ab718d237fb1ec",
+          "bytes": 22355
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_vs30.vcs",
+          "sha256": "7ed53ad86dd786b6fd9985b12ab9e3e5c1b2a337cf8d036e5224039780d319bb",
+          "bytes": 31079
+        },
+        {
+          "path": "readme_l4n.txt",
+          "sha256": "e44cd201d239069c39f64d29d8a7adfae73cca92ade906ab266add29f59107a4",
+          "bytes": 78157
+        },
+        {
+          "path": "to_l4n_survivor.exe",
+          "sha256": "3fea6597eb66e583c134aed55ced927e788ef02a14fcd11f724685c83f70c789",
+          "bytes": 1326080
+        },
+        {
+          "path": "启动项指令【四】.txt",
+          "sha256": "cf8ba4e4fe46af93487d16a652cd1f00c8e2960ac8025d9adbf2d1e24c5e94e7",
+          "bytes": 65
+        }
+      ]
+    },
+    {
+      "kind": "l4n",
+      "source": "L4N_v2.41.1.zip",
+      "sha256": "86404c27154b6afdbfbabc564d9225ae26a3e3fabb3acea28d640b6d0552ac6b",
+      "files": [
+        {
+          "path": "bin/left4neko.dll",
+          "sha256": "7a392b2918ccc596e280fc842b90200a3251d1da8324f886142ed95c55aa1e1d",
+          "bytes": 1775104
+        },
+        {
+          "path": "bin/neko/build_sound_cache.bat",
+          "sha256": "a339b007e3ec528ec450f692bc4c1e6c9642d5e5cdfa5cba67d65360a3eb6c58",
+          "bytes": 325
+        },
+        {
+          "path": "bin/neko/copy_sentence.bat",
+          "sha256": "928a373729905ef74dfc254f46373a9745c2e520a73e6c4bba690d5242e509a7",
+          "bytes": 1556
+        },
+        {
+          "path": "bin/neko/l4n_magic_converter.exe",
+          "sha256": "8e1ffff0dc526b2427908eb24e30f6de03b1f6023c9a71d4a460527313cefa7f",
+          "bytes": 1915904
+        },
+        {
+          "path": "bin/neko/other_tools.7z",
+          "sha256": "f6f5e49b85fc35b9fcb504a6edf8a22075da6da82cd1b91bf29680d7006b47c2",
+          "bytes": 6083814
+        },
+        {
+          "path": "bin/neko/plugins/l4n_plugin.h",
+          "sha256": "950be54e2068acadf5f1bd5f918101fd1d8b4b3bb58e0b9d1e98cb30e4d1e35b",
+          "bytes": 1093
+        },
+        {
+          "path": "bin/neko/source_nekomimi.exe",
+          "sha256": "6c9c1fc062eed6a6bace4fafd7bce3d79c9f23ef0000a3343c630d10703700f7",
+          "bytes": 2552832
+        },
+        {
+          "path": "bin/neko/survivor_convert.bat",
+          "sha256": "dce8ca6faf070e168eebc2ea6462130ff3a704b1633e9c98f1029fa3539ece96",
+          "bytes": 2428
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_biker.mdl",
+          "sha256": "7081aa03487248273a10dc6b808ea4d560eff0c0b4123ade4aa9184d57cc70fa",
+          "bytes": 319792
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_coach.mdl",
+          "sha256": "bcd185860b7ea910bccc4c90a0c30be037ae28c2321eca7856fd30236d4996ad",
+          "bytes": 286520
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_gambler.mdl",
+          "sha256": "d2f446309f87ab95f4cb68f1aaafc02937f54c0efafba14f09a86fa21483e2d3",
+          "bytes": 297188
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_manager.mdl",
+          "sha256": "5578a72aa4b677fe24bd8c806d4f1ddbeb636ddeb8c7329b9a5d2f133a55a609",
+          "bytes": 318568
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_mechanic.mdl",
+          "sha256": "97fe7f205f2ae6e8c43e93ef5421cf7582c912fc4489f0cd5e2f0da3bfec2794",
+          "bytes": 298068
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_namvet.mdl",
+          "sha256": "2ab4e166db343251075e0ea17df000d1428b8df8ee83f58eea3eb9a4e4f4b3ab",
+          "bytes": 303196
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_producer.mdl",
+          "sha256": "123a4c74236e60fdf8cfef6c6d4fd238e028617365ec9f58cbc0c5fa99697c2c",
+          "bytes": 268440
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_teenangst.mdl",
+          "sha256": "a91409ff08b7ef1a2464ff1ab0942b951b3512fbe2fd4d21323609ba95dc42b9",
+          "bytes": 264228
+        },
+        {
+          "path": "bin/neko/survivor_vpk_gen.bat",
+          "sha256": "592b852e77701ed237232c005fbd0576e0e7f0740f49e1cf01aed1b574e6f419",
+          "bytes": 185
+        },
+        {
+          "path": "bin/neko/to_l4n_survivor.bat",
+          "sha256": "b7e5ac4b36b19413db8eaafb954c9c99ba5e59c25c45b8e17ef569500ba0c66c",
+          "bytes": 73
+        },
+        {
+          "path": "left4dead2 no-insecure.bat",
+          "sha256": "67e20f54caf4ee5574588c7fba0c92df3d980095d171dbe3cdb70ba738fa2510",
+          "bytes": 373
+        },
+        {
+          "path": "left4dead2.exe",
+          "sha256": "cc32708954007d2328391e3d58bc78c8adbe6a47bfde032c43a6145deb2fdaea",
+          "bytes": 136192
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko",
+          "sha256": "353d15ed5d5f5b191905cf7b0429e3c49ece8901163baba11d32269e7b4eabc4",
+          "bytes": 28
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko.dll",
+          "sha256": "787067e34a66aa6b8187aea699374125d04477d769b129a819a13f3df62f4ab9",
+          "bytes": 335872
+        },
+        {
+          "path": "left4dead2/materials/l4n/bloom_map.vtf",
+          "sha256": "30f70fdd55a7ffa335215bc7741ebf675619f3530be31b3baaeb0707d206015e",
+          "bytes": 1048736
+        },
+        {
+          "path": "left4dead2/materials/l4n/brdf_lut.vtf",
+          "sha256": "6cae2076919bdc2f0c884e356939c6f57c47bb990237e4a1ee9d55632bd77a18",
+          "bytes": 524512
+        },
+        {
+          "path": "left4dead2/materials/l4n/neko_tonemap.vmt",
+          "sha256": "faff2e9a14b2255eca5929a1513773c7946c830f611bfc8efbb4fd751af41a4d",
+          "bytes": 53
+        },
+        {
+          "path": "left4dead2/materials/l4n/world_error.vmt",
+          "sha256": "60d6e636d452cfb4476aa905ef7eedf701fe8402b1077afd78a3c3eec9ce928a",
+          "bytes": 786
+        },
+        {
+          "path": "left4dead2/neko/config.vdf",
+          "sha256": "1500f051c36fdb4648f58e8236720642ffe011b26a06e5cf26dae3119759b56b",
+          "bytes": 10350
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_english.vdf",
+          "sha256": "3db112f4f5f075757e1500fd4cac9484b97753fa1c9773d6d35380f217fb57df",
+          "bytes": 17372
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_schinese.vdf",
+          "sha256": "8a67a7c0f0d236085193ff9d4c0b26f31f9a3973fcc7b5d6198785c2b89c178e",
+          "bytes": 12976
+        },
+        {
+          "path": "left4dead2/neko/localize_overrides_template.vdf",
+          "sha256": "ad4fd136f2f8b7f1ad2905404bb726cde02ebccb31da748f5338a6d157e479d4",
+          "bytes": 996
+        },
+        {
+          "path": "left4dead2/neko/mdl_extension.qc",
+          "sha256": "52f37b29b59b8fd639913885c602b8cf02c118b3aab53c803afc8c9a54322bb5",
+          "bytes": 3264
+        },
+        {
+          "path": "left4dead2/neko/neko_proxy.vmt",
+          "sha256": "6b88db9a85d9031d4f1d4de44abcffb1f03405c5970798da910c51326c86d68e",
+          "bytes": 2030
+        },
+        {
+          "path": "left4dead2/neko/scheme_overrides_template.vdf",
+          "sha256": "08c028a0a8fe6f12c037e58d34dde8da03a0d76b36780d163ab7fd305716af07",
+          "bytes": 609
+        },
+        {
+          "path": "left4dead2/neko/sequence_event_template.vdf",
+          "sha256": "03e5e1f374e999a48785119489f5d9e893c24c109d204abe0be698fdb5ca156f",
+          "bytes": 403
+        },
+        {
+          "path": "left4dead2/neko/server_name_filter_template.txt",
+          "sha256": "771c8b50dfeb96e0f82b77f7f01d9641b80b965f83035753b6bad8c0372f4dc3",
+          "bytes": 497
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display.vmt",
+          "sha256": "f194676b020a38afbb742c1e787193989b19bfd95f74e9a4c629eaac1cb2e4b2",
+          "bytes": 783
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_ps30.vcs",
+          "sha256": "7e96e08cbca80dc767e223d82094b6fc2fbdea69eacf39c23ae401968e8f4533",
+          "bytes": 705
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_vs30.vcs",
+          "sha256": "61d4a18d12bc5577a01a585b86c263fbf990e64391b931324adeba52346903e5",
+          "bytes": 1126
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_nohdr_ps30.vcs",
+          "sha256": "e44285a6fee020d6da0507a4586289b131a2f48ba9cac8fd0bbcd076414a57f4",
+          "bytes": 2272
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_vs30.vcs",
+          "sha256": "0efe8aca2e50ba87440a82e6f3461280f9639e938e1919f97966d442b2fa3877",
+          "bytes": 264
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_ps30.vcs",
+          "sha256": "9266683547345cb5edff2c14c14508d740d017f1e3f73f743c6a1c1585d5bf81",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_vs30.vcs",
+          "sha256": "c1067e407ca297261b24ed081cde42cfd00bef2e9859b3ad45bda23210f10483",
+          "bytes": 575
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_ps30.vcs",
+          "sha256": "8664b5383032498ba14a176d3981628e3e817083b26546996f63bc741b109339",
+          "bytes": 175827
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_vs30.vcs",
+          "sha256": "c8ae9820c8f9e6e284603c885f63b4914cc426694d27e3ed7b07cc04420a3501",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_ps30.vcs",
+          "sha256": "b251b4a4990d7c6a6359b38f5eb2144bc050a6670ea35471f07c6ce7475ef990",
+          "bytes": 208
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_vs30.vcs",
+          "sha256": "92b1bb9fa6b31583cf16f3c823296effcb3f55158014a9eae895f2b5c99fd54b",
+          "bytes": 542
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_luminance_compare_ps20b.vcs",
+          "sha256": "4942c0487f88ed342c0432363bcef9f1ac7f6769a7290d65dcc118866b015b6c",
+          "bytes": 484
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract.vmt",
+          "sha256": "fbac8afc751bdffb5b5c591c1a38915ace332fa9def078c60c3277a53d5f5606",
+          "bytes": 2832
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_ps30.vcs",
+          "sha256": "9fe0cd24564b96e91c9806928f6569b3f1cb5de2083e18bd1ec84850e3e8aacc",
+          "bytes": 78327
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_vs30.vcs",
+          "sha256": "c84f3bb979ca03323f105d2b414f20bff612169cf7667a47226ff36604b0367a",
+          "bytes": 3431
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_screenspaceeffect_vs20.vcs",
+          "sha256": "9b7f46ebc36005f6fb511b28344ddaaddb97fdc4ff954616ea648e1795221262",
+          "bytes": 818
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_screenspaceeffect_vs30.vcs",
+          "sha256": "4e304684a4722221b8ffaf3ed4e95088f647688d81d2b0945b19e5104ee3c047",
+          "bytes": 840
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_ps30.vcs",
+          "sha256": "92dbf233ee4e89f3fd67cd006180e9aade65dc23609d7189028d1c10b64452fd",
+          "bytes": 1537
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_vs30.vcs",
+          "sha256": "2d09e243287ad1e52820babafb940d355519fc1961fffb1cbc6de73588294648",
+          "bytes": 407
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_ps30.vcs",
+          "sha256": "5219b3d75d132a3fe734975651556155fb897ea5110b4e98247d22de6cc67c46",
+          "bytes": 14362
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_vs30.vcs",
+          "sha256": "94f30606e0c0cabc5fe20c3dd34ea74ff93c4f569a778b3ab12ad23d2fd6865f",
+          "bytes": 912
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_tonemap_ps30.vcs",
+          "sha256": "b678cceb3226bc990f15f36e156e36ee563c2368d343bc703782f3a18695daa9",
+          "bytes": 1247
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_ps30.vcs",
+          "sha256": "07904ee196f050e9e17bfbcbae88a571f194e7b68d60bec7818e915ffcbf1ee5",
+          "bytes": 1694793
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_vs30.vcs",
+          "sha256": "562e711d5594a677bdae86466399c8fc5d995c6581482cc9e8aacbcd14ed9e09",
+          "bytes": 333190
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_ps30.vcs",
+          "sha256": "ae2e85102c82d1d6c24043b32c7d6a2cddcba07e3b488744e5d194db4f025729",
+          "bytes": 1326
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_vs30.vcs",
+          "sha256": "698d69aaf66a78498d94ac187256b70255b5d436e000d18970b6da85d4fe1995",
+          "bytes": 584
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_ps30.vcs",
+          "sha256": "52bcd78880cc05b555f9b836663e72b364e1172da456209aabc41eaec8c7ee36",
+          "bytes": 5947
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_vs30.vcs",
+          "sha256": "2640588bf47e2f34b33725850aca26a06d7ccaa5028263c1cf30fc3e8f0e520a",
+          "bytes": 448
+        },
+        {
+          "path": "left4dead2/shaders/fxc/nekotoon.vmt",
+          "sha256": "ea39f3c88ccc297ff17e2ea7c63589a108c524191a0bbf6f0b5444a0ed13c054",
+          "bytes": 9151
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_ps30.vcs",
+          "sha256": "8dd689bec377b32291723c91169612454ad95617f2e8562c92ba5911db1c35b9",
+          "bytes": 4263
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_vs30.vcs",
+          "sha256": "71c54f1460f45124a7534c3d4cefcc966c98201dd968aceb9ad6982f6c29c9d5",
+          "bytes": 31674
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr.vmt",
+          "sha256": "7bbc4dc65fea327de641672e19bb3d2f598a2215e81af1435dfc3ea9487466e7",
+          "bytes": 3370
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_ps30.vcs",
+          "sha256": "ce65434fdcf965584e7719ebbba540480cdb976ce515be75d9ab718d237fb1ec",
+          "bytes": 22355
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_vs30.vcs",
+          "sha256": "7ed53ad86dd786b6fd9985b12ab9e3e5c1b2a337cf8d036e5224039780d319bb",
+          "bytes": 31079
+        },
+        {
+          "path": "readme_l4n.txt",
+          "sha256": "3f4d80b4d5eb25787c03be5994b78e7586c4ffd05e7855a99fc5ab38546e1d54",
+          "bytes": 86677
+        },
+        {
+          "path": "reshade-shaders/Shaders/L4N/L4N_Util.fx",
+          "sha256": "ee33c309eb9b207c3c4e03a04883b3edc660b79003bbee415eed26be40da33b4",
+          "bytes": 1952
+        },
+        {
+          "path": "to_l4n_survivor.exe",
+          "sha256": "af3879f72a4896d11e4485e403c0c584c59cebbe959a5a54c47a9554f4b5317f",
+          "bytes": 197120
+        },
+        {
+          "path": "启动项指令【四】.txt",
+          "sha256": "cf8ba4e4fe46af93487d16a652cd1f00c8e2960ac8025d9adbf2d1e24c5e94e7",
+          "bytes": 65
+        }
+      ]
+    },
+    {
+      "kind": "l4n",
+      "source": "L4N_v2.47.2.zip",
+      "sha256": "3d331f3644a89f2078726b7f40202e811d709c6ab08708ea35b9191b2eb354c8",
+      "files": [
+        {
+          "path": "bin/left4neko.dll",
+          "sha256": "eeddd74a0f3d38768bd9b5585a9f6dd01886fa338ffef42359b84c93cefb7b40",
+          "bytes": 1809408
+        },
+        {
+          "path": "bin/neko/build_sound_cache.bat",
+          "sha256": "a339b007e3ec528ec450f692bc4c1e6c9642d5e5cdfa5cba67d65360a3eb6c58",
+          "bytes": 325
+        },
+        {
+          "path": "bin/neko/copy_sentence.bat",
+          "sha256": "928a373729905ef74dfc254f46373a9745c2e520a73e6c4bba690d5242e509a7",
+          "bytes": 1556
+        },
+        {
+          "path": "bin/neko/l4n_magic_converter.exe",
+          "sha256": "8e1ffff0dc526b2427908eb24e30f6de03b1f6023c9a71d4a460527313cefa7f",
+          "bytes": 1915904
+        },
+        {
+          "path": "bin/neko/other_tools.7z",
+          "sha256": "f6f5e49b85fc35b9fcb504a6edf8a22075da6da82cd1b91bf29680d7006b47c2",
+          "bytes": 6083814
+        },
+        {
+          "path": "bin/neko/plugins/l4n_plugin.h",
+          "sha256": "950be54e2068acadf5f1bd5f918101fd1d8b4b3bb58e0b9d1e98cb30e4d1e35b",
+          "bytes": 1093
+        },
+        {
+          "path": "bin/neko/source_nekomimi.exe",
+          "sha256": "6c9c1fc062eed6a6bace4fafd7bce3d79c9f23ef0000a3343c630d10703700f7",
+          "bytes": 2552832
+        },
+        {
+          "path": "bin/neko/survivor_convert.bat",
+          "sha256": "dce8ca6faf070e168eebc2ea6462130ff3a704b1633e9c98f1029fa3539ece96",
+          "bytes": 2428
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_biker.mdl",
+          "sha256": "7081aa03487248273a10dc6b808ea4d560eff0c0b4123ade4aa9184d57cc70fa",
+          "bytes": 319792
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_coach.mdl",
+          "sha256": "bcd185860b7ea910bccc4c90a0c30be037ae28c2321eca7856fd30236d4996ad",
+          "bytes": 286520
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_gambler.mdl",
+          "sha256": "d2f446309f87ab95f4cb68f1aaafc02937f54c0efafba14f09a86fa21483e2d3",
+          "bytes": 297188
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_manager.mdl",
+          "sha256": "5578a72aa4b677fe24bd8c806d4f1ddbeb636ddeb8c7329b9a5d2f133a55a609",
+          "bytes": 318568
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_mechanic.mdl",
+          "sha256": "97fe7f205f2ae6e8c43e93ef5421cf7582c912fc4489f0cd5e2f0da3bfec2794",
+          "bytes": 298068
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_namvet.mdl",
+          "sha256": "2ab4e166db343251075e0ea17df000d1428b8df8ee83f58eea3eb9a4e4f4b3ab",
+          "bytes": 303196
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_producer.mdl",
+          "sha256": "123a4c74236e60fdf8cfef6c6d4fd238e028617365ec9f58cbc0c5fa99697c2c",
+          "bytes": 268440
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_teenangst.mdl",
+          "sha256": "a91409ff08b7ef1a2464ff1ab0942b951b3512fbe2fd4d21323609ba95dc42b9",
+          "bytes": 264228
+        },
+        {
+          "path": "bin/neko/survivor_vpk_gen.bat",
+          "sha256": "592b852e77701ed237232c005fbd0576e0e7f0740f49e1cf01aed1b574e6f419",
+          "bytes": 185
+        },
+        {
+          "path": "bin/neko/to_l4n_survivor.bat",
+          "sha256": "b7e5ac4b36b19413db8eaafb954c9c99ba5e59c25c45b8e17ef569500ba0c66c",
+          "bytes": 73
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko",
+          "sha256": "353d15ed5d5f5b191905cf7b0429e3c49ece8901163baba11d32269e7b4eabc4",
+          "bytes": 28
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko.dll",
+          "sha256": "6990cbb7ce0a460af7fd23c19fb54cccb26c821390b5672d3b9d3413beedb3b9",
+          "bytes": 337920
+        },
+        {
+          "path": "left4dead2/materials/l4n/bloom_map.vtf",
+          "sha256": "30f70fdd55a7ffa335215bc7741ebf675619f3530be31b3baaeb0707d206015e",
+          "bytes": 1048736
+        },
+        {
+          "path": "left4dead2/materials/l4n/brdf_lut.vtf",
+          "sha256": "6cae2076919bdc2f0c884e356939c6f57c47bb990237e4a1ee9d55632bd77a18",
+          "bytes": 524512
+        },
+        {
+          "path": "left4dead2/materials/l4n/neko_tonemap.vmt",
+          "sha256": "faff2e9a14b2255eca5929a1513773c7946c830f611bfc8efbb4fd751af41a4d",
+          "bytes": 53
+        },
+        {
+          "path": "left4dead2/materials/l4n/world_error.vmt",
+          "sha256": "60d6e636d452cfb4476aa905ef7eedf701fe8402b1077afd78a3c3eec9ce928a",
+          "bytes": 786
+        },
+        {
+          "path": "left4dead2/neko/config_template.vdf",
+          "sha256": "fe3ee10448ee773e96b86134d46db6a194d8f13062586e9664ed538b40fe785b",
+          "bytes": 7174
+        },
+        {
+          "path": "left4dead2/neko/key_bind_acts.vdf",
+          "sha256": "f44ae58886bbea04f8a52ad6d65e9eb36fa9d5bf355f669c4cb83df0a2b4b776",
+          "bytes": 611
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_english.vdf",
+          "sha256": "e3a7afc07c677ae855087e7fb6c69486b7740d3ff93556257e680c7bf9374b62",
+          "bytes": 23236
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_schinese.vdf",
+          "sha256": "21381552a74ad5cc15e41de957a171240c099176632163ff0144143c647ad2e2",
+          "bytes": 16568
+        },
+        {
+          "path": "left4dead2/neko/localize_overrides_template.vdf",
+          "sha256": "ad4fd136f2f8b7f1ad2905404bb726cde02ebccb31da748f5338a6d157e479d4",
+          "bytes": 996
+        },
+        {
+          "path": "left4dead2/neko/mdl_extension.qc",
+          "sha256": "6d93c5b1e36284a06e5cb4e139f4eac85ec55ef653ceb85700600bd31746eb25",
+          "bytes": 3328
+        },
+        {
+          "path": "left4dead2/neko/neko_proxy.vmt",
+          "sha256": "6b88db9a85d9031d4f1d4de44abcffb1f03405c5970798da910c51326c86d68e",
+          "bytes": 2030
+        },
+        {
+          "path": "left4dead2/neko/scheme_overrides_template.vdf",
+          "sha256": "08c028a0a8fe6f12c037e58d34dde8da03a0d76b36780d163ab7fd305716af07",
+          "bytes": 609
+        },
+        {
+          "path": "left4dead2/neko/sequence_event_template.vdf",
+          "sha256": "03e5e1f374e999a48785119489f5d9e893c24c109d204abe0be698fdb5ca156f",
+          "bytes": 403
+        },
+        {
+          "path": "left4dead2/neko/server_name_filter_template.txt",
+          "sha256": "ec7fe8436b6bf57a2593e5c50aff06bc6127244d0690388ee4f72bf342799b1e",
+          "bytes": 581
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display.vmt",
+          "sha256": "f194676b020a38afbb742c1e787193989b19bfd95f74e9a4c629eaac1cb2e4b2",
+          "bytes": 783
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_ps30.vcs",
+          "sha256": "7e96e08cbca80dc767e223d82094b6fc2fbdea69eacf39c23ae401968e8f4533",
+          "bytes": 705
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_vs30.vcs",
+          "sha256": "61d4a18d12bc5577a01a585b86c263fbf990e64391b931324adeba52346903e5",
+          "bytes": 1126
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_ps30.vcs",
+          "sha256": "ae2e85102c82d1d6c24043b32c7d6a2cddcba07e3b488744e5d194db4f025729",
+          "bytes": 1326
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_vs30.vcs",
+          "sha256": "698d69aaf66a78498d94ac187256b70255b5d436e000d18970b6da85d4fe1995",
+          "bytes": 584
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_ps30.vcs",
+          "sha256": "52bcd78880cc05b555f9b836663e72b364e1172da456209aabc41eaec8c7ee36",
+          "bytes": 5947
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_vs30.vcs",
+          "sha256": "2640588bf47e2f34b33725850aca26a06d7ccaa5028263c1cf30fc3e8f0e520a",
+          "bytes": 448
+        },
+        {
+          "path": "left4dead2/shaders/fxc/nekotoon.vmt",
+          "sha256": "b7fee29d0d5da442a858ed29321c1dac91de121276d47fd2ae8435017fea3954",
+          "bytes": 10519
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_nohdr_ps30.vcs",
+          "sha256": "e44285a6fee020d6da0507a4586289b131a2f48ba9cac8fd0bbcd076414a57f4",
+          "bytes": 2272
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_vs30.vcs",
+          "sha256": "0efe8aca2e50ba87440a82e6f3461280f9639e938e1919f97966d442b2fa3877",
+          "bytes": 264
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_ps30.vcs",
+          "sha256": "9266683547345cb5edff2c14c14508d740d017f1e3f73f743c6a1c1585d5bf81",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_vs30.vcs",
+          "sha256": "c1067e407ca297261b24ed081cde42cfd00bef2e9859b3ad45bda23210f10483",
+          "bytes": 575
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_ps30.vcs",
+          "sha256": "8664b5383032498ba14a176d3981628e3e817083b26546996f63bc741b109339",
+          "bytes": 175827
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_vs30.vcs",
+          "sha256": "c8ae9820c8f9e6e284603c885f63b4914cc426694d27e3ed7b07cc04420a3501",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_ps30.vcs",
+          "sha256": "b251b4a4990d7c6a6359b38f5eb2144bc050a6670ea35471f07c6ce7475ef990",
+          "bytes": 208
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_vs30.vcs",
+          "sha256": "92b1bb9fa6b31583cf16f3c823296effcb3f55158014a9eae895f2b5c99fd54b",
+          "bytes": 542
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_luminance_compare_ps20b.vcs",
+          "sha256": "4942c0487f88ed342c0432363bcef9f1ac7f6769a7290d65dcc118866b015b6c",
+          "bytes": 484
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract.vmt",
+          "sha256": "fbac8afc751bdffb5b5c591c1a38915ace332fa9def078c60c3277a53d5f5606",
+          "bytes": 2832
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_ps30.vcs",
+          "sha256": "9fe0cd24564b96e91c9806928f6569b3f1cb5de2083e18bd1ec84850e3e8aacc",
+          "bytes": 78327
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_vs30.vcs",
+          "sha256": "c84f3bb979ca03323f105d2b414f20bff612169cf7667a47226ff36604b0367a",
+          "bytes": 3431
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_screenspaceeffect_vs20.vcs",
+          "sha256": "9b7f46ebc36005f6fb511b28344ddaaddb97fdc4ff954616ea648e1795221262",
+          "bytes": 818
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_screenspaceeffect_vs30.vcs",
+          "sha256": "4e304684a4722221b8ffaf3ed4e95088f647688d81d2b0945b19e5104ee3c047",
+          "bytes": 840
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_ps30.vcs",
+          "sha256": "92dbf233ee4e89f3fd67cd006180e9aade65dc23609d7189028d1c10b64452fd",
+          "bytes": 1537
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_vs30.vcs",
+          "sha256": "2d09e243287ad1e52820babafb940d355519fc1961fffb1cbc6de73588294648",
+          "bytes": 407
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_ps30.vcs",
+          "sha256": "5219b3d75d132a3fe734975651556155fb897ea5110b4e98247d22de6cc67c46",
+          "bytes": 14362
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_vs30.vcs",
+          "sha256": "94f30606e0c0cabc5fe20c3dd34ea74ff93c4f569a778b3ab12ad23d2fd6865f",
+          "bytes": 912
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_tonemap_ps30.vcs",
+          "sha256": "b678cceb3226bc990f15f36e156e36ee563c2368d343bc703782f3a18695daa9",
+          "bytes": 1247
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_ps30.vcs",
+          "sha256": "b91c6a97e603f8a574d180f35f0457ee54e7d5c052a21fa69a49ae311ebe3f11",
+          "bytes": 2116452
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_vs30.vcs",
+          "sha256": "3e3c641c9549f7be56d8d83a8da0faced37fc570fb25201dc1e93c0bc3c7e756",
+          "bytes": 1026812
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_ps30.vcs",
+          "sha256": "8dd689bec377b32291723c91169612454ad95617f2e8562c92ba5911db1c35b9",
+          "bytes": 4263
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_vs30.vcs",
+          "sha256": "71c54f1460f45124a7534c3d4cefcc966c98201dd968aceb9ad6982f6c29c9d5",
+          "bytes": 31674
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr.vmt",
+          "sha256": "db2f52bd077dfc2a561ad48b1a84a4e0a334b6f967e72a4bd2147e8c87e8b5ff",
+          "bytes": 3638
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_ps30.vcs",
+          "sha256": "ce65434fdcf965584e7719ebbba540480cdb976ce515be75d9ab718d237fb1ec",
+          "bytes": 22355
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_vs30.vcs",
+          "sha256": "7ed53ad86dd786b6fd9985b12ab9e3e5c1b2a337cf8d036e5224039780d319bb",
+          "bytes": 31079
+        },
+        {
+          "path": "left4dead2 no-insecure.bat",
+          "sha256": "67e20f54caf4ee5574588c7fba0c92df3d980095d171dbe3cdb70ba738fa2510",
+          "bytes": 373
+        },
+        {
+          "path": "left4dead2.exe",
+          "sha256": "18ac96cae0bb60418a42921db658b2211363a194442651e4c8de89f9c115de18",
+          "bytes": 136192
+        },
+        {
+          "path": "readme_l4n.txt",
+          "sha256": "c71ce2da5b387622c03d1f24e214368ea3e0730164037f365a972655e1470ad4",
+          "bytes": 91887
+        },
+        {
+          "path": "reshade-shaders/Shaders/L4N/L4N_Util.fx",
+          "sha256": "ee33c309eb9b207c3c4e03a04883b3edc660b79003bbee415eed26be40da33b4",
+          "bytes": 1952
+        },
+        {
+          "path": "to_l4n_survivor.exe",
+          "sha256": "af3879f72a4896d11e4485e403c0c584c59cebbe959a5a54c47a9554f4b5317f",
+          "bytes": 197120
+        },
+        {
+          "path": "left4dead2/neko/config.vdf",
+          "sha256": "fe3ee10448ee773e96b86134d46db6a194d8f13062586e9664ed538b40fe785b",
+          "bytes": 7174
+        },
+        {
+          "path": "启动项指令【四】.txt",
+          "sha256": "cf8ba4e4fe46af93487d16a652cd1f00c8e2960ac8025d9adbf2d1e24c5e94e7",
+          "bytes": 65
+        }
+      ]
+    },
+    {
+      "kind": "l4n",
+      "source": "L4N_v2.50.3.zip",
+      "sha256": "f853848e92571c4ba82b0db910c917b3e51c4a94735a11592abad793422b7784",
+      "files": [
+        {
+          "path": "bin/left4neko.dll",
+          "sha256": "b38bf6dfde9c109387cb8505d330ef255e869f8cc742a1d42cbf3587f50c1a18",
+          "bytes": 2153472
+        },
+        {
+          "path": "bin/neko/build_sound_cache.bat",
+          "sha256": "a339b007e3ec528ec450f692bc4c1e6c9642d5e5cdfa5cba67d65360a3eb6c58",
+          "bytes": 325
+        },
+        {
+          "path": "bin/neko/copy_sentence.bat",
+          "sha256": "928a373729905ef74dfc254f46373a9745c2e520a73e6c4bba690d5242e509a7",
+          "bytes": 1556
+        },
+        {
+          "path": "bin/neko/l4n_magic_converter.exe",
+          "sha256": "c752ea04fcb864ffbd20abaf39bfb441a18f870822bec974fcc32f0d96a1669b",
+          "bytes": 1915904
+        },
+        {
+          "path": "bin/neko/other_tools.7z",
+          "sha256": "f6f5e49b85fc35b9fcb504a6edf8a22075da6da82cd1b91bf29680d7006b47c2",
+          "bytes": 6083814
+        },
+        {
+          "path": "bin/neko/plugins/l4n_plugin.h",
+          "sha256": "7dc37e2e1a6e48cb486bf4ab50317eb214d8fd0ee9cbf28f87e112cf31556ebd",
+          "bytes": 2030
+        },
+        {
+          "path": "bin/neko/source_nekomimi.exe",
+          "sha256": "6c9c1fc062eed6a6bace4fafd7bce3d79c9f23ef0000a3343c630d10703700f7",
+          "bytes": 2552832
+        },
+        {
+          "path": "bin/neko/survivor_convert.bat",
+          "sha256": "dce8ca6faf070e168eebc2ea6462130ff3a704b1633e9c98f1029fa3539ece96",
+          "bytes": 2428
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_biker.mdl",
+          "sha256": "7081aa03487248273a10dc6b808ea4d560eff0c0b4123ade4aa9184d57cc70fa",
+          "bytes": 319792
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_coach.mdl",
+          "sha256": "bcd185860b7ea910bccc4c90a0c30be037ae28c2321eca7856fd30236d4996ad",
+          "bytes": 286520
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_gambler.mdl",
+          "sha256": "d2f446309f87ab95f4cb68f1aaafc02937f54c0efafba14f09a86fa21483e2d3",
+          "bytes": 297188
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_manager.mdl",
+          "sha256": "5578a72aa4b677fe24bd8c806d4f1ddbeb636ddeb8c7329b9a5d2f133a55a609",
+          "bytes": 318568
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_mechanic.mdl",
+          "sha256": "97fe7f205f2ae6e8c43e93ef5421cf7582c912fc4489f0cd5e2f0da3bfec2794",
+          "bytes": 298068
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_namvet.mdl",
+          "sha256": "2ab4e166db343251075e0ea17df000d1428b8df8ee83f58eea3eb9a4e4f4b3ab",
+          "bytes": 303196
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_producer.mdl",
+          "sha256": "123a4c74236e60fdf8cfef6c6d4fd238e028617365ec9f58cbc0c5fa99697c2c",
+          "bytes": 268440
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_teenangst.mdl",
+          "sha256": "a91409ff08b7ef1a2464ff1ab0942b951b3512fbe2fd4d21323609ba95dc42b9",
+          "bytes": 264228
+        },
+        {
+          "path": "bin/neko/survivor_vpk_gen.bat",
+          "sha256": "592b852e77701ed237232c005fbd0576e0e7f0740f49e1cf01aed1b574e6f419",
+          "bytes": 185
+        },
+        {
+          "path": "bin/neko/to_l4n_survivor.bat",
+          "sha256": "b7e5ac4b36b19413db8eaafb954c9c99ba5e59c25c45b8e17ef569500ba0c66c",
+          "bytes": 73
+        },
+        {
+          "path": "crash_dumps/crashpad_handler.exe",
+          "sha256": "bbaa2fe0a771aff1112c6dcd8521e71d7dfc9b6825f356e6fd4d577fd86e9301",
+          "bytes": 768000
+        },
+        {
+          "path": "left4dead2 no-insecure.bat",
+          "sha256": "67e20f54caf4ee5574588c7fba0c92df3d980095d171dbe3cdb70ba738fa2510",
+          "bytes": 373
+        },
+        {
+          "path": "left4dead2.exe",
+          "sha256": "75ff2703ae07aa549bc800dfe267699a03c3ff8ea16421c52466a7f14f366f6f",
+          "bytes": 136192
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko",
+          "sha256": "353d15ed5d5f5b191905cf7b0429e3c49ece8901163baba11d32269e7b4eabc4",
+          "bytes": 28
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko.dll",
+          "sha256": "0d28cd604b0f0ef75a54654e501c1ca887d71ef35475869af2a6179a00540aa5",
+          "bytes": 337920
+        },
+        {
+          "path": "left4dead2/materials/l4n/bloom_map.vtf",
+          "sha256": "30f70fdd55a7ffa335215bc7741ebf675619f3530be31b3baaeb0707d206015e",
+          "bytes": 1048736
+        },
+        {
+          "path": "left4dead2/materials/l4n/brdf_lut.vtf",
+          "sha256": "6cae2076919bdc2f0c884e356939c6f57c47bb990237e4a1ee9d55632bd77a18",
+          "bytes": 524512
+        },
+        {
+          "path": "left4dead2/materials/l4n/neko_tonemap.vmt",
+          "sha256": "faff2e9a14b2255eca5929a1513773c7946c830f611bfc8efbb4fd751af41a4d",
+          "bytes": 53
+        },
+        {
+          "path": "left4dead2/materials/l4n/world_error.vmt",
+          "sha256": "60d6e636d452cfb4476aa905ef7eedf701fe8402b1077afd78a3c3eec9ce928a",
+          "bytes": 786
+        },
+        {
+          "path": "left4dead2/neko/config.vdf",
+          "sha256": "41357a53bec3d1527f143d0f5636e761927ce897c47173762e99d4bb32f0fc3c",
+          "bytes": 7081
+        },
+        {
+          "path": "left4dead2/neko/key_bind_acts.vdf",
+          "sha256": "f0bd025876ca082b98f48f4f8961ee186a5b9a85665df3815cbb7f594cf26939",
+          "bytes": 663
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_english.vdf",
+          "sha256": "00b2b08db97b3d099f0baa13686ccf3ff8047cabc58a7b403caf1ae92a18df72",
+          "bytes": 25736
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_schinese.vdf",
+          "sha256": "f055580a03566005e7ae3147982e4ece3f803f572c12f62b87f6119de26af25b",
+          "bytes": 18730
+        },
+        {
+          "path": "left4dead2/neko/localize_overrides_template.vdf",
+          "sha256": "ad4fd136f2f8b7f1ad2905404bb726cde02ebccb31da748f5338a6d157e479d4",
+          "bytes": 996
+        },
+        {
+          "path": "left4dead2/neko/mdl_extension.qc",
+          "sha256": "960e4f070c7f98185ebf556742cf297c2d673d13a0f493a9d37f3c1a18d516f4",
+          "bytes": 4366
+        },
+        {
+          "path": "left4dead2/neko/neko_proxy.vmt",
+          "sha256": "6b88db9a85d9031d4f1d4de44abcffb1f03405c5970798da910c51326c86d68e",
+          "bytes": 2030
+        },
+        {
+          "path": "left4dead2/neko/scheme_overrides_template.vdf",
+          "sha256": "08c028a0a8fe6f12c037e58d34dde8da03a0d76b36780d163ab7fd305716af07",
+          "bytes": 609
+        },
+        {
+          "path": "left4dead2/neko/sequence_event_template.vdf",
+          "sha256": "03e5e1f374e999a48785119489f5d9e893c24c109d204abe0be698fdb5ca156f",
+          "bytes": 403
+        },
+        {
+          "path": "left4dead2/neko/server_name_filter_template.txt",
+          "sha256": "ec7fe8436b6bf57a2593e5c50aff06bc6127244d0690388ee4f72bf342799b1e",
+          "bytes": 581
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display.vmt",
+          "sha256": "f194676b020a38afbb742c1e787193989b19bfd95f74e9a4c629eaac1cb2e4b2",
+          "bytes": 783
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_ps30.vcs",
+          "sha256": "7e96e08cbca80dc767e223d82094b6fc2fbdea69eacf39c23ae401968e8f4533",
+          "bytes": 705
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_vs30.vcs",
+          "sha256": "b90b2146d8a00d8a622ac7be042fe78d5c8d137a92158c7ced55c461e3ff50de",
+          "bytes": 1124
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_nohdr_ps30.vcs",
+          "sha256": "e44285a6fee020d6da0507a4586289b131a2f48ba9cac8fd0bbcd076414a57f4",
+          "bytes": 2272
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_vs30.vcs",
+          "sha256": "9c37042521cabc3ffbdfd951c37377d772a4731c010b1bf7a96ead6a4d09e2c7",
+          "bytes": 264
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_ps30.vcs",
+          "sha256": "9266683547345cb5edff2c14c14508d740d017f1e3f73f743c6a1c1585d5bf81",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_vs30.vcs",
+          "sha256": "ac732efa22575b31ede73c1f64fcb7017284b3a839baf1ac741eb92b92a90eaf",
+          "bytes": 1853
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_ps30.vcs",
+          "sha256": "8664b5383032498ba14a176d3981628e3e817083b26546996f63bc741b109339",
+          "bytes": 175827
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_vs30.vcs",
+          "sha256": "2df1fb417e0d673337ad2b65742b2c2e5d9bb7bca5b22a46af279261f964d4a5",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_ps30.vcs",
+          "sha256": "b251b4a4990d7c6a6359b38f5eb2144bc050a6670ea35471f07c6ce7475ef990",
+          "bytes": 208
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_vs30.vcs",
+          "sha256": "37cdcfa4fc6515e368d722dffe9be21f8cddcf79646a5157afd45550b62eca14",
+          "bytes": 547
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_luminance_compare_ps20b.vcs",
+          "sha256": "4942c0487f88ed342c0432363bcef9f1ac7f6769a7290d65dcc118866b015b6c",
+          "bytes": 484
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract.vmt",
+          "sha256": "fbac8afc751bdffb5b5c591c1a38915ace332fa9def078c60c3277a53d5f5606",
+          "bytes": 2832
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_ps30.vcs",
+          "sha256": "9fe0cd24564b96e91c9806928f6569b3f1cb5de2083e18bd1ec84850e3e8aacc",
+          "bytes": 78327
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_vs30.vcs",
+          "sha256": "7a2e1cc405c88244d88bc3b78e24e2d7e22f640578aed0acc65656dcf79d876a",
+          "bytes": 3436
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_screenspaceeffect_vs20.vcs",
+          "sha256": "6118ee59c9f628fcf7a9c623f64bc506759251f6af9a87446fe3b829df16ef26",
+          "bytes": 818
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_screenspaceeffect_vs30.vcs",
+          "sha256": "3ee659990d0a6cad722847d19ec905f9d3a3f98a147e15b78c1c5c7c2ec17973",
+          "bytes": 840
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_ps30.vcs",
+          "sha256": "92dbf233ee4e89f3fd67cd006180e9aade65dc23609d7189028d1c10b64452fd",
+          "bytes": 1537
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_vs30.vcs",
+          "sha256": "6731257b9bd274c3dd6a643f4c48d383e922a7fba9864fdba495439215380ffc",
+          "bytes": 407
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_ps30.vcs",
+          "sha256": "5219b3d75d132a3fe734975651556155fb897ea5110b4e98247d22de6cc67c46",
+          "bytes": 14362
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_vs30.vcs",
+          "sha256": "c90d94761dc3decdf87842673546b7c8c3c308fb76332ab6848f296e7d182963",
+          "bytes": 912
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_tonemap_ps30.vcs",
+          "sha256": "b678cceb3226bc990f15f36e156e36ee563c2368d343bc703782f3a18695daa9",
+          "bytes": 1247
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_ps30.vcs",
+          "sha256": "6a236822e631241ba4beea8cff7d8403c7213e187e20753819f9a0c48c6ecf76",
+          "bytes": 2133568
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_vs30.vcs",
+          "sha256": "96987593c651495a5dc3e1f00465d479d8a634f683021bc1aba28bebe6802673",
+          "bytes": 2317244
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_ps30.vcs",
+          "sha256": "ae2e85102c82d1d6c24043b32c7d6a2cddcba07e3b488744e5d194db4f025729",
+          "bytes": 1326
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_vs30.vcs",
+          "sha256": "ea7d50190d330d0c938802624b34bafcd0f4005576629861a287036681b419fd",
+          "bytes": 584
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_ps30.vcs",
+          "sha256": "52bcd78880cc05b555f9b836663e72b364e1172da456209aabc41eaec8c7ee36",
+          "bytes": 5947
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_vs30.vcs",
+          "sha256": "1dc573ffc175aa786fac8039bb3996f49b718b69e1cf07dd6e83695b92b55b97",
+          "bytes": 448
+        },
+        {
+          "path": "left4dead2/shaders/fxc/nekotoon.ptex",
+          "sha256": "aec5ec9fee2cc5c87678e5cba69034283532491bdc0f8b6fd9a3e18f19bd3a83",
+          "bytes": 2312
+        },
+        {
+          "path": "left4dead2/shaders/fxc/nekotoon.vmt",
+          "sha256": "e523d38a0e9ebf1ccc379c82f90fa28d76205c27be65f4c7826c95d5396276f5",
+          "bytes": 11396
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_ps30.vcs",
+          "sha256": "8dd689bec377b32291723c91169612454ad95617f2e8562c92ba5911db1c35b9",
+          "bytes": 4263
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_vs30.vcs",
+          "sha256": "1b413892ce2b18522f1149e48cd75180eda2a39814482e99bc6964753eef7a2c",
+          "bytes": 66036
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr.ptex",
+          "sha256": "6881bcd42449e29f294685922fa1f71d5e079cd1678022dadcceba5609be54cf",
+          "bytes": 2829
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr.vmt",
+          "sha256": "db2f52bd077dfc2a561ad48b1a84a4e0a334b6f967e72a4bd2147e8c87e8b5ff",
+          "bytes": 3638
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_ps30.vcs",
+          "sha256": "55cd5c318633e648a29ab27f640e1f8dc83b9e0df840e314099483d768b4b25c",
+          "bytes": 24507
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_vs30.vcs",
+          "sha256": "8537cc66d57a3db6fcbe105bdecb11976c089a513888fc4a731f6b0950dda268",
+          "bytes": 81447
+        },
+        {
+          "path": "readme_l4n.txt",
+          "sha256": "129a8d90c64052f1ae44ba820f9608133acd011fc418a2f5495f9241c1e0ff1b",
+          "bytes": 95307
+        },
+        {
+          "path": "reshade-shaders/Shaders/L4N/L4N_Util.fx",
+          "sha256": "ee33c309eb9b207c3c4e03a04883b3edc660b79003bbee415eed26be40da33b4",
+          "bytes": 1952
+        },
+        {
+          "path": "to_l4n_survivor.exe",
+          "sha256": "af3879f72a4896d11e4485e403c0c584c59cebbe959a5a54c47a9554f4b5317f",
+          "bytes": 197120
+        },
+        {
+          "path": "启动项指令【四】.txt",
+          "sha256": "cf8ba4e4fe46af93487d16a652cd1f00c8e2960ac8025d9adbf2d1e24c5e94e7",
+          "bytes": 65
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.3.1dxvk-2.3.1(AMD显卡用).zip",
+      "sha256": "42283e1a6b629ff9540daaacba4519975d26e099127d178dab233404e86c4f08",
+      "files": [
+        {
+          "path": "x32/bin/dxvk_d3d9.dll",
+          "sha256": "942c5c314c39841a1257df6dd3a5048a84e115aa16b0c1fd4512254c53539af3",
+          "bytes": 4046862
+        },
+        {
+          "path": "x32/dxgi.dll",
+          "sha256": "5aa3060b2902bd7f79f20153dc9ded14153616a4b401d1286d85847f9222ece5",
+          "bytes": 2949134
+        },
+        {
+          "path": "x32/dxvk_d3d9.dll",
+          "sha256": "942c5c314c39841a1257df6dd3a5048a84e115aa16b0c1fd4512254c53539af3",
+          "bytes": 4046862
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.4.1.zip",
+      "sha256": "7ca3c837eea37b3cd1bbdac87f64da080b407b99a8b6ee007d6d971d7c1293a5",
+      "files": [
+        {
+          "path": "dxvk-2.4.1/x32/bin/dxvk_d3d9.dll",
+          "sha256": "cc556331fc3388989749620bceead4c2da95c3932ed38cf5cc24f3f0a878866e",
+          "bytes": 4124686
+        },
+        {
+          "path": "dxvk-2.4.1/x32/dxgi.dll",
+          "sha256": "4b5d6275d5987de5e64f6ce42f5f7b888fb75bd414326d2ecc792effd9a385da",
+          "bytes": 2998286
+        },
+        {
+          "path": "dxvk-2.4.1/x32/dxvk_d3d9.dll",
+          "sha256": "cc556331fc3388989749620bceead4c2da95c3932ed38cf5cc24f3f0a878866e",
+          "bytes": 4124686
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.4.zip",
+      "sha256": "04cef72ba73dcea2065b72734e953e125f5e549033c17ba509b2bc385a2ae9c4",
+      "files": [
+        {
+          "path": "dxvk-2.4/x32/bin/dxvk_d3d9.dll",
+          "sha256": "b2c451064705afa824b6b24e71b7bfa5dccbce92c326665a30482908abd6ec5c",
+          "bytes": 4096014
+        },
+        {
+          "path": "dxvk-2.4/x32/dxgi.dll",
+          "sha256": "55326f4b9ffd9db4225e6ccfc47d1fa7209183eecc33f010594106899992549f",
+          "bytes": 2990094
+        },
+        {
+          "path": "dxvk-2.4/x32/dxvk_d3d9.dll",
+          "sha256": "b2c451064705afa824b6b24e71b7bfa5dccbce92c326665a30482908abd6ec5c",
+          "bytes": 4096014
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.5.1.zip",
+      "sha256": "449a07ee93a1acf35a383c6708212b35a1d90060c26ca22710580c7decce5ef8",
+      "files": [
+        {
+          "path": "dxvk-2.5.1/x32/bin/dxvk_d3d9.dll",
+          "sha256": "f8ba5139c4a1d75b9653f66204fb4da20b0a2ed947dccd8fabf757429935cc8f",
+          "bytes": 4206606
+        },
+        {
+          "path": "dxvk-2.5.1/x32/dxgi.dll",
+          "sha256": "8233be33a7350dfabba08fd3c2c420c30a54b0a234eb5bb11d29407c5d8767fa",
+          "bytes": 2965518
+        },
+        {
+          "path": "dxvk-2.5.1/x32/dxvk_d3d9.dll",
+          "sha256": "f8ba5139c4a1d75b9653f66204fb4da20b0a2ed947dccd8fabf757429935cc8f",
+          "bytes": 4206606
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.5.2.zip",
+      "sha256": "ec7e8e928265ac694f6ac85e9971a3c40c43c91c64191abd42f7af6a5600dba7",
+      "files": [
+        {
+          "path": "dxvk-2.5.2/x32/bin/dxvk_d3d9.dll",
+          "sha256": "4cf5eb3f7c3efb7b56d4dfe02d3bd175041abdcdf7e69cf2f09d3857e18c77ca",
+          "bytes": 4251662
+        },
+        {
+          "path": "dxvk-2.5.2/x32/dxgi.dll",
+          "sha256": "5a4894d3036ddca1f812d6300cdc3088a8815ddcbc31c0ba000bd9d0e7652263",
+          "bytes": 2990094
+        },
+        {
+          "path": "dxvk-2.5.2/x32/dxvk_d3d9.dll",
+          "sha256": "4cf5eb3f7c3efb7b56d4dfe02d3bd175041abdcdf7e69cf2f09d3857e18c77ca",
+          "bytes": 4251662
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.5.3.zip",
+      "sha256": "7a98ccb0b4e41d8abbecd1826fd7b051fbba9642f67d32747fd900844b58f308",
+      "files": [
+        {
+          "path": "dxvk-2.5.3/x32/bin/dxvk_d3d9.dll",
+          "sha256": "3d6b529dc4f7f55639aad580e81b2939ab1489cdbb9f1550dce74e41656bbf5b",
+          "bytes": 4284430
+        },
+        {
+          "path": "dxvk-2.5.3/x32/dxgi.dll",
+          "sha256": "dabe59a85e82876e89fdaae1f718bac80db9a8e13660f48c6b8a746d74bf87c2",
+          "bytes": 3014670
+        },
+        {
+          "path": "dxvk-2.5.3/x32/dxvk_d3d9.dll",
+          "sha256": "3d6b529dc4f7f55639aad580e81b2939ab1489cdbb9f1550dce74e41656bbf5b",
+          "bytes": 4284430
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.5.zip",
+      "sha256": "8dc31de8e28cf9ad1580f6781ae00b793d9810e97b7a86b42387ce0e66c09ca9",
+      "files": [
+        {
+          "path": "dxvk-2.5/x32/bin/dxvk_d3d9.dll",
+          "sha256": "98c9650200a3ec6009ec2d45c6f9de55c25cafeb9f52c9d9f2c31f9354c54a8b",
+          "bytes": 4206606
+        },
+        {
+          "path": "dxvk-2.5/x32/dxgi.dll",
+          "sha256": "fcb7a63619b405750011d0cbd69543f301ae831a3f669a8cc0b483a6abc89677",
+          "bytes": 2957326
+        },
+        {
+          "path": "dxvk-2.5/x32/dxvk_d3d9.dll",
+          "sha256": "98c9650200a3ec6009ec2d45c6f9de55c25cafeb9f52c9d9f2c31f9354c54a8b",
+          "bytes": 4206606
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.6.1.zip",
+      "sha256": "6fc88a446daa43036fd18f683398d6d2e8318102f2e98a6b59cba0f429da25dd",
+      "files": [
+        {
+          "path": "dxvk-2.6.1/x32/bin/dxvk_d3d9.dll",
+          "sha256": "0349923a6618f2383451c170a0f24d9c8f328392179aca71826a853655982405",
+          "bytes": 4452366
+        },
+        {
+          "path": "dxvk-2.6.1/x32/dxgi.dll",
+          "sha256": "1bba04c9941aeded96d9ee2dc7841d41b2d1369680b98cf9e60f5fe61c17f648",
+          "bytes": 3137550
+        },
+        {
+          "path": "dxvk-2.6.1/x32/dxvk_d3d9.dll",
+          "sha256": "0349923a6618f2383451c170a0f24d9c8f328392179aca71826a853655982405",
+          "bytes": 4452366
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.6.zip",
+      "sha256": "04bc1b872d4241f754aa778427e294a5c4a1482c6fce92045b7065837523059f",
+      "files": [
+        {
+          "path": "dxvk-2.6/x32/bin/dxvk_d3d9.dll",
+          "sha256": "7069ab4ab6ede0e95ad448ca86ccf024e13d2a5b87f4f7bb7713a205d615e75d",
+          "bytes": 4460558
+        },
+        {
+          "path": "dxvk-2.6/x32/dxgi.dll",
+          "sha256": "513bfa3c64f799bad23197e47b744dcea58693fa0316801b335fd695672ddda8",
+          "bytes": 3153934
+        },
+        {
+          "path": "dxvk-2.6/x32/dxvk_d3d9.dll",
+          "sha256": "7069ab4ab6ede0e95ad448ca86ccf024e13d2a5b87f4f7bb7713a205d615e75d",
+          "bytes": 4460558
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.7.1.zip",
+      "sha256": "4b51efc586248e5355a770687f0d8415b85c745d916879e964f60985130e8b27",
+      "files": [
+        {
+          "path": "x32/bin/dxvk_d3d9.dll",
+          "sha256": "00ecd422b3b12e9d3b309785f3f19431405389d80eb4a37018ebc63e2d87d900",
+          "bytes": 4493326
+        },
+        {
+          "path": "x32/dxgi.dll",
+          "sha256": "53defc65dd2e53d05924a960c0891e15692ca8780ed0509a1a7efda71f4d631e",
+          "bytes": 3194894
+        },
+        {
+          "path": "x32/dxvk_d3d9.dll",
+          "sha256": "00ecd422b3b12e9d3b309785f3f19431405389d80eb4a37018ebc63e2d87d900",
+          "bytes": 4493326
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-2.7.zip",
+      "sha256": "856f8b5f92c5dfb396de3bd92e47b03707b12fc949fc9af9bf8d22bb5be4c5cb",
+      "files": [
+        {
+          "path": "dxvk-2.7/x32/bin/dxvk_d3d9.dll",
+          "sha256": "1950b62696f5c88784fe243f25eed299fc6608ddea1b8117198953043767569f",
+          "bytes": 4472846
+        },
+        {
+          "path": "dxvk-2.7/x32/dxgi.dll",
+          "sha256": "baad64838782f46bd71dbc6e276f2c992ccc848c8b1088eeb33d49d983dd9376",
+          "bytes": 3182606
+        },
+        {
+          "path": "dxvk-2.7/x32/dxvk_d3d9.dll",
+          "sha256": "1950b62696f5c88784fe243f25eed299fc6608ddea1b8117198953043767569f",
+          "bytes": 4472846
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-3.0.1.zip",
+      "sha256": "8456e06f46302151d3f0aa8d876d52cb6c6f288b5b3bb6aca51e6154f65ec2d5",
+      "files": [
+        {
+          "path": "dxvk-3.0.1/x32/bin/dxvk_d3d9.dll",
+          "sha256": "3bcc7134759ac64897e492e3fb666ae00d341fa06edb4b27867d5a6ab2c6e5a7",
+          "bytes": 7786510
+        },
+        {
+          "path": "dxvk-3.0.1/x32/d3d9.dll",
+          "sha256": "3bcc7134759ac64897e492e3fb666ae00d341fa06edb4b27867d5a6ab2c6e5a7",
+          "bytes": 7786510
+        },
+        {
+          "path": "dxvk-3.0.1/x32/dxgi.dll",
+          "sha256": "6ce9b7ae210ea8e16a7fc0673c67f3f3a85687fdd34e161504e93799c810699c",
+          "bytes": 5816334
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-3.0.2.zip",
+      "sha256": "e827590ba95571c0948d4b4a5be5ea4cf0a6bd1eca2adb05fb2426e3fab76970",
+      "files": [
+        {
+          "path": "x32/bin/dxvk_d3d9.dll",
+          "sha256": "44a2e749694128710cce3a545c954bd9d986dd6a8ea61bb08d931c2ef0190488",
+          "bytes": 7843854
+        },
+        {
+          "path": "x32/dxgi.dll",
+          "sha256": "a97c07a7bdd2c580461de99bac5c7b8297fe3ac348587d84315bb6f4090ee092",
+          "bytes": 5869582
+        },
+        {
+          "path": "x32/dxvk_d3d9.dll",
+          "sha256": "44a2e749694128710cce3a545c954bd9d986dd6a8ea61bb08d931c2ef0190488",
+          "bytes": 7843854
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-3.1.1.zip",
+      "sha256": "178e744eee5d973f76e9806070c1fcfc90441c84be3aefb7c2558328d3290320",
+      "files": [
+        {
+          "path": "x32/bin/dxvk_d3d9.dll",
+          "sha256": "265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa",
+          "bytes": 7856142
+        },
+        {
+          "path": "x32/dxgi.dll",
+          "sha256": "abd1449dc28d536a4289c256ae7f4b6bbd15fa552792b7170c2ddece473c8bda",
+          "bytes": 5877774
+        },
+        {
+          "path": "x32/dxvk_d3d9.dll",
+          "sha256": "265888c31ca78dffa290c39cb7e50bfb02762590e41927906e46fb32f01497fa",
+          "bytes": 7856142
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-3.1.zip",
+      "sha256": "87574efe365944fe128cc06ba760c264720d6105ed4398f56b69ff5624368dd1",
+      "files": [
+        {
+          "path": "dxvk-3.1/x32/bin/dxvk_d3d9.dll",
+          "sha256": "2efb4c004abed6028349010f1a647d5b09616c67fd7f40fa8175ddb7b5f16e58",
+          "bytes": 7856142
+        },
+        {
+          "path": "dxvk-3.1/x32/dxgi.dll",
+          "sha256": "ffc9679f53038680d327caecbd603a49fd148f815f0839eed6e4797c0b16b94e",
+          "bytes": 5881870
+        },
+        {
+          "path": "dxvk-3.1/x32/dxvk_d3d9.dll",
+          "sha256": "2efb4c004abed6028349010f1a647d5b09616c67fd7f40fa8175ddb7b5f16e58",
+          "bytes": 7856142
+        }
+      ]
+    },
+    {
+      "kind": "dxvk",
+      "source": "dxvk-async-2.0(A卡用).zip",
+      "sha256": "c1abead4582bf02383519a965462997841f8c65866fc19ef6d89077840341263",
+      "files": [
+        {
+          "path": "dxvk-async-2.0/x32/bin/dxvk_d3d9.dll",
+          "sha256": "d7f8126646e278a33066956f91b4babb3a317377f3c3007fa341ecad36fdbb22",
+          "bytes": 3547150
+        },
+        {
+          "path": "dxvk-async-2.0/x32/dxgi.dll",
+          "sha256": "025b8b2525728ab6f3c69fbd566ae0b4df0455ea4febab3492baac7c98f9e5a3",
+          "bytes": 2523150
+        },
+        {
+          "path": "dxvk-async-2.0/x32/dxvk_d3d9.dll",
+          "sha256": "d7f8126646e278a33066956f91b4babb3a317377f3c3007fa341ecad36fdbb22",
+          "bytes": 3547150
+        }
+      ]
+    },
+    {
+      "kind": "l4n",
+      "source": "3558049615.vpk",
+      "sha256": "9adf35391cbb0ef88dc5b060d6e0dabf8bf4b48aa2280349dbdfde73bd55d652",
+      "files": [
+        {
+          "path": "bin/left4neko.dll",
+          "sha256": "f6f80f514088deb8ccfdecd7cd9c2eb9b43fedafd7c529eb1fc9f7300c0d2b50",
+          "bytes": 2194432
+        },
+        {
+          "path": "bin/neko/build_sound_cache.bat",
+          "sha256": "a339b007e3ec528ec450f692bc4c1e6c9642d5e5cdfa5cba67d65360a3eb6c58",
+          "bytes": 325
+        },
+        {
+          "path": "bin/neko/copy_sentence.bat",
+          "sha256": "928a373729905ef74dfc254f46373a9745c2e520a73e6c4bba690d5242e509a7",
+          "bytes": 1556
+        },
+        {
+          "path": "bin/neko/l4n_magic_converter.exe",
+          "sha256": "c752ea04fcb864ffbd20abaf39bfb441a18f870822bec974fcc32f0d96a1669b",
+          "bytes": 1915904
+        },
+        {
+          "path": "bin/neko/other_tools.7z",
+          "sha256": "f6f5e49b85fc35b9fcb504a6edf8a22075da6da82cd1b91bf29680d7006b47c2",
+          "bytes": 6083814
+        },
+        {
+          "path": "bin/neko/plugins/l4n_plugin.h",
+          "sha256": "ed3af89eae33463e8248ee0b4c78340729bd2541ccd6410f2636a83bd7af0f86",
+          "bytes": 2207
+        },
+        {
+          "path": "bin/neko/source_nekomimi.exe",
+          "sha256": "6c9c1fc062eed6a6bace4fafd7bce3d79c9f23ef0000a3343c630d10703700f7",
+          "bytes": 2552832
+        },
+        {
+          "path": "bin/neko/survivor_convert.bat",
+          "sha256": "dce8ca6faf070e168eebc2ea6462130ff3a704b1633e9c98f1029fa3539ece96",
+          "bytes": 2428
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_biker.mdl",
+          "sha256": "7081aa03487248273a10dc6b808ea4d560eff0c0b4123ade4aa9184d57cc70fa",
+          "bytes": 319792
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_coach.mdl",
+          "sha256": "bcd185860b7ea910bccc4c90a0c30be037ae28c2321eca7856fd30236d4996ad",
+          "bytes": 286520
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_gambler.mdl",
+          "sha256": "d2f446309f87ab95f4cb68f1aaafc02937f54c0efafba14f09a86fa21483e2d3",
+          "bytes": 297188
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_manager.mdl",
+          "sha256": "5578a72aa4b677fe24bd8c806d4f1ddbeb636ddeb8c7329b9a5d2f133a55a609",
+          "bytes": 318568
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_mechanic.mdl",
+          "sha256": "97fe7f205f2ae6e8c43e93ef5421cf7582c912fc4489f0cd5e2f0da3bfec2794",
+          "bytes": 298068
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_namvet.mdl",
+          "sha256": "2ab4e166db343251075e0ea17df000d1428b8df8ee83f58eea3eb9a4e4f4b3ab",
+          "bytes": 303196
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_producer.mdl",
+          "sha256": "123a4c74236e60fdf8cfef6c6d4fd238e028617365ec9f58cbc0c5fa99697c2c",
+          "bytes": 268440
+        },
+        {
+          "path": "bin/neko/survivor_converter/survivor_teenangst.mdl",
+          "sha256": "a91409ff08b7ef1a2464ff1ab0942b951b3512fbe2fd4d21323609ba95dc42b9",
+          "bytes": 264228
+        },
+        {
+          "path": "bin/neko/survivor_vpk_gen.bat",
+          "sha256": "592b852e77701ed237232c005fbd0576e0e7f0740f49e1cf01aed1b574e6f419",
+          "bytes": 185
+        },
+        {
+          "path": "bin/neko/to_l4n_survivor.bat",
+          "sha256": "b7e5ac4b36b19413db8eaafb954c9c99ba5e59c25c45b8e17ef569500ba0c66c",
+          "bytes": 73
+        },
+        {
+          "path": "crash_dumps/crashpad_handler.exe",
+          "sha256": "bbaa2fe0a771aff1112c6dcd8521e71d7dfc9b6825f356e6fd4d577fd86e9301",
+          "bytes": 768000
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko",
+          "sha256": "353d15ed5d5f5b191905cf7b0429e3c49ece8901163baba11d32269e7b4eabc4",
+          "bytes": 28
+        },
+        {
+          "path": "left4dead2/bin/game_shader_generic_neko.dll",
+          "sha256": "639b4cdbb9cf00dae0695d2cfd829cf2b44696c48f135d3cb8a69d4811791442",
+          "bytes": 337920
+        },
+        {
+          "path": "left4dead2/materials/l4n/bloom_map.vtf",
+          "sha256": "30f70fdd55a7ffa335215bc7741ebf675619f3530be31b3baaeb0707d206015e",
+          "bytes": 1048736
+        },
+        {
+          "path": "left4dead2/materials/l4n/brdf_lut.vtf",
+          "sha256": "6cae2076919bdc2f0c884e356939c6f57c47bb990237e4a1ee9d55632bd77a18",
+          "bytes": 524512
+        },
+        {
+          "path": "left4dead2/materials/l4n/neko_tonemap.vmt",
+          "sha256": "faff2e9a14b2255eca5929a1513773c7946c830f611bfc8efbb4fd751af41a4d",
+          "bytes": 53
+        },
+        {
+          "path": "left4dead2/materials/l4n/world_error.vmt",
+          "sha256": "60d6e636d452cfb4476aa905ef7eedf701fe8402b1077afd78a3c3eec9ce928a",
+          "bytes": 786
+        },
+        {
+          "path": "left4dead2/neko/config_template.vdf",
+          "sha256": "212ab126a762f78e0b0a38af8d3d740557353c5737da45e6683d37ef3f3f94c0",
+          "bytes": 9940
+        },
+        {
+          "path": "left4dead2/neko/key_bind_acts.vdf",
+          "sha256": "f0bd025876ca082b98f48f4f8961ee186a5b9a85665df3815cbb7f594cf26939",
+          "bytes": 663
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_english.vdf",
+          "sha256": "04122b970d0ee218e27477710ffc1e356eb76ad89e484738db3b5f9179b6dc74",
+          "bytes": 26174
+        },
+        {
+          "path": "left4dead2/neko/l4ngui_schinese.vdf",
+          "sha256": "473af107cbe03dc43a3b0a4310207ba51c57827e4d64e0691b4ad019f56fa1b2",
+          "bytes": 19064
+        },
+        {
+          "path": "left4dead2/neko/localize_overrides_template.vdf",
+          "sha256": "ad4fd136f2f8b7f1ad2905404bb726cde02ebccb31da748f5338a6d157e479d4",
+          "bytes": 996
+        },
+        {
+          "path": "left4dead2/neko/mdl_extension.qc",
+          "sha256": "960e4f070c7f98185ebf556742cf297c2d673d13a0f493a9d37f3c1a18d516f4",
+          "bytes": 4366
+        },
+        {
+          "path": "left4dead2/neko/neko_proxy.vmt",
+          "sha256": "6b88db9a85d9031d4f1d4de44abcffb1f03405c5970798da910c51326c86d68e",
+          "bytes": 2030
+        },
+        {
+          "path": "left4dead2/neko/scheme_overrides_template.vdf",
+          "sha256": "08c028a0a8fe6f12c037e58d34dde8da03a0d76b36780d163ab7fd305716af07",
+          "bytes": 609
+        },
+        {
+          "path": "left4dead2/neko/sequence_event_template.vdf",
+          "sha256": "03e5e1f374e999a48785119489f5d9e893c24c109d204abe0be698fdb5ca156f",
+          "bytes": 403
+        },
+        {
+          "path": "left4dead2/neko/server_name_filter_template.txt",
+          "sha256": "ec7fe8436b6bf57a2593e5c50aff06bc6127244d0690388ee4f72bf342799b1e",
+          "bytes": 581
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display.vmt",
+          "sha256": "f194676b020a38afbb742c1e787193989b19bfd95f74e9a4c629eaac1cb2e4b2",
+          "bytes": 783
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_ps30.vcs",
+          "sha256": "7e96e08cbca80dc767e223d82094b6fc2fbdea69eacf39c23ae401968e8f4533",
+          "bytes": 705
+        },
+        {
+          "path": "left4dead2/shaders/fxc/digital_display_vs30.vcs",
+          "sha256": "b90b2146d8a00d8a622ac7be042fe78d5c8d137a92158c7ced55c461e3ff50de",
+          "bytes": 1124
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_ps30.vcs",
+          "sha256": "ae2e85102c82d1d6c24043b32c7d6a2cddcba07e3b488744e5d194db4f025729",
+          "bytes": 1326
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBloom_vs30.vcs",
+          "sha256": "ea7d50190d330d0c938802624b34bafcd0f4005576629861a287036681b419fd",
+          "bytes": 584
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_ps30.vcs",
+          "sha256": "52bcd78880cc05b555f9b836663e72b364e1172da456209aabc41eaec8c7ee36",
+          "bytes": 5947
+        },
+        {
+          "path": "left4dead2/shaders/fxc/NekoBlurFilter_vs30.vcs",
+          "sha256": "1dc573ffc175aa786fac8039bb3996f49b718b69e1cf07dd6e83695b92b55b97",
+          "bytes": 448
+        },
+        {
+          "path": "left4dead2/shaders/fxc/nekotoon.ptex",
+          "sha256": "aec5ec9fee2cc5c87678e5cba69034283532491bdc0f8b6fd9a3e18f19bd3a83",
+          "bytes": 2312
+        },
+        {
+          "path": "left4dead2/shaders/fxc/nekotoon.vmt",
+          "sha256": "e523d38a0e9ebf1ccc379c82f90fa28d76205c27be65f4c7826c95d5396276f5",
+          "bytes": 11396
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_nohdr_ps30.vcs",
+          "sha256": "e44285a6fee020d6da0507a4586289b131a2f48ba9cac8fd0bbcd076414a57f4",
+          "bytes": 2272
+        },
+        {
+          "path": "left4dead2/shaders/fxc/Neko_Downsample_vs30.vcs",
+          "sha256": "9c37042521cabc3ffbdfd951c37377d772a4731c010b1bf7a96ead6a4d09e2c7",
+          "bytes": 264
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_ps30.vcs",
+          "sha256": "9266683547345cb5edff2c14c14508d740d017f1e3f73f743c6a1c1585d5bf81",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_emissive_scroll_blended_pass_vs30.vcs",
+          "sha256": "ac732efa22575b31ede73c1f64fcb7017284b3a839baf1ac741eb92b92a90eaf",
+          "bytes": 1853
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_ps30.vcs",
+          "sha256": "8664b5383032498ba14a176d3981628e3e817083b26546996f63bc741b109339",
+          "bytes": 175827
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_engine_post_vs30.vcs",
+          "sha256": "2df1fb417e0d673337ad2b65742b2c2e5d9bb7bca5b22a46af279261f964d4a5",
+          "bytes": 424
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_ps30.vcs",
+          "sha256": "b251b4a4990d7c6a6359b38f5eb2144bc050a6670ea35471f07c6ce7475ef990",
+          "bytes": 208
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_glow_color_vs30.vcs",
+          "sha256": "37cdcfa4fc6515e368d722dffe9be21f8cddcf79646a5157afd45550b62eca14",
+          "bytes": 547
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_luminance_compare_ps20b.vcs",
+          "sha256": "4942c0487f88ed342c0432363bcef9f1ac7f6769a7290d65dcc118866b015b6c",
+          "bytes": 484
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract.vmt",
+          "sha256": "fbac8afc751bdffb5b5c591c1a38915ace332fa9def078c60c3277a53d5f5606",
+          "bytes": 2832
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_ps30.vcs",
+          "sha256": "9fe0cd24564b96e91c9806928f6569b3f1cb5de2083e18bd1ec84850e3e8aacc",
+          "bytes": 78327
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_refract_vs30.vcs",
+          "sha256": "7a2e1cc405c88244d88bc3b78e24e2d7e22f640578aed0acc65656dcf79d876a",
+          "bytes": 3436
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_screenspaceeffect_vs20.vcs",
+          "sha256": "6118ee59c9f628fcf7a9c623f64bc506759251f6af9a87446fe3b829df16ef26",
+          "bytes": 818
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_screenspaceeffect_vs30.vcs",
+          "sha256": "3ee659990d0a6cad722847d19ec905f9d3a3f98a147e15b78c1c5c7c2ec17973",
+          "bytes": 840
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_ps30.vcs",
+          "sha256": "92dbf233ee4e89f3fd67cd006180e9aade65dc23609d7189028d1c10b64452fd",
+          "bytes": 1537
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sky_vs30.vcs",
+          "sha256": "6731257b9bd274c3dd6a643f4c48d383e922a7fba9864fdba495439215380ffc",
+          "bytes": 407
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_ps30.vcs",
+          "sha256": "5219b3d75d132a3fe734975651556155fb897ea5110b4e98247d22de6cc67c46",
+          "bytes": 14362
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_sprite_vs30.vcs",
+          "sha256": "c90d94761dc3decdf87842673546b7c8c3c308fb76332ab6848f296e7d182963",
+          "bytes": 912
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_tonemap_ps30.vcs",
+          "sha256": "b678cceb3226bc990f15f36e156e36ee563c2368d343bc703782f3a18695daa9",
+          "bytes": 1247
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_ps30.vcs",
+          "sha256": "6a236822e631241ba4beea8cff7d8403c7213e187e20753819f9a0c48c6ecf76",
+          "bytes": 2133568
+        },
+        {
+          "path": "left4dead2/shaders/fxc/neko_toon_vs30.vcs",
+          "sha256": "96987593c651495a5dc3e1f00465d479d8a634f683021bc1aba28bebe6802673",
+          "bytes": 2317244
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_ps30.vcs",
+          "sha256": "8dd689bec377b32291723c91169612454ad95617f2e8562c92ba5911db1c35b9",
+          "bytes": 4263
+        },
+        {
+          "path": "left4dead2/shaders/fxc/outline_vs30.vcs",
+          "sha256": "1b413892ce2b18522f1149e48cd75180eda2a39814482e99bc6964753eef7a2c",
+          "bytes": 66036
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr.ptex",
+          "sha256": "6881bcd42449e29f294685922fa1f71d5e079cd1678022dadcceba5609be54cf",
+          "bytes": 2829
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr.vmt",
+          "sha256": "db2f52bd077dfc2a561ad48b1a84a4e0a334b6f967e72a4bd2147e8c87e8b5ff",
+          "bytes": 3638
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_ps30.vcs",
+          "sha256": "55cd5c318633e648a29ab27f640e1f8dc83b9e0df840e314099483d768b4b25c",
+          "bytes": 24507
+        },
+        {
+          "path": "left4dead2/shaders/fxc/pbr_vs30.vcs",
+          "sha256": "8537cc66d57a3db6fcbe105bdecb11976c089a513888fc4a731f6b0950dda268",
+          "bytes": 81447
+        },
+        {
+          "path": "left4dead2 no-insecure.bat",
+          "sha256": "67e20f54caf4ee5574588c7fba0c92df3d980095d171dbe3cdb70ba738fa2510",
+          "bytes": 373
+        },
+        {
+          "path": "left4dead2.exe",
+          "sha256": "f0dd2229ef7d77b4f0b68e231a7d5806ce3e703e6566fe952ab84113d764bd51",
+          "bytes": 136192
+        },
+        {
+          "path": "readme_l4n.txt",
+          "sha256": "0c70401226bbb923816ccf1a84281160778745011e8a3819206c2445f8e6e82c",
+          "bytes": 96228
+        },
+        {
+          "path": "reshade-shaders/Shaders/L4N/L4N_Util.fx",
+          "sha256": "ee33c309eb9b207c3c4e03a04883b3edc660b79003bbee415eed26be40da33b4",
+          "bytes": 1952
+        },
+        {
+          "path": "to_l4n_survivor.exe",
+          "sha256": "af3879f72a4896d11e4485e403c0c584c59cebbe959a5a54c47a9554f4b5317f",
+          "bytes": 197120
+        }
+      ]
+    },
+    {
+      "kind": "skeeto",
+      "source": "3787239937.vpk",
+      "sha256": "645c727d9f3df5632a72b3f57c2076eca2699a2f3868068d147a28ee381d12e4",
+      "files": [
+        {
+          "path": "bin/wininet.dll",
+          "sha256": "ea58e4a1232e3cc4246613f3a6166be743baf99f157760b6c3538250dda7b72b",
+          "bytes": 157696
+        },
+        {
+          "path": "Setup_安装 维护 卸载.bat",
+          "sha256": "b1ead3840f7635fdcdc6fbd7d79f74c6c4d07857520813e171b3f7b54c0d845f",
+          "bytes": 400
+        },
+        {
+          "path": "skeeto.dll",
+          "sha256": "794ffc2dd3a65a26126f57d990a29750999e05b65b00aac2d7662e0d34ace326",
+          "bytes": 3932160
+        },
+        {
+          "path": "Skeeto/Commands.txt",
+          "sha256": "2ecfeb971c4519e21d303ed58080393357d6ce3c77b56ac2825906659bc96425",
+          "bytes": 13188
+        },
+        {
+          "path": "Skeeto/DIY/Agent Skills/README.txt",
+          "sha256": "25974b68501f373f0605427d4d57ae540cfc051d5f2144083110dee8893c1041",
+          "bytes": 1845
+        },
+        {
+          "path": "Skeeto/DIY/Agent Skills/skeeto-hit-feedback/scripts/validate_feedback.py",
+          "sha256": "d41f25232e5e846467365e3ae770ac518200db2ca1b6362c2f10bd0a9a3c4b63",
+          "bytes": 16620
+        },
+        {
+          "path": "Skeeto/DIY/Agent Skills/skeeto-hit-feedback/SKILL.md",
+          "sha256": "005ed061c0be6a6c054262bc5d350f1fe06d413b6a57c9aa27ef98814dab9eab",
+          "bytes": 24552
+        },
+        {
+          "path": "Skeeto/DIY/Background_主菜单背景.txt",
+          "sha256": "626965ea2fafe3dd167d4f512fd967bac3433581fa0e516599d2d425ca7c85a4",
+          "bytes": 9227
+        },
+        {
+          "path": "Skeeto/DIY/Crosshair_贴图准星.txt",
+          "sha256": "a12489578cf077ebf0ac385b1d28329f3d687c9a778f12ff3565469f81b3d93e",
+          "bytes": 2558
+        },
+        {
+          "path": "Skeeto/DIY/ESCMenu_ESC菜单UI.txt",
+          "sha256": "807438f653b2be0f1ffe4daa6cfc4a1e353aaf4791c1f788f38a53d6bd43fbee",
+          "bytes": 19143
+        },
+        {
+          "path": "Skeeto/DIY/Examples 命中反馈json示例/skeeto_ci_my_random_sfx.json",
+          "sha256": "3958530d650d662a78886eb2ee7c60b56da9861970782bc6c9952887d49fcfa7",
+          "bytes": 828
+        },
+        {
+          "path": "Skeeto/DIY/Examples 命中反馈json示例/skeeto_ci_my_sequence.json",
+          "sha256": "51d3e0a87ac6677c37ba0dd3d8350e60483da9a8370b0ca7d87209686e4b869f",
+          "bytes": 849
+        },
+        {
+          "path": "Skeeto/DIY/Examples 命中反馈json示例/skeeto_ci_my_style.json",
+          "sha256": "c72c5e70c27f09db84583edcda004e0020aa73d0a2f804d4e8c093d629e6714d",
+          "bytes": 756
+        },
+        {
+          "path": "Skeeto/DIY/Examples 命中反馈json示例/skeeto_ff_my_style.json",
+          "sha256": "fee99c2417801edb0314592e27deac9c42de8f54a76d991ab18b33de383783e1",
+          "bytes": 475
+        },
+        {
+          "path": "Skeeto/DIY/Examples 命中反馈json示例/skeeto_fx_my_style.json",
+          "sha256": "4155f3962851b3f80f1d51f5d09ba802b5690577a4d9f53bca97907ca755744b",
+          "bytes": 1000
+        },
+        {
+          "path": "Skeeto/DIY/Examples 命中反馈json示例/skeeto_si_my_simple.json",
+          "sha256": "2aae60f64e79fb5e544606f42f3cad836ba4eb69d97055ed8b454775336b97d1",
+          "bytes": 651
+        },
+        {
+          "path": "Skeeto/DIY/Examples 命中反馈json示例/skeeto_si_my_streak.json",
+          "sha256": "f5fc7e9b0b2e6ba974aa6a21801473271eef5eac95725213912c4a9c9c414c09",
+          "bytes": 1135
+        },
+        {
+          "path": "Skeeto/DIY/Examples 命中反馈json示例/skeeto_si_my_world.json",
+          "sha256": "2610dd3268e67bac071b48094506ac13de140b8ca51d387c91cc8fe74959b293",
+          "bytes": 754
+        },
+        {
+          "path": "Skeeto/DIY/HitFeedback_命中反馈.txt",
+          "sha256": "8f05ee97c16044a6073ac41538f8bb7cd097f1490291ad01b69e49b97bfa652f",
+          "bytes": 9428
+        },
+        {
+          "path": "Skeeto/DIY/Menu_主菜单UI.txt",
+          "sha256": "5a525a0a94af0e8cf4d723a784f80af95885c9f9e4c47d5c49d75f62fd5590cb",
+          "bytes": 24891
+        },
+        {
+          "path": "Skeeto/Maintain.ps1",
+          "sha256": "db754f927b2a82ee60894ec6425d561f814cdfcffef41068baa88e7f0c9361ae",
+          "bytes": 78998
+        },
+        {
+          "path": "Skeeto/Manifest.json",
+          "sha256": "854b61e5f04d4d9e89a9ee2fbffbec1cb566df62aed6aecbaceecd65ead65e00",
+          "bytes": 3508
+        },
+        {
+          "path": "Skeeto/README.txt",
+          "sha256": "2d73d215e839bdba372282a28b8d6b1e7575c14314827c39dbc7b2086b13eb8a",
+          "bytes": 8504
+        },
+        {
+          "path": "skeeto_apply_update.bat",
+          "sha256": "8e6bee485c8e485e5d8ca8954f1d94abed8bf77c6500da738e29270070f8ceb4",
+          "bytes": 1067
+        },
+        {
+          "path": "SKEETO_WORKSHOP.txt",
+          "sha256": "a14595bd60f717e6731880fca483e2ca43ba8553bd8fafaea8f74931b22c886c",
+          "bytes": 185
+        },
+        {
+          "path": "Skeeto_更新日志.txt",
+          "sha256": "e5a253507e9dc1ff2efc7c4f5da022ad20999fd0a8411b4eabd3623edd44a5f4",
+          "bytes": 273117
+        },
+        {
+          "path": "VERSION.txt",
+          "sha256": "56dc4140a0614010a8c7918978efcac511da8f3ddc2c52981393bfda9294b0a0",
+          "bytes": 171
+        }
+      ]
+    },
+    {
+      "kind": "evolved",
+      "source": "3785109042.vpk",
+      "sha256": "0d79e10915130f52d00657c43b04a0a6a5eee01a49955d0acbdc09b8a47d788b",
+      "files": [
+        {
+          "path": "bin/neko/plugins/L4D2Evolved.dll",
+          "sha256": "05819c701943781c9d7868502f7926fbfa763b600be4bfe8c88fa3b4892fcd6d",
+          "bytes": 6856192
+        },
+        {
+          "path": "bin/neko/plugins/L4d2evomodel.dll",
+          "sha256": "a21ddb162076163aad18dd9d7e3927784eeb918a8a2ebdbb4b0c7f5979e17039",
+          "bytes": 3028480
+        },
+        {
+          "path": "bin/winmm.dll",
+          "sha256": "adeed50031270c273a9e6bfe597e4486c3131b44b0c6d11444927a8e852db537",
+          "bytes": 31232
+        },
+        {
+          "path": "Evolved/config.sample",
+          "sha256": "92444a296fb499d90ca4cef185df4a41cb1038d24abbb7bea5b9451b6b74fa21",
+          "bytes": 3916
+        },
+        {
+          "path": "Evolved/d3d9.dll",
+          "sha256": "f7c9ae2f826be3f381b1797990b3124a623897fa686e3bf47fb348e82521134e",
+          "bytes": 2654208
+        },
+        {
+          "path": "Evolved/version.txt",
+          "sha256": "0a5d71a53024d9d6a410062789da3fe155ba44cca15210791fb8ae09c749426c",
+          "bytes": 5
+        },
+        {
+          "path": "left4dead2/addons/killicon.vpk",
+          "sha256": "9e18aacbea4005686f85cb62368c5f967775d892767bea99105210f265d009fe",
+          "bytes": 13982458
+        },
+        {
+          "path": "left4dead2/addons/mdR_Anims_Base_for_l4d2vr.vpk",
+          "sha256": "87ce5255ee0775c4a812d09535b69910df30a1e011033a550191137c2818856e",
+          "bytes": 1478185
+        },
+        {
+          "path": "left4dead2/sound/vrmod/headshot.wav",
+          "sha256": "755842402165188f9f6e69bd1b82d31087d26d7b5f3e64348d87719e2bc5b2ca",
+          "bytes": 318900
+        },
+        {
+          "path": "left4dead2/sound/vrmod/hit.wav",
+          "sha256": "e76ab525bff3fd616ee4e908213d385a8f18f9628972f3c8bc9905aa2a2c0698",
+          "bytes": 63602
+        },
+        {
+          "path": "left4dead2/sound/vrmod/kill.wav",
+          "sha256": "d3950891c75b5e6eb357900ec81db87986b824cdf196583dfbc182bdc7e0b80d",
+          "bytes": 152228
+        },
+        {
+          "path": "manifest.json",
+          "sha256": "071a642566c1c336c84660563a243a3e7d3c07d66048b3532f47b7a67e9a89be",
+          "bytes": 832
+        },
+        {
+          "path": "updatelog.txt",
+          "sha256": "3b1c1658680c0f662fef5a8cae6b94df43f66e97d0158d704a20600f7945c7ad",
+          "bytes": 14472
+        },
+        {
+          "path": "winmm.dll",
+          "sha256": "adeed50031270c273a9e6bfe597e4486c3131b44b0c6d11444927a8e852db537",
+          "bytes": 31232
+        },
+        {
+          "path": "删除evo[放游戏根目录使用].bat",
+          "sha256": "7f82dd442198541c0437c6f0de5ae1b6fcec4cc57ad8bb935c05f7a948a5647c",
+          "bytes": 6699
+        }
+      ]
+    }
+  ]
+}
