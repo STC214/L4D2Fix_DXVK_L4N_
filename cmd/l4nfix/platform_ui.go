@@ -30,16 +30,14 @@ var platformReady = map[string]workshopResource{}
 var platformChoices []string
 
 func createPlatformControls(hwnd uintptr) {
-	groupBox(hwnd, "平台资源与部署", 630, 22, 300, 310)
-	btnCheckUpdates = button(hwnd, "检查最新版并下载", idCheckUpdates, 646, 50, 268, 36)
-	platformLabel := label(hwnd, "增强平台（二选一）", 646, 102, 268, 22)
+	groupBox(hwnd, "4  Skeeto / EVO · 可选增强", 508, 230, 480, 290)
+	platformLabel := label(hwnd, "增强平台（二选一）", 524, 256, 448, 22)
 	procSendMessageW.Call(platformLabel, wmSetFont, textFont, 1)
-	comboPlatform = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 646, 130, 268, 180, hwnd, 0)
-	platformStatusCtl = label(hwnd, "尚未检查更新", 646, 164, 268, 42)
-	btnDeployPlatform = button(hwnd, "部署所选平台", idDeployPlatform, 646, 220, 268, 36)
-	btnCleanPlatform = button(hwnd, "清理已部署平台", idCleanPlatform, 646, 272, 268, 36)
-	btnHelp = button(hwnd, "使用说明（在线）", idHelp, 646, 356, 268, 36)
-	installedPlatformCtl = label(hwnd, "增强平台：正在检测…", 646, 406, 268, 108)
+	comboPlatform = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 524, 280, 448, 180, hwnd, 0)
+	platformStatusCtl = label(hwnd, "尚未检查更新", 524, 320, 448, 34)
+	btnDeployPlatform = button(hwnd, "部署所选平台", idDeployPlatform, 524, 372, 216, 34)
+	btnCleanPlatform = button(hwnd, "清理已部署平台", idCleanPlatform, 756, 372, 216, 34)
+	installedPlatformCtl = label(hwnd, "增强平台：正在检测…", 524, 420, 448, 78)
 	procSendMessageW.Call(installedPlatformCtl, wmSetFont, textFont, 1)
 	for _, h := range []uintptr{btnCheckUpdates, comboPlatform, platformStatusCtl, btnDeployPlatform, btnCleanPlatform, btnHelp} {
 		procSendMessageW.Call(h, wmSetFont, textFont, 1)
@@ -65,21 +63,25 @@ func refreshPlatformChoices() {
 	if len(platformChoices) > 0 {
 		procSendMessageW.Call(comboPlatform, cbSetCurSel, 0, 0)
 	}
-	text := "尚未检查更新"
-	if len(platformChoices) > 0 {
-		text = fmt.Sprintf("%d 个平台资源就绪", len(platformChoices))
-	}
-	procSetWindowTextW.Call(platformStatusCtl, uintptr(unsafe.Pointer(utf16Ptr(text))))
-	busyMu.Lock()
-	working := busy
-	busyMu.Unlock()
-	if working || len(platformChoices) == 0 {
-		procEnableWindow.Call(btnDeployPlatform, 0)
-	} else {
-		procEnableWindow.Call(btnDeployPlatform, 1)
-	}
+	refreshWorkflowControls()
 }
-func runCheckUpdates() error {
+func runCheckUpdates() (result error) {
+	changeWorkflow(func(s *workflowState) {
+		s.Updates = checkRunning
+		s.L4NReady, s.DXVKReady = false, false
+	})
+	defer func() {
+		changeWorkflow(func(s *workflowState) {
+			if result == nil {
+				s.Updates = checkPassed
+			} else {
+				s.Updates = checkFailed
+			}
+		})
+		if result != nil {
+			appendLog("[update] 建议检查网络环境，点击 1 检测资源网络，确认连通后再重试 2；已校验成功的资源保留")
+		}
+	}()
 	root, e := packageRoot()
 	if e != nil {
 		return e
@@ -105,6 +107,9 @@ func runCheckUpdates() error {
 			platformReadyMu.Lock()
 			platformReady[r.Platform] = r
 			platformReadyMu.Unlock()
+			if r.Platform == "l4n" {
+				changeWorkflow(func(s *workflowState) { s.L4NReady = true })
+			}
 			invokeUI(func() {
 				if r.Platform == "l4n" {
 					loadL4nOptionsIntoCombo()
@@ -126,6 +131,7 @@ func runCheckUpdates() error {
 		if err != nil {
 			return err
 		}
+		changeWorkflow(func(s *workflowState) { s.DXVKReady = true })
 		invokeUI(func() {
 			loadDxvkOptionsIntoCombo()
 			for i, opt := range dxvkOptions {

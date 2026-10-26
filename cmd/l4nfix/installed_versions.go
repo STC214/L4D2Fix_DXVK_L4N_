@@ -315,14 +315,21 @@ func installedVersionText(gameRoot, resRoot, backupRoot string) (string, error) 
 func refreshInstalledVersions() {
 	id := versionRefreshID.Add(1)
 	invokeUI(func() {
+		if versionRefreshID.Load() != id {
+			return
+		}
+		changeWorkflow(func(s *workflowState) { s.BaseInstalled = false })
 		procSetWindowTextW.Call(installedVersionCtl, uintptr(unsafe.Pointer(utf16Ptr("当前游戏：正在检测版本…"))))
 		procSetWindowTextW.Call(installedPlatformCtl, uintptr(unsafe.Pointer(utf16Ptr("增强平台：正在检测…"))))
 	})
 	go func() {
+		baseInstalled := false
 		text := "当前游戏：未定位到游戏目录"
 		platformText := "增强平台：未定位到游戏目录"
 		if root, e := packageRoot(); e == nil {
 			if exe, e := resolveGameExe(root); e == nil {
+				_, baseErr := ensureBaseDeployed(root, filepath.Dir(exe))
+				baseInstalled = baseErr == nil
 				if detected, e := installedPlatformText(filepath.Dir(exe), resourceRoot(root), filepath.Join(root, platformBackupName)); e == nil {
 					platformText = detected
 				} else {
@@ -345,6 +352,7 @@ func refreshInstalledVersions() {
 		}
 		invokeUI(func() {
 			if versionRefreshID.Load() == id {
+				changeWorkflow(func(s *workflowState) { s.BaseInstalled = baseInstalled })
 				procSetWindowTextW.Call(installedVersionCtl, uintptr(unsafe.Pointer(utf16Ptr(text))))
 				procSetWindowTextW.Call(installedPlatformCtl, uintptr(unsafe.Pointer(utf16Ptr(platformText))))
 			}

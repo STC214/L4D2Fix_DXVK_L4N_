@@ -325,7 +325,7 @@ func main() {
 		uintptr(unsafe.Pointer(utf16Ptr(windowTitle()))),
 		cbs|wsVisible,
 		cwUseDefault, cwUseDefault,
-		960, 560,
+		windowWidth, windowHeight,
 		0, 0, hInstance, 0,
 	)
 	refreshInstalledVersions()
@@ -378,8 +378,10 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 		code := uint16(wParam >> 16)
 		if code == bnClicked {
 			switch id {
+			case idCheckNetwork:
+				go guarded("检测资源网络", runCheckNetwork)
 			case idCheckUpdates:
-				go guarded("检查平台更新", runCheckUpdates)
+				go guarded("检查平台更新", runCheckUpdatesWithGuidance)
 			case idDeployPlatform:
 				go guarded("部署平台", runDeployPlatform)
 			case idCleanPlatform:
@@ -408,6 +410,12 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 		hdc := wParam
 		procSetBkMode.Call(hdc, transparent)
 		procSetTextColor.Call(hdc, colorWhite)
+		if id, _, _ := procGetDlgCtrlID.Call(lParam); id == idSectionHeading {
+			// An opaque, high-contrast caption masks only the original left
+			// border gap. Native themed group-box captions can ignore colors.
+			procSetBkMode.Call(hdc, 2) // OPAQUE
+			gdi32.NewProc("SetBkColor").Call(hdc, colorBlack)
+		}
 		return blackBr
 	case wmDestroy:
 		for _, font := range []uintptr{textFont, titleFont, buttonFont, guideFont} {
@@ -423,45 +431,45 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 }
 
 func createControls(hwnd uintptr) {
-	title := label(hwnd, "DXVK + L4N 一键处理工具", 22, 28, 300, 26)
+	title := label(hwnd, "L4N + DXVK · 平台部署工具", 20, 16, 580, 26)
 	procSendMessageW.Call(title, wmSetFont, titleFont, 1)
-	desc := label(hwnd, "自动识别游戏目录，备份原文件并安装所选补丁。", 22, 62, 594, 20)
+	desc := label(hwnd, "1 / 2 优先（可直接做 2） → 3 基础部署 → 4 可选增强；清理独立于检测步骤", 20, 50, 968, 22)
 	procSendMessageW.Call(desc, wmSetFont, textFont, 1)
-	installedVersionCtl = label(hwnd, "当前游戏：正在检测版本…", 22, 86, 594, 22)
-	procSendMessageW.Call(installedVersionCtl, wmSetFont, textFont, 1)
-	btnRefreshVersion = button(hwnd, "刷新版本", idRefreshVersion, 510, 24, 106, 30)
-	procSendMessageW.Call(btnRefreshVersion, wmSetFont, buttonFont, 1)
+	btnRefreshVersion = button(hwnd, "刷新版本", idRefreshVersion, 686, 14, 120, 32)
+	btnHelp = button(hwnd, "使用说明（在线）", idHelp, 818, 14, 170, 32)
 
-	actionBox := groupBox(hwnd, "处理选项", 16, 112, 606, 180)
-	procSendMessageW.Call(actionBox, wmSetFont, textFont, 1)
-	versionLabel := label(hwnd, "DXVK版本", 32, 136, 260, 20)
-	procSendMessageW.Call(versionLabel, wmSetFont, textFont, 1)
-	comboDxvk = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 32, 160, 260, 220, hwnd, 0)
-	procSendMessageW.Call(comboDxvk, wmSetFont, textFont, 1)
-	l4nLabel := label(hwnd, "L4N版本", 332, 136, 274, 20)
-	procSendMessageW.Call(l4nLabel, wmSetFont, textFont, 1)
-	comboL4n = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 332, 160, 274, 220, hwnd, 0)
-	procSendMessageW.Call(comboL4n, wmSetFont, textFont, 1)
-	btnRun = button(hwnd, "一键处理", idRun, 32, 200, 174, 36)
-	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 232, 200, 174, 36)
-	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 432, 200, 174, 36)
-	btnClean = button(hwnd, "一键清理", idClean, 32, 244, 174, 36)
-	btnClose = button(hwnd, "系统字体/游戏默认", idClose, 232, 244, 374, 36)
-	for _, h := range []uintptr{btnRun, btnBackupMod, btnRestoreMod, btnClean, btnClose} {
-		procSendMessageW.Call(h, wmSetFont, buttonFont, 1)
-	}
-	progress = create("msctls_progress32", "", wsChild|wsVisible, 22, 306, 594, 17, hwnd, 0)
+	groupBox(hwnd, "1  检测网络 · 与 2 同级", 16, 82, 480, 136)
+	label(hwnd, "检测 Steam / GitHub 接口及实际资源下载链路。", 32, 110, 448, 32)
+	btnCheckNetwork = button(hwnd, "检测资源网络", idCheckNetwork, 32, 158, 170, 36)
+	networkStatusCtl = label(hwnd, "", 216, 156, 264, 48)
+	groupBox(hwnd, "2  检测更新 · 可直接开始", 508, 82, 480, 136)
+	label(hwnd, "检查 L4N、DXVK、Skeeto / EVO 并下载校验。", 524, 110, 448, 32)
+	btnCheckUpdates = button(hwnd, "检查最新版并下载", idCheckUpdates, 524, 158, 186, 36)
+	updateStatusCtl = label(hwnd, "", 722, 156, 250, 48)
+
+	groupBox(hwnd, "3  L4N + DXVK · 基础部署", 16, 230, 480, 290)
+	label(hwnd, "DXVK 版本", 32, 256, 216, 20)
+	label(hwnd, "L4N 版本", 264, 256, 216, 20)
+	comboDxvk = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 32, 280, 216, 200, hwnd, 0)
+	comboL4n = create("COMBOBOX", "", wsChild|wsVisible|wsTabStop|wsVScroll|cbsDropList|cbsHasStrings, 264, 280, 216, 200, hwnd, 0)
+	btnRun = button(hwnd, "一键处理", idRun, 32, 322, 216, 36)
+	btnClean = button(hwnd, "一键清理", idClean, 264, 322, 216, 36)
+	btnBackupMod = button(hwnd, "备份MOD", idBackupMod, 32, 372, 116, 34)
+	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 160, 372, 116, 34)
+	btnClose = button(hwnd, "系统字体/游戏默认", idClose, 288, 372, 192, 34)
+	installedVersionCtl = label(hwnd, "当前游戏：正在检测版本…", 32, 420, 448, 46)
+	label(hwnd, "先完成 2，再部署；已有基础可直接用于 4。", 32, 474, 448, 24)
+	createPlatformControls(hwnd)
+
+	groupBox(hwnd, "5  日志 · 最新消息置顶", 16, 532, 972, 170)
+	progress = create("msctls_progress32", "", wsChild|wsVisible, 32, 558, 500, 16, hwnd, 0)
 	procSendMessageW.Call(progress, pbmSetRange32, 0, 100)
 	procSendMessageW.Call(progress, pbmSetPos, 0, 0)
-
-	statusCtl = label(hwnd, "就绪 - 请选择 DXVK 版本后一键处理", 22, 337, 594, 24)
-	procSendMessageW.Call(statusCtl, wmSetFont, textFont, 1)
-	logTitle := label(hwnd, "日志", 22, 367, 80, 20)
-	procSendMessageW.Call(logTitle, wmSetFont, textFont, 1)
-	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 22, 386, 594, 130, hwnd, 0)
-	procSendMessageW.Call(logCtl, wmSetFont, textFont, 1)
-
-	createPlatformControls(hwnd)
+	statusCtl = label(hwnd, "就绪 · 可先检测网络或直接检查更新", 548, 554, 424, 24)
+	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 32, 588, 940, 98, hwnd, 0)
+	// Enough for recent UI messages; chronological session logs remain on disk.
+	procSendMessageW.Call(logCtl, 0x00C5, 1<<20, 0) // EM_SETLIMITTEXT
+	refreshWorkflowControls()
 
 	loadDxvkOptionsIntoCombo()
 	loadL4nOptionsIntoCombo()
@@ -471,15 +479,37 @@ func createControls(hwnd uintptr) {
 }
 
 func label(hwnd uintptr, text string, x, y, w, h int32) uintptr {
-	return create("STATIC", text, wsChild|wsVisible, x, y, w, h, hwnd, 0)
+	child := create("STATIC", text, wsChild|wsVisible, x, y, w, h, hwnd, 0)
+	procSendMessageW.Call(child, wmSetFont, textFont, 1)
+	return child
 }
 
 func button(hwnd uintptr, text string, id uintptr, x, y, w, h int32) uintptr {
 	return create("BUTTON", text, wsChild|wsVisible|wsTabStop|bsOwnerDraw, x, y, w, h, hwnd, id)
 }
 
+const idSectionHeading = 1020
+
 func groupBox(hwnd uintptr, text string, x, y, w, h int32) uintptr {
-	return create("BUTTON", text, wsChild|wsVisible|bsGroupBox, x, y, w, h, hwnd, 0)
+	// Keep the frame and the caption independent: the gap stays at the
+	// original left inset instead of moving to the center of the whole frame.
+	child := create("BUTTON", "", wsChild|wsVisible|bsGroupBox, x, y, w, h, hwnd, 0)
+	procSendMessageW.Call(child, wmSetFont, titleFont, 1)
+	dc, _, _ := user32.NewProc("GetDC").Call(hwnd)
+	oldFont, _, _ := procSelectObject.Call(dc, titleFont)
+	measured := rect{}
+	procDrawTextW.Call(dc, uintptr(unsafe.Pointer(utf16Ptr(text))), ^uintptr(0), uintptr(unsafe.Pointer(&measured)), 0x0400|dtSingleLine)
+	procSelectObject.Call(dc, oldFont)
+	user32.NewProc("ReleaseDC").Call(hwnd, dc)
+	captionWidth := measured.right - measured.left + 12
+	if captionWidth > w-20 {
+		captionWidth = w - 20
+	}
+	// SS_CENTER | SS_CENTERIMAGE: center within this small left-hand gap,
+	// horizontally and vertically, not within the entire section border.
+	heading := create("STATIC", text, wsChild|wsVisible|0x0001|0x0200, x+10, y, captionWidth, 24, hwnd, idSectionHeading)
+	procSendMessageW.Call(heading, wmSetFont, titleFont, 1)
+	return child
 }
 
 func create(class, text string, style uintptr, x, y, w, h int32, parent, id uintptr) uintptr {
@@ -491,6 +521,7 @@ func create(class, text string, style uintptr, x, y, w, h int32, parent, id uint
 		uintptr(x), uintptr(y), uintptr(w), uintptr(h),
 		parent, id, hInstance, 0,
 	)
+	procSendMessageW.Call(child, wmSetFont, textFont, 1)
 	return child
 }
 
@@ -539,7 +570,12 @@ func drawButton(dis *drawItemStruct) {
 	procFillRect.Call(dis.hdc, uintptr(unsafe.Pointer(&dis.rcItem)), brush)
 	procDeleteObject.Call(brush)
 
-	accentBrush, _, _ := procCreateSolidBrush.Call(colorAccent)
+	accentColor := uintptr(colorAccent)
+	textColor := uintptr(colorWhite)
+	if dis.itemState&0x0004 != 0 { // ODS_DISABLED
+		accentColor, textColor = 0x505050, 0x909090
+	}
+	accentBrush, _, _ := procCreateSolidBrush.Call(accentColor)
 	accent := dis.rcItem
 	accent.bottom = accent.top + 3
 	procFillRect.Call(dis.hdc, uintptr(unsafe.Pointer(&accent)), accentBrush)
@@ -547,7 +583,7 @@ func drawButton(dis *drawItemStruct) {
 
 	oldFont, _, _ := procSelectObject.Call(dis.hdc, buttonFont)
 	procSetBkMode.Call(dis.hdc, transparent)
-	procSetTextColor.Call(dis.hdc, colorWhite)
+	procSetTextColor.Call(dis.hdc, textColor)
 	text := buttonText(dis.ctrlID)
 	rc := dis.rcItem
 	rc.top += 3
@@ -559,6 +595,8 @@ func drawButton(dis *drawItemStruct) {
 
 func buttonText(id uint32) string {
 	switch id {
+	case idCheckNetwork:
+		return "检测资源网络"
 	case idCheckUpdates:
 		return "检查最新版并下载"
 	case idDeployPlatform:
@@ -673,34 +711,15 @@ func guarded(name string, fn func() error) {
 		appendLog("[done] " + name + "完成")
 		setStatus("完成")
 	}
-	setBusy(false)
-	refreshInstalledVersions()
 	busyMu.Lock()
 	busy = false
 	busyMu.Unlock()
+	setBusy(false)
+	refreshInstalledVersions()
 }
 
 func setBusy(v bool) {
-	invokeUI(func() {
-		en := uintptr(1)
-		if v {
-			en = 0
-		}
-		procEnableWindow.Call(btnRun, en)
-		procEnableWindow.Call(comboDxvk, en)
-		procEnableWindow.Call(comboL4n, en)
-		procEnableWindow.Call(btnBackupMod, en)
-		procEnableWindow.Call(btnRestoreMod, en)
-		procEnableWindow.Call(btnClean, en)
-		procEnableWindow.Call(btnClose, en)
-		procEnableWindow.Call(btnRefreshVersion, en)
-		for _, h := range []uintptr{btnCheckUpdates, btnDeployPlatform, btnCleanPlatform, comboPlatform} {
-			procEnableWindow.Call(h, en)
-		}
-		if len(platformChoices) == 0 {
-			procEnableWindow.Call(btnDeployPlatform, 0)
-		}
-	})
+	invokeUI(refreshWorkflowControls)
 }
 
 func setStatus(s string) {
@@ -735,12 +754,24 @@ func appendLog(s string) {
 	}
 	invokeUI(func() {
 		line := s + "\r\n"
-		procSendMessageW.Call(logCtl, emSetSel, ^uintptr(0), ^uintptr(0))
+		procSendMessageW.Call(logCtl, emSetSel, 0, 0)
 		procSendMessageW.Call(logCtl, emReplaceSel, 0, uintptr(unsafe.Pointer(utf16Ptr(line))))
+		// Trim the oldest UI tail, not the newest entry. Persistent logs are
+		// untouched and remain chronological for troubleshooting.
+		n, _, _ := user32.NewProc("GetWindowTextLengthW").Call(logCtl)
+		if n > 200000 {
+			procSendMessageW.Call(logCtl, emSetSel, 180000, ^uintptr(0))
+			procSendMessageW.Call(logCtl, emReplaceSel, 0, uintptr(unsafe.Pointer(utf16Ptr(""))))
+		}
+		procSendMessageW.Call(logCtl, emSetSel, 0, 0)
+		procSendMessageW.Call(logCtl, 0x00B7, 0, 0) // EM_SCROLLCARET
 	})
 }
 
 func runInstall() error {
+	if !workflowSnapshot().canDeployBase() {
+		return fmt.Errorf("请先进行 2 检测更新，完成 L4N 和 DXVK 资源下载校验后再部署")
+	}
 	opt, err := selectedDxvkOption()
 	if err != nil {
 		return err

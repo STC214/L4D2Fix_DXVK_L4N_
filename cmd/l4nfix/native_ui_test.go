@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sort"
 	"strings"
 	"syscall"
 	"testing"
@@ -34,7 +35,7 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 		t.Fatalf("register hidden window: %v", err)
 	}
 	defer user32.NewProc("UnregisterClassW").Call(uintptr(unsafe.Pointer(class)), hInstance)
-	hwnd, _, err := procCreateWindowExW.Call(0, uintptr(unsafe.Pointer(class)), uintptr(unsafe.Pointer(utf16Ptr(windowTitle()))), cbs, cwUseDefault, cwUseDefault, 960, 560, 0, 0, hInstance, 0)
+	hwnd, _, err := procCreateWindowExW.Call(0, uintptr(unsafe.Pointer(class)), uintptr(unsafe.Pointer(utf16Ptr(windowTitle()))), cbs, cwUseDefault, cwUseDefault, windowWidth, windowHeight, 0, 0, hInstance, 0)
 	if hwnd == 0 {
 		t.Fatalf("create hidden window: %v", err)
 	}
@@ -48,7 +49,7 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 	if readText(btnRefreshVersion) != "刷新版本" {
 		t.Fatal("refresh caption missing")
 	}
-	for handle, want := range map[uintptr]string{btnCheckUpdates: "检查最新版并下载", btnDeployPlatform: "部署所选平台", btnCleanPlatform: "清理已部署平台", btnHelp: "使用说明（在线）"} {
+	for handle, want := range map[uintptr]string{btnCheckNetwork: "检测资源网络", btnCheckUpdates: "检查最新版并下载", btnDeployPlatform: "部署所选平台", btnCleanPlatform: "清理已部署平台", btnHelp: "使用说明（在线）"} {
 		if handle == 0 || readText(handle) != want {
 			t.Fatalf("platform control missing: %s", want)
 		}
@@ -62,6 +63,113 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 	if font, _, _ := procSendMessageW.Call(installedPlatformCtl, 0x0031, 0, 0); font != textFont {
 		t.Fatal("platform version label uses inconsistent font")
 	}
+	if path := os.Getenv("L4N_UI_CAPTURE_PATH"); path != "" {
+		captureNativeTestWindow(t, hwnd, path)
+	}
+	oldWorkflow := workflowSnapshot()
+	oldChoices := platformChoices
+	defer func() { workflowMu.Lock(); workflow = oldWorkflow; workflowMu.Unlock(); platformChoices = oldChoices }()
+	setState := func(s workflowState, working bool) {
+		workflowMu.Lock()
+		workflow = s
+		workflowMu.Unlock()
+		busyMu.Lock()
+		busy = working
+		busyMu.Unlock()
+		refreshWorkflowControls()
+	}
+	enabled := func(h uintptr) bool { r, _, _ := user32.NewProc("IsWindowEnabled").Call(h); return r != 0 }
+	platformChoices = []string{"skeeto"}
+	setState(workflowState{}, false)
+	if !enabled(btnCheckNetwork) || !enabled(btnCheckUpdates) || !enabled(btnClean) || !enabled(btnCleanPlatform) || enabled(btnRun) || enabled(btnDeployPlatform) {
+		t.Fatal("initial prerequisites/independent cleanup incorrect")
+	}
+	ready := workflowState{Updates: checkPassed, L4NReady: true, DXVKReady: true}
+	setState(ready, false)
+	if !enabled(btnRun) || enabled(btnDeployPlatform) {
+		t.Fatal("base/enhancement order incorrect")
+	}
+	ready.BaseInstalled = true
+	setState(ready, false)
+	if !enabled(btnDeployPlatform) {
+		t.Fatal("enhancement still locked after verified base")
+	}
+	setState(ready, true)
+	for _, h := range []uintptr{btnRun, btnDeployPlatform, btnCheckUpdates, btnCheckNetwork, btnClean, btnCleanPlatform} {
+		if enabled(h) {
+			t.Fatal("task controls active while busy")
+		}
+	}
+	setState(workflowState{Network: checkFailed, Updates: checkFailed}, false)
+	if !enabled(btnClean) || !enabled(btnCleanPlatform) || !strings.Contains(readText(updateStatusCtl), "网络检测") || !strings.Contains(readText(networkStatusCtl), "不建议") {
+		t.Fatal("failure guidance/cleanup incorrect")
+	}
+	// Check all five visible numbered section captions and child bounds.
+	var client rect
+	user32.NewProc("GetClientRect").Call(hwnd, uintptr(unsafe.Pointer(&client)))
+	groups := 0
+	for child, _, _ := user32.NewProc("GetWindow").Call(hwnd, 5); child != 0; child, _, _ = user32.NewProc("GetWindow").Call(child, 2) {
+		caption := readText(child)
+		if len(caption) > 2 && caption[0] >= '1' && caption[0] <= '5' && strings.HasPrefix(caption[1:], "  ") {
+			groups++
+		}
+		var bounds rect
+		user32.NewProc("GetWindowRect").Call(child, uintptr(unsafe.Pointer(&bounds)))
+		user32.NewProc("MapWindowPoints").Call(0, hwnd, uintptr(unsafe.Pointer(&bounds)), 2)
+		if bounds.left < 0 || bounds.top < 0 || bounds.right > client.right || bounds.bottom > client.bottom {
+			t.Fatalf("control outside client bounds: %q %+v client=%+v", caption, bounds, client)
+		}
+		className := make([]uint16, 64)
+		user32.NewProc("GetClassNameW").Call(child, uintptr(unsafe.Pointer(&className[0])), uintptr(len(className)))
+		if syscall.UTF16ToString(className) == "STATIC" && caption != "" {
+			dc, _, _ := user32.NewProc("GetDC").Call(child)
+			font, _, _ := procSendMessageW.Call(child, 0x0031, 0, 0)
+			oldFont, _, _ := procSelectObject.Call(dc, font)
+			if id, _, _ := procGetDlgCtrlID.Call(child); id == idSectionHeading {
+				procSendMessageW.Call(hwnd, wmCtlColorStatic, dc, child)
+				textColor, _, _ := gdi32.NewProc("GetTextColor").Call(dc)
+				backgroundColor, _, _ := gdi32.NewProc("GetBkColor").Call(dc)
+				style, _, _ := user32.NewProc("GetWindowLongW").Call(child, ^uintptr(15)) // GWL_STYLE = -16
+				if textColor != colorWhite || backgroundColor != colorBlack || style&0x0201 != 0x0201 {
+					t.Fatalf("heading contrast/alignment incorrect: %s", caption)
+				}
+				if bounds.left != 26 && bounds.left != 518 {
+					t.Fatalf("heading gap moved away from left inset: %s %+v", caption, bounds)
+				}
+			}
+			measured := rect{right: bounds.right - bounds.left}
+			procDrawTextW.Call(dc, uintptr(unsafe.Pointer(utf16Ptr(caption))), ^uintptr(0), uintptr(unsafe.Pointer(&measured)), 0x0400|0x0010) // DT_CALCRECT|DT_WORDBREAK
+			procSelectObject.Call(dc, oldFont)
+			user32.NewProc("ReleaseDC").Call(child, dc)
+			if measured.bottom > bounds.bottom-bounds.top {
+				t.Fatalf("label text clipped: %q needs %d px has %d", caption, measured.bottom, bounds.bottom-bounds.top)
+			}
+		}
+	}
+	if groups != 5 {
+		t.Fatalf("numbered sections: %d", groups)
+	}
+	// Execute posted log updates on this UI thread without showing the window.
+	appendLog("native-log-old")
+	appendLog("native-log-new")
+	uiMu.Lock()
+	ids := make([]uintptr, 0, len(uiWork))
+	for id := range uiWork {
+		ids = append(ids, id)
+	}
+	uiMu.Unlock()
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	for _, id := range ids {
+		runUIWork(id)
+	}
+	if !strings.HasPrefix(readText(logCtl), "native-log-new\r\nnative-log-old\r\n") {
+		t.Fatal("newest log is not at top")
+	}
+	first, _, _ := procSendMessageW.Call(logCtl, 0x00CE, 0, 0) // EM_GETFIRSTVISIBLELINE
+	if first != 0 {
+		t.Fatal("log not scrolled to top")
+	}
+	setState(oldWorkflow, false)
 	// Refreshing after a download must clear stale entries rather than append
 	// duplicate version choices, including when no valid resources remain.
 	procSendMessageW.Call(comboDxvk, cbAddString, 0, uintptr(unsafe.Pointer(utf16Ptr("stale-placeholder"))))
