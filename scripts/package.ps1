@@ -24,7 +24,7 @@ $target=Join-Path $stage 'L4N_Go_Win32_Portable'
 New-Item -ItemType Directory $target -Force | Out-Null
 $zipTemp=Join-Path $tempRoot ('.package-'+[guid]::NewGuid().ToString('N')+'.zip')
 try{
- foreach($name in @('L4N_Go_Win32.exe','L4N_Font_Change.exe','L4D2_Font_Change.exe')){Copy-Item -LiteralPath (Join-Path $portable $name) -Destination $target}
+ foreach($name in @('L4N_Go_Win32.exe','L4N_Font_Change.exe','L4D2_Font_Change.exe','Steam_Workshop_Subscribe.exe')){Copy-Item -LiteralPath (Join-Path $portable $name) -Destination $target}
  Copy-Item -LiteralPath (Join-Path $project 'docs/使用教程.md') -Destination (Join-Path $target '使用说明.md')
  $source=Join-Path $portable 'resources'
  foreach($f in Get-ChildItem -LiteralPath $source -Recurse -File){

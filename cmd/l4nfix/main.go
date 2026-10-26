@@ -808,6 +808,9 @@ func runToggleFont() error {
 }
 
 func runInstallWithDxvk(opt dxvkOption) error {
+	if processExists("left4dead2.exe") {
+		return fmt.Errorf("请先退出游戏再部署 L4N＋DXVK")
+	}
 	root, err := packageRoot()
 	if err != nil {
 		return err
@@ -867,42 +870,48 @@ func runInstallWithDxvk(opt dxvkOption) error {
 	if err != nil {
 		return err
 	}
-	archivedConfig, err := archiveL4nConfigIfChanged(gameRoot, resRoot, filepath.Join(baseSource.NormalizedDir, filepath.FromSlash(configRelativePath)), man)
-	if err != nil {
-		return fmt.Errorf("配置留档失败，已停止覆盖: %w", err)
-	}
-	if archivedConfig != "" {
-		appendLog("[config] 已保留现有配置: " + archivedConfig)
-	} else {
-		appendLog("[config] 配置未变化或尚未安装，无需留档")
-	}
-	if err := installRuntimes(runtimeDir); err != nil {
-		appendLog("[runtime] " + err.Error())
-	}
-	man.LaunchOptions = launchOptions
-	man.LaunchInstruction = &launchInstruction
-	man.PackageSources = append(man.PackageSources, baseSource, dxvkSource)
-	if err := saveManifest(man, backupRoot); err != nil {
-		return err
-	}
-	appendLog("[backup] manifest: " + filepath.Join(backupRoot, "manifest.json"))
+	return installWithSteamChoice(func(writeLaunchOptions bool) error {
+		archivedConfig, err := archiveL4nConfigIfChanged(gameRoot, resRoot, filepath.Join(baseSource.NormalizedDir, filepath.FromSlash(configRelativePath)), man)
+		if err != nil {
+			return fmt.Errorf("配置留档失败，已停止覆盖: %w", err)
+		}
+		if archivedConfig != "" {
+			appendLog("[config] 已保留现有配置: " + archivedConfig)
+		} else {
+			appendLog("[config] 配置未变化或尚未安装，无需留档")
+		}
+		if err := installRuntimes(runtimeDir); err != nil {
+			appendLog("[runtime] " + err.Error())
+		}
+		man.LaunchOptions = launchOptions
+		man.LaunchInstruction = &launchInstruction
+		man.PackageSources = append(man.PackageSources, baseSource, dxvkSource)
+		if err := saveManifest(man, backupRoot); err != nil {
+			return err
+		}
+		appendLog("[backup] manifest: " + filepath.Join(backupRoot, "manifest.json"))
 
-	setProgress(40)
-	if err := copyPatchFiles(man, backupRoot, gameRoot, patchFiles); err != nil {
-		return err
-	}
+		setProgress(40)
+		if err := copyPatchFiles(man, backupRoot, gameRoot, patchFiles); err != nil {
+			return err
+		}
 
-	setProgress(78)
-	if err := setSteamLaunchOptions(man, backupRoot, launchOptions); err != nil {
-		return fmt.Errorf("game files deployed and rollback retained; Steam launch options incomplete: %w", err)
-	}
+		setProgress(78)
+		if writeLaunchOptions {
+			if err := setSteamLaunchOptions(man, backupRoot, launchOptions); err != nil {
+				return fmt.Errorf("game files deployed and rollback retained; Steam launch options incomplete: %w", err)
+			}
+		} else {
+			appendLog("[steam] 请手动粘贴到 求生之路2 → 属性 → 启动选项：" + launchOptions)
+		}
 
-	setProgress(92)
-	if err := saveManifest(man, backupRoot); err != nil {
-		return err
-	}
-	appendLog("[verify] 游戏内可用 mat_info / mem_dump 验证")
-	return nil
+		setProgress(92)
+		if err := saveManifest(man, backupRoot); err != nil {
+			return err
+		}
+		appendLog("[verify] 游戏内可用 mat_info / mem_dump 验证")
+		return nil
+	})
 }
 
 func runRestore() error {
@@ -1266,8 +1275,12 @@ func manifestHasFile(man *manifest, target string) bool {
 
 func setSteamLaunchOptions(man *manifest, backupRoot, options string) error {
 	appendLog("[steam] writing launch options")
-	if processExists("steam.exe") {
-		appendLog("[steam] Steam 正在运行；若退出时覆盖配置，请关闭 Steam 后重新执行")
+	running, err := steamProcessesRunning()
+	if err != nil {
+		return err
+	}
+	if running {
+		return fmt.Errorf("Steam 已重新运行，停止写启动项；请关闭后重试或手动填写参数")
 	}
 	return setSteamLaunchOptionsForRoots(man, backupRoot, options, steamRoots(""))
 }

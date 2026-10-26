@@ -12,3 +12,11 @@ $files = @(Get-ChildItem -LiteralPath $main -File -Filter '*.go' | ForEach-Objec
 if ($LASTEXITCODE -ne 0) { throw "Main tests failed: exit=$LASTEXITCODE" }
 & go -C $project test @options ./cmd/fontchange ./cmd/l4nfontchange ./cmd/makeicon ./internal/...
 if ($LASTEXITCODE -ne 0) { throw "Companion/internal tests failed: exit=$LASTEXITCODE" }
+$previousArch = $env:GOARCH
+try {
+    $env:GOARCH = '386'
+    & go -C $project test @options ./cmd/workshopsubscribe ./internal/steamsubscription
+    if ($LASTEXITCODE -ne 0) { throw "x86 Steam bridge tests/build failed: exit=$LASTEXITCODE" }
+} finally {
+    $env:GOARCH = $previousArch
+}

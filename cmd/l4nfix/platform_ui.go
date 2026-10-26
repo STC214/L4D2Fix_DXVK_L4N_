@@ -158,7 +158,9 @@ func runDeployPlatform() error {
 	if selected.Detail.Content != r.Detail.Content || selected.SHA256 != r.SHA256 {
 		return fmt.Errorf("资源记录已变化，请重新检查更新")
 	}
-	return deployPlatform(root, resourceRoot(root), filepath.Dir(gameExe), kind, "")
+	return withPlatformSubscriptions(kind, func() error {
+		return deployPlatform(root, resourceRoot(root), filepath.Dir(gameExe), kind, "")
+	}, func() { updateSkeetoSubscriptions(root, filepath.Dir(gameExe), true) })
 }
 func runCleanPlatform() error {
 	root, e := packageRoot()
@@ -173,7 +175,9 @@ func runCleanPlatform() error {
 	if e != nil {
 		return e
 	}
-	return restorePlatform(root, data.GameRoot, true)
+	return withPlatformSubscriptions(data.Platform, func() error {
+		return restorePlatform(root, data.GameRoot, true)
+	}, func() { updateSkeetoSubscriptions(root, data.GameRoot, false) })
 }
 func openUsageGuide() {
 	shell := syscall.NewLazyDLL("shell32.dll").NewProc("ShellExecuteW")

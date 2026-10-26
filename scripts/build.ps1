@@ -23,12 +23,25 @@ try {
         @{ Name='L4D2_Font_Change.exe'; Package='./cmd/fontchange' },
         @{ Name='L4N_Font_Change.exe'; Package='./cmd/l4nfontchange' }
     )
+    # L4D2's bundled Steam API is x86 even when the main tool is x64.
+    $companions += @{ Name='Steam_Workshop_Subscribe.exe'; Package='./cmd/workshopsubscribe'; Arch='386' }
     $fontStaging = @()
     try {
         foreach ($tool in $companions) {
             $temp = Join-Path (Split-Path $OutputPath) ('.build-' + [Guid]::NewGuid().ToString('N') + '.exe')
             $fontStaging += @{ Temp=$temp; Output=(Join-Path (Split-Path $OutputPath) $tool.Name) }
-            & go build -ldflags='-H=windowsgui' -o $temp $tool.Package
+            $previousArch = $env:GOARCH
+            try {
+                if ($tool.Arch) { $env:GOARCH = $tool.Arch }
+                if ($tool.Arch) {
+                    # Bridge uses captured stdout; parent hides its console.
+                    & go build -o $temp $tool.Package
+                } else {
+                    & go build -ldflags='-H=windowsgui' -o $temp $tool.Package
+                }
+            } finally {
+                $env:GOARCH = $previousArch
+            }
             if ($LASTEXITCODE -ne 0) { throw "Companion build failed: $($tool.Name), exit=$LASTEXITCODE" }
         }
         foreach ($tool in $fontStaging) {
