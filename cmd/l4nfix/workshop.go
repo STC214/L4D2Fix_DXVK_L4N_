@@ -262,8 +262,8 @@ func downloadWorkshopResource(ctx context.Context, c *http.Client, res string, p
 	if n != int64(d.Size) {
 		return record, fmt.Errorf("%s 下载长度不符: %d / %d", p.Name, n, d.Size)
 	}
-	// Validate the full ZIP (including member CRC and path/size limits) before
-	// changing its extension or publishing it to the interface.
+	// Rename the raw Workshop payload to ZIP first, then validate every member
+	// (CRC, path and size limits) before inspecting the version or publishing it.
 	probe, e := os.MkdirTemp(dir, ".pending-inspect-")
 	if e != nil {
 		return record, e
@@ -296,6 +296,9 @@ func downloadWorkshopResource(ctx context.Context, c *http.Client, res string, p
 	if e != nil {
 		return record, e
 	}
+	if e = ctx.Err(); e != nil {
+		return record, e
+	}
 	if e = renameFileRetry(zipTemp, target); e != nil {
 		return record, e
 	}
@@ -303,7 +306,10 @@ func downloadWorkshopResource(ctx context.Context, c *http.Client, res string, p
 	return record, nil
 }
 func checkWorkshopUpdates(ctx context.Context, c *http.Client, endpoint, res string, onReady func(workshopResource)) error {
-	details, e := fetchWorkshopDetails(ctx, c, endpoint)
+	return checkWorkshopPlatforms(ctx, c, endpoint, res, workshopPlatforms, onReady)
+}
+func checkWorkshopPlatforms(ctx context.Context, c *http.Client, endpoint, res string, platforms []workshopPlatform, onReady func(workshopResource)) error {
+	details, e := fetchWorkshopDetailsFor(ctx, c, endpoint, platforms)
 	if e != nil {
 		return e
 	}
@@ -312,7 +318,7 @@ func checkWorkshopUpdates(ctx context.Context, c *http.Client, endpoint, res str
 		return fmt.Errorf("更新记录损坏: %w", e)
 	}
 	var failures []string
-	for _, p := range workshopPlatforms {
+	for _, p := range platforms {
 		var d workshopDetail
 		count := 0
 		for _, item := range details {

@@ -1,39 +1,6 @@
 {
   "resources": [
     {
-      "platform": "l4n",
-      "detail": {
-        "publishedfileid": "3558049615",
-        "result": 1,
-        "creator": "76561198859761739",
-        "creator_app_id": 550,
-        "consumer_app_id": 550,
-        "filename": "L4N_v2.51.0.zip",
-        "file_size": "23245152",
-        "file_url": "https://cdn.steamusercontent.com/ugc/16068050382074527913/C385418FA63E2256CDEE31EC71FF75C5AFC4B1A3/",
-        "hcontent_file": "16068050382074527913",
-        "preview_url": "https://images.steamusercontent.com/ugc/16079323924674717760/61DB81FD125E4C6BC36D8731BF7B35A4E7864878/",
-        "hcontent_preview": "16079323924674717760",
-        "title": "NekoShaders & L4N",
-        "description": "L4N对游戏进行了一系列改进，更多信息请查看安装包里的readme_l4n.txt\r\nL4N introduces a series of improvements to the game. \r\nAfter installation, once the game loads the map, run `l4n_menu` in the console to open the HUD menu, which provides access to most functions.\r\n`readme_l4n` contains detailed usage documentation, currently updated very frequently. We don't have the resources to maintain versions in other languages, so only a Chinese version is provided.\r\n\r\nNekoShaders是L4N的着色器模块\r\nNekoShaders is the shader module for L4N.\r\n其中包括了：\r\n  - 表现写实风格的PBR着色器\r\n  - 表现卡通风格的NekoToon着色器\r\n  - 色调映射、Bloom等用于改进游戏画面的一些后处理着色器\r\nThese include:\r\n  - PBR shader for a realistic style\r\n  - NekoToon shader for a cartoon style\r\n  - Post-processing shaders such as tone mapping and bloom, which are used to enhance the game's visuals\r\n\r\n除了NekoToon和PBR，其它着色器需要配合L4N使用\r\n你可以单独安装NekoShaders，只要安装时忽略left4dead2.exe这个文件即可\r\nAside from NekoToon and PBR, all other shaders require L4N to function.\r\nYou can install NekoShaders separately; just make sure to skip the `left4dead2.exe` file during installation.\r\n\r\n[h1]🛠️ 安装指南[/h1]\r\n[olist]\r\n[*]点击 [b]订阅[/b] 按钮。\r\n[*]启动游戏，在主菜单等待创意工坊内容下载/加载完毕，随后 [b]关闭游戏[/b]。\r\n[*]打开游戏根目录，进入以下路径：\r\n[code]left4dead2\\addons\\workshop[/code]\r\n[*]在该文件夹内找到名为 [b]3558049615.vpk[/b] 的文件。\r\n[i]（若看不到 .vpk 后缀，请先在 Windows 资源管理器中开启“显示文件扩展名”）[/i]\r\n[*]将文件后缀 [b].vpk[/b] 重命名修改为 [b].zip[/b]。\r\n[*]使用解压软件（如 WinRAR / 7-Zip）打开该 zip 文件，将其中的 [b]所有内容直接解压并覆盖到游戏根目录[/b] 下。\r\n[/olist]\r\n\r\n[h1]🛠️ Installation Guide[/h1]\r\n[olist]\r\n[*]Click the [b]Subscribe[/b] button.\r\n[*]Launch the game, wait for the workshop content to finish downloading/loading on the main menu, then [b]exit the game[/b].\r\n[*]Navigate to your game root directory and open the following path:\r\n[code]left4dead2\\addons\\workshop[/code]\r\n[*]Locate the file named [b]3558049615.vpk[/b].\r\n[i](If you cannot see the .vpk extension, make sure \"File name extensions\" is enabled in Windows File Explorer.)[/i]\r\n[*]Rename the file extension from [b].vpk[/b] to [b].zip[/b].\r\n[*]Open the .zip file with any archive tool (e.g., WinRAR, 7-Zip) and [b]extract all contents directly into the game root directory[/b] (overwrite if prompted).\r\n[/olist]\r\n\r\n\r\n[img]https://images.steamusercontent.com/ugc/12316515522153754209/7DCB3847DDFBAF3B57C44F2E9E21B8B157DCE05B/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false[/img]",
-        "time_created": 1756461368,
-        "time_updated": 1791462722,
-        "visibility": 0,
-        "banned": 0,
-        "ban_reason": "",
-        "subscriptions": 152603,
-        "favorited": 17707,
-        "lifetime_subscriptions": 281593,
-        "lifetime_favorited": 19447,
-        "views": 160124,
-        "tags": []
-      },
-      "version": "2.51.0",
-      "archive": "l4n/L4N_v2.51.0.zip",
-      "sha256": "9adf35391cbb0ef88dc5b060d6e0dabf8bf4b48aa2280349dbdfde73bd55d652",
-      "checked": "2026-10-26T18:13:22Z"
-    },
-    {
       "platform": "skeeto",
       "detail": {
         "publishedfileid": "3787239937",
@@ -133,7 +100,6 @@
     }
   ],
   "latest": {
-    "l4n": "l4n/L4N_v2.51.0.zip",
     "skeeto": "skeeto/Skeeto-2.2.4.zip",
     "evolved": "evolved/L4D2Evolved-1.2.5.zip"
   }

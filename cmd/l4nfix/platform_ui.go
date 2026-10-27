@@ -88,11 +88,16 @@ func runCheckUpdates() (result error) {
 	}
 	// Keep complete local versions usable even if a remote check fails.
 	workshop := func() error {
+		l4nCtx, l4nCancel := context.WithTimeout(context.Background(), 30*time.Minute)
+		l4nErr := checkL4NUpdates(l4nCtx, workshopClient(), dxvkReleaseClient(), workshopAPI, l4nReleaseAPI, resourceRoot(root))
+		l4nCancel()
+		// Independent budget: a slow L4N history batch must not expire the
+		// original enhancement-platform check before it even starts.
 		ctx, cancel := context.WithTimeout(context.Background(), 16*time.Minute)
 		defer cancel()
 		var modErrors []error
 		client := workshopClient()
-		err := checkWorkshopUpdates(ctx, client, workshopAPI, resourceRoot(root), func(r workshopResource) {
+		err := checkWorkshopPlatforms(ctx, client, workshopAPI, resourceRoot(root), workshopPlatforms[1:], func(r workshopResource) {
 			if r.Platform == "skeeto" {
 				if err := prepareSkeetoModCache(ctx, client, workshopAPI, resourceRoot(root), r); err != nil {
 					appendLog("[update] Skeeto 工坊 MOD 准备失败: " + err.Error())
@@ -103,22 +108,11 @@ func runCheckUpdates() (result error) {
 			platformReadyMu.Lock()
 			platformReady[r.Platform] = r
 			platformReadyMu.Unlock()
-			if r.Platform == "l4n" {
-				changeWorkflow(func(s *workflowState) { s.L4NReady = true })
-			}
 			invokeUI(func() {
-				if r.Platform == "l4n" {
-					loadL4nOptionsIntoCombo()
-					for i, opt := range l4nOptions {
-						if strings.EqualFold(filepath.Clean(opt.Dir), filepath.Join(resourceRoot(root), r.Archive)) {
-							procSendMessageW.Call(comboL4n, cbSetCurSel, uintptr(i), 0)
-						}
-					}
-				}
 				refreshPlatformChoices()
 			})
 		})
-		return errors.Join(append(modErrors, err)...)
+		return errors.Join(append(modErrors, err, l4nErr)...)
 	}
 	dxvk := func() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 6*time.Minute)
@@ -146,7 +140,13 @@ func runCheckUpdates() (result error) {
 	var historyErr error
 	if workflowSnapshot().Network == checkPassed {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-		historyErr = downloadEmbeddedHistory(ctx, dxvkReleaseClient(), resourceRoot(root), embeddedResourceCatalog.History)
+		var history []catalogResource
+		for _, r := range embeddedResourceCatalog.History {
+			if r.Kind == "dxvk" {
+				history = append(history, r)
+			}
+		}
+		historyErr = downloadEmbeddedHistory(ctx, dxvkReleaseClient(), resourceRoot(root), history)
 		cancel()
 	} else {
 		appendLog("[update] 网络检测未通过，跳过历史版本批量下载；已有本地版本仍可部署")

@@ -126,6 +126,15 @@ func runCheckNetwork() error {
 			appendLog(fmt.Sprintf("[network] 通过 · %s · %d ms", name, elapsed.Milliseconds()))
 		}
 	})
+	// The L4N backup is an independent source, not covered by the DXVK probe.
+	started := time.Now()
+	backupErr := checkL4NBackupNetwork(ctx, github, l4nReleaseAPI)
+	if backupErr != nil {
+		appendLog(fmt.Sprintf("[network] 失败 · L4N 备份仓库/下载链路 · %d ms · %v", time.Since(started).Milliseconds(), backupErr))
+	} else {
+		appendLog(fmt.Sprintf("[network] 通过 · L4N 备份仓库/下载链路 · %d ms", time.Since(started).Milliseconds()))
+	}
+	err = errors.Join(err, backupErr)
 	changeWorkflow(func(s *workflowState) {
 		if err == nil {
 			s.Network = checkPassed

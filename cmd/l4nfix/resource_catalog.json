@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-10-27",
+  "asOf": "2026-10-28",
   "history": [
     {
       "kind": "dxvk",
@@ -83,53 +83,46 @@
     },
     {
       "kind": "l4n",
-      "version": "2.51.0",
-      "archive": "l4n/L4N_v2.51.0.zip",
-      "url": "https://github.com/STC214/L4D2Fix_DXVK_L4N_/releases/download/V8.15/L4N_v2.51.0.zip",
-      "size": 23245152,
-      "sha256": "9adf35391cbb0ef88dc5b060d6e0dabf8bf4b48aa2280349dbdfde73bd55d652"
+      "version": "2.56.2",
+      "archive": "l4n/L4N_v2.56.2.7z",
+      "url": "https://github.com/STC214/l4n-releases/releases/download/L4N_v2.56.2/L4N_v2.56.2.7z",
+      "size": 13638258,
+      "sha256": "8a9e9a4e25ef29755dd6811434d28651025c083671a40ce0085080bcf6e9c81a"
     },
     {
       "kind": "l4n",
-      "version": "2.50.3",
-      "archive": "l4n/L4N_v2.50.3.zip",
-      "url": "https://github.com/STC214/L4D2Fix_DXVK_L4N_/releases/download/V8.15/L4N_v2.50.3.zip",
-      "size": 15405278,
-      "sha256": "f853848e92571c4ba82b0db910c917b3e51c4a94735a11592abad793422b7784"
+      "version": "2.56.1",
+      "archive": "l4n/L4N_v2.56.1.7z",
+      "url": "https://github.com/STC214/l4n-releases/releases/download/L4N_v2.56.1/L4N_v2.56.1.7z",
+      "size": 13638583,
+      "sha256": "5a20a73b297cc043e75967a055dc30c37673ef136e71acbd14eb616f5463ffe5"
     },
     {
       "kind": "l4n",
-      "version": "2.47.2",
-      "archive": "l4n/L4N_v2.47.2.zip",
-      "url": "https://github.com/STC214/L4D2Fix_DXVK_L4N_/releases/download/V8.15/L4N_v2.47.2.zip",
-      "size": 20682619,
-      "sha256": "3d331f3644a89f2078726b7f40202e811d709c6ab08708ea35b9191b2eb354c8"
+      "version": "2.56.0",
+      "archive": "l4n/L4N_v2.56.0.7z",
+      "url": "https://github.com/STC214/l4n-releases/releases/download/L4N_v2.56.0/L4N_v2.56.0.7z",
+      "size": 13637942,
+      "sha256": "b8fcd221ed647317dffd8892ba0c2629a5dad3d599430df5f2d77c8b38b162cc"
     },
     {
       "kind": "l4n",
-      "version": "2.41.1",
-      "archive": "l4n/L4N_v2.41.1.zip",
-      "url": "https://github.com/STC214/L4D2Fix_DXVK_L4N_/releases/download/V8.15/L4N_v2.41.1.zip",
-      "size": 12356764,
-      "sha256": "86404c27154b6afdbfbabc564d9225ae26a3e3fabb3acea28d640b6d0552ac6b"
+      "version": "2.55.0",
+      "archive": "l4n/L4N_v2.55.0.7z",
+      "url": "https://github.com/STC214/l4n-releases/releases/download/L4N_v2.55.0/L4N_v2.55.0.7z",
+      "size": 13636617,
+      "sha256": "9e8398ef11b389914179bce19c826ebcfa716593b15f338d0b647e19cf3fa75e"
     },
     {
       "kind": "l4n",
-      "version": "2.35.2",
-      "archive": "l4n/L4N_v2.35.2.zip",
-      "url": "https://github.com/STC214/L4D2Fix_DXVK_L4N_/releases/download/V8.15/L4N_v2.35.2.zip",
-      "size": 14825762,
-      "sha256": "ed3cc75b5057a3b53adc09cdb1ccdc9d3d32975578f9ff85813af472e1652e33"
+      "version": "2.54.0",
+      "archive": "l4n/L4N_v2.54.0.7z",
+      "url": "https://github.com/STC214/l4n-releases/releases/download/L4N_v2.54.0/L4N_v2.54.0.7z",
+      "size": 13632772,
+      "sha256": "0a5f5735845585ff33fce84b056dcca1f8dfb24ea8dfc9a9a2ff87088614b4d8"
     }
   ],
   "bundled": [
-    {
-      "kind": "l4n",
-      "version": "2.51.0",
-      "archive": "l4n/L4N_v2.51.0.zip",
-      "size": 23245152,
-      "sha256": "9adf35391cbb0ef88dc5b060d6e0dabf8bf4b48aa2280349dbdfde73bd55d652"
-    },
     {
       "kind": "skeeto",
       "version": "2.2.4",
@@ -143,13 +136,6 @@
       "archive": "evolved/L4D2Evolved-1.2.5.zip",
       "size": 6180529,
       "sha256": "0d79e10915130f52d00657c43b04a0a6a5eee01a49955d0acbdc09b8a47d788b"
-    },
-    {
-      "kind": "l4n",
-      "version": "2.50.3",
-      "archive": "l4n/L4N_v2.50.3.zip",
-      "size": 15405278,
-      "sha256": "f853848e92571c4ba82b0db910c917b3e51c4a94735a11592abad793422b7784"
     },
     {
       "kind": "dxvk",
@@ -178,6 +164,22 @@
       "archive": "dxvk/dxvk-async-2.0(A卡用).zip",
       "size": 3465846,
       "sha256": "c1abead4582bf02383519a965462997841f8c65866fc19ef6d89077840341263"
+    },
+    {
+      "kind": "l4n",
+      "version": "2.56.2",
+      "archive": "l4n/L4N_v2.56.2.7z",
+      "url": "https://github.com/STC214/l4n-releases/releases/download/L4N_v2.56.2/L4N_v2.56.2.7z",
+      "size": 13638258,
+      "sha256": "8a9e9a4e25ef29755dd6811434d28651025c083671a40ce0085080bcf6e9c81a"
+    },
+    {
+      "kind": "l4n",
+      "version": "2.56.1",
+      "archive": "l4n/L4N_v2.56.1.7z",
+      "url": "https://github.com/STC214/l4n-releases/releases/download/L4N_v2.56.1/L4N_v2.56.1.7z",
+      "size": 13638583,
+      "sha256": "5a20a73b297cc043e75967a055dc30c37673ef136e71acbd14eb616f5463ffe5"
     }
   ]
 }

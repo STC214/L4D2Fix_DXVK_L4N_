@@ -11,6 +11,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/bodgit/sevenzip"
 	"hash/crc32"
 	"io"
 	"l4nfix/internal/pathguard"
@@ -42,7 +43,7 @@ type packageMapping struct {
 }
 
 func archiveName(name string) (string, bool) {
-	for _, ext := range []string{".tar.gz", ".tgz", ".zip", ".tar"} {
+	for _, ext := range []string{".tar.gz", ".tgz", ".zip", ".tar", ".7z"} {
 		if strings.HasSuffix(strings.ToLower(name), ext) {
 			return name[:len(name)-len(ext)], true
 		}
@@ -130,6 +131,31 @@ func (b *extractionBudget) write(root, name string, size int64, dir bool, r io.R
 
 func extractPackage(source, root string) error {
 	b := extractionBudget{seen: map[string]bool{}}
+	if strings.HasSuffix(strings.ToLower(source), ".7z") {
+		z, err := sevenzip.OpenReader(source)
+		if err != nil {
+			return err
+		}
+		defer z.Close()
+		for _, f := range z.File {
+			if f.UncompressedSize > uint64(maxPackageBytes) || (!f.FileInfo().IsDir() && !f.Mode().IsRegular()) {
+				return fmt.Errorf("7z 包含超限文件、链接或特殊文件: %s", f.Name)
+			}
+			r, err := f.Open()
+			if err != nil {
+				return err
+			}
+			err = b.write(root, f.Name, int64(f.UncompressedSize), f.FileInfo().IsDir(), r)
+			closeErr := r.Close()
+			if err != nil {
+				return err
+			}
+			if closeErr != nil {
+				return closeErr
+			}
+		}
+		return nil
+	}
 	if strings.HasSuffix(strings.ToLower(source), ".zip") {
 		z, err := zip.OpenReader(source)
 		if err != nil {
@@ -514,7 +540,7 @@ func preparePackage(source, resRoot, kind string) (info packageSource, err error
 	input := source
 	if !st.IsDir() {
 		if _, ok := archiveName(source); !ok {
-			return info, fmt.Errorf("支持 ZIP、TAR、TAR.GZ、TGZ 压缩包")
+			return info, fmt.Errorf("支持 ZIP、7Z、TAR、TAR.GZ、TGZ 压缩包")
 		}
 		info.SHA256, err = fileHash(source)
 		if err != nil {

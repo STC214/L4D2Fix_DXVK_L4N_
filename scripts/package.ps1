@@ -3,6 +3,7 @@ $ErrorActionPreference='Stop'
 function Test-ExcludedResourcePath([string]$Relative) {
  $excluded=@('.package_tmp','.l4n_auto_backup','.platform_auto_backup','platform_cleanup_backups','manual_cleanup_backups','addons_backup','display_settings_backup','.l4d2_font_change_backup','config_backups','addons_backup.tmp','addons_backup.old')
  foreach($segment in ($Relative -split '[\\/]')) {
+  if($segment -eq '.l4n-workshop-cache'){return $true}
   if($excluded -contains $segment -or $segment -like '.mods-backup-*' -or $segment -like '.display-backup-*' -or $segment -like '.replace-old-*' -or $segment -like '.pending-*' -or $segment -like '.copy-*.tmp' -or $segment -like '.write-*.tmp') { return $true }
  }
  return $false
@@ -32,6 +33,7 @@ try{
  foreach($name in @('L4N_Go_Win32.exe','L4N_Font_Change.exe','L4D2_Font_Change.exe','Steam_Workshop_Subscribe.exe')){Copy-Item -LiteralPath (Join-Path $portable $name) -Destination $target}
  Copy-Item -LiteralPath (Join-Path $project 'docs/使用教程.md') -Destination (Join-Path $target '使用说明.md')
  foreach($guide in @('手动残留清理与文件结构.md','平台文件结构清理清单.json')){Copy-Item -LiteralPath (Join-Path (Join-Path $project 'docs') $guide) -Destination (Join-Path $target $guide)}
+ Copy-Item -LiteralPath (Join-Path $project 'docs/third-party-licenses') -Destination (Join-Path $target 'licenses') -Recurse
  $source=Join-Path $portable 'resources'
  foreach($f in Get-ChildItem -LiteralPath $source -Recurse -File){
   $relative=$f.FullName.Substring($source.Length+1)

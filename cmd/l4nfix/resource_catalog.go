@@ -65,6 +65,9 @@ func validateCatalogResource(r catalogResource) error {
 	prefix := "/doitsujin/dxvk/releases/download/"
 	if r.Kind == "l4n" {
 		prefix = "/STC214/L4D2Fix_DXVK_L4N_/releases/download/"
+		if strings.HasPrefix(u.Path, "/STC214/l4n-releases/releases/download/") {
+			prefix = "/STC214/l4n-releases/releases/download/"
+		}
 	}
 	if !strings.HasPrefix(u.Path, prefix) {
 		return fmt.Errorf("历史资源仓库身份不符")
@@ -106,8 +109,11 @@ func hasLocalCatalogVersion(res string, r catalogResource) bool {
 		}
 		prepared, err := preparePackage(option.Dir, res, r.Kind)
 		if err == nil {
+			matches := r.Kind != "l4n" || compareOptionVersions(strings.Split(preparedL4NVersion(prepared), "."), version) == 0
 			os.RemoveAll(prepared.TemporaryDir)
-			return true
+			if matches {
+				return true
+			}
 		}
 	}
 	return false
@@ -176,6 +182,9 @@ func downloadCatalogResource(ctx context.Context, client *http.Client, res strin
 	defer os.RemoveAll(prepared.TemporaryDir)
 	if prepared.SHA256 != r.SHA256 {
 		return fmt.Errorf("历史资源校验期间变化")
+	}
+	if r.Kind == "l4n" && (!l4nReleaseTag.MatchString("L4N_v"+preparedL4NVersion(prepared)) || compareOptionVersions(strings.Split(preparedL4NVersion(prepared), "."), strings.Split(r.Version, ".")) != 0) {
+		return fmt.Errorf("L4N 安装包内部版本与 Release 版本不符")
 	}
 	if err := ctx.Err(); err != nil {
 		return err
