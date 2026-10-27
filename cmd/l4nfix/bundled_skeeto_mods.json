@@ -1,0 +1,33 @@
+{
+  "skeetoContent": "12450748370088602631",
+  "mods": [
+    {
+      "detail": {
+        "publishedfileid": "3782512354",
+        "result": 1,
+        "consumer_app_id": 550,
+        "hcontent_file": "11392447518791731232",
+        "time_updated": 1792670041,
+        "file_size": 186100403,
+        "file_url": "https://cdn.steamusercontent.com/ugc/11392447518791731232/FF14AA6DB47B63BD0899C38F30BFDE9C580958C4/",
+        "title": "Skeeto Preset Asset Pack 预设素材包 贴图&特效&音效&json配置&粒子清单 [请本地化此mod]"
+      },
+      "archive": "skeeto_mods\\3782512354-11392447518791731232.vpk",
+      "sha256": "c52577b761233723e271caf5de23da64b7904da2f5589722a505b21b35033813"
+    },
+    {
+      "detail": {
+        "publishedfileid": "3787239937",
+        "result": 1,
+        "consumer_app_id": 550,
+        "hcontent_file": "12450748370088602631",
+        "time_updated": 1793030566,
+        "file_size": 1715627,
+        "file_url": "https://cdn.steamusercontent.com/ugc/12450748370088602631/6630691FBFDA14FC67A94FFABE7D6097042C5E5A/",
+        "title": "Skeeto 客户端模块化增强框架 A Modular Client-Side Enhancement Framework"
+      },
+      "archive": "skeeto_mods\\3787239937-12450748370088602631.vpk",
+      "sha256": "5321b310c4898d9e052a528c854bfbdf1b29dee4ce88b99d5668cb01970f7129"
+    }
+  ]
+}

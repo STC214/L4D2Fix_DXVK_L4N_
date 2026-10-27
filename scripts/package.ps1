@@ -9,6 +9,11 @@ function Test-ExcludedResourcePath([string]$Relative) {
 }
 $project=Split-Path -Parent $PSScriptRoot
 $portable=Join-Path $project 'L4N_Go_Win32_Portable'
+& (Join-Path $PSScriptRoot 'verify-offline-resources.ps1')
+$catalog=Get-Content -LiteralPath (Join-Path $project 'cmd/l4nfix/resource_catalog.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$modSeed=Get-Content -LiteralPath (Join-Path $project 'cmd/l4nfix/bundled_skeeto_mods.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$allowedCore=@($catalog.bundled | ForEach-Object {$_.archive.Replace('\','/')})
+$allowedMods=@($modSeed.mods | ForEach-Object {$_.archive.Replace('\','/')})
 if(-not $SkipBuild){& (Join-Path $PSScriptRoot 'build.ps1');if($LASTEXITCODE -ne 0){throw 'Build failed'}}
 $metadata=& go version -m (Join-Path $portable 'L4N_Go_Win32.exe')
 if($LASTEXITCODE -ne 0){throw 'EXE metadata read failed'}
@@ -31,10 +36,16 @@ try{
  foreach($f in Get-ChildItem -LiteralPath $source -Recurse -File){
   $relative=$f.FullName.Substring($source.Length+1)
   if(Test-ExcludedResourcePath $relative){continue}
+  $normalized=$relative.Replace('\','/')
+  $kind=($normalized -split '/')[0]
+  if($kind -in @('l4n','dxvk','skeeto','evolved') -and $normalized -notin $allowedCore){continue}
+  if($kind -eq 'skeeto_mods' -and $normalized -notin $allowedMods){continue}
   $dest=Join-Path (Join-Path $target 'resources') $relative
   New-Item -ItemType Directory (Split-Path $dest) -Force | Out-Null
   Copy-Item -LiteralPath $f.FullName -Destination $dest
  }
+ Copy-Item -LiteralPath (Join-Path $project 'cmd/l4nfix/bundled_workshop_index.json') -Destination (Join-Path $target 'resources/workshop-index.json') -Force
+ Copy-Item -LiteralPath (Join-Path $project 'cmd/l4nfix/bundled_skeeto_mods.json') -Destination (Join-Path $target 'resources/skeeto-mods.json') -Force
  foreach($folder in @('dxvk','l4n','skeeto','evolved')){New-Item -ItemType Directory (Join-Path $target ('resources/'+$folder)) -Force | Out-Null}
  Add-Type -AssemblyName System.IO.Compression
  Add-Type -AssemblyName System.IO.Compression.FileSystem

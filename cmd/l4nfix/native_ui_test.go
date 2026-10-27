@@ -102,7 +102,7 @@ func TestNativeHiddenUIReadOnly(t *testing.T) {
 	if !enabled(btnCheckNetwork) || !enabled(btnCheckUpdates) || !enabled(btnClean) || !enabled(btnCleanPlatform) || enabled(btnRun) || enabled(btnDeployPlatform) {
 		t.Fatal("initial prerequisites/independent cleanup incorrect")
 	}
-	ready := workflowState{Updates: checkPassed, L4NReady: true, DXVKReady: true}
+	ready := workflowState{L4NReady: true, DXVKReady: true} // Offline: no network or update check.
 	setState(ready, false)
 	if !enabled(btnRun) || enabled(btnDeployPlatform) {
 		t.Fatal("base/enhancement order incorrect")

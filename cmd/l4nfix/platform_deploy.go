@@ -285,7 +285,7 @@ func deployPlatformLocked(exeRoot, res, game, kind, version string) (err error) 
 	if kind == "skeeto" && exists(filepath.Join(game, "bin", "wininet.dll")) {
 		return fmt.Errorf("bin/wininet.dll 已存在，请先核对原代理 DLL；保留现有文件")
 	}
-	record, archive, e := selectWorkshopResource(res, kind, version)
+	record, archive, e := selectDeployablePlatformResource(res, kind, version)
 	if e != nil {
 		return e
 	}

@@ -88,7 +88,10 @@ func refreshWorkflowControls() {
 		networkText = "失败 · 不建议更新，请检查网络"
 	}
 	uiText(networkStatusCtl, networkText)
-	updateText := "下载并校验后解锁部署"
+	updateText := "可选：联网检查并补充资源"
+	if s.canDeployBase() {
+		updateText = "本地资源就绪 · 可直接部署"
+	}
 	switch s.Updates {
 	case checkRunning:
 		updateText = "检查 / 下载 / 校验中…"
@@ -101,7 +104,7 @@ func refreshWorkflowControls() {
 		}
 	}
 	uiText(updateStatusCtl, updateText)
-	platformText := "请先进行 2 检测更新"
+	platformText := "未找到完整的本地平台资源"
 	if len(platformChoices) > 0 {
 		platformText = fmt.Sprintf("%d 个平台就绪 · 请先完成 3 基础部署", len(platformChoices))
 		if s.BaseInstalled {

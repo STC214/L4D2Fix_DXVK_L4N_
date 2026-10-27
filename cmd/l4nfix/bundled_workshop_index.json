@@ -1,0 +1,140 @@
+{
+  "resources": [
+    {
+      "platform": "l4n",
+      "detail": {
+        "publishedfileid": "3558049615",
+        "result": 1,
+        "creator": "76561198859761739",
+        "creator_app_id": 550,
+        "consumer_app_id": 550,
+        "filename": "L4N_v2.51.0.zip",
+        "file_size": "23245152",
+        "file_url": "https://cdn.steamusercontent.com/ugc/16068050382074527913/C385418FA63E2256CDEE31EC71FF75C5AFC4B1A3/",
+        "hcontent_file": "16068050382074527913",
+        "preview_url": "https://images.steamusercontent.com/ugc/16079323924674717760/61DB81FD125E4C6BC36D8731BF7B35A4E7864878/",
+        "hcontent_preview": "16079323924674717760",
+        "title": "NekoShaders & L4N",
+        "description": "L4N对游戏进行了一系列改进，更多信息请查看安装包里的readme_l4n.txt\r\nL4N introduces a series of improvements to the game. \r\nAfter installation, once the game loads the map, run `l4n_menu` in the console to open the HUD menu, which provides access to most functions.\r\n`readme_l4n` contains detailed usage documentation, currently updated very frequently. We don't have the resources to maintain versions in other languages, so only a Chinese version is provided.\r\n\r\nNekoShaders是L4N的着色器模块\r\nNekoShaders is the shader module for L4N.\r\n其中包括了：\r\n  - 表现写实风格的PBR着色器\r\n  - 表现卡通风格的NekoToon着色器\r\n  - 色调映射、Bloom等用于改进游戏画面的一些后处理着色器\r\nThese include:\r\n  - PBR shader for a realistic style\r\n  - NekoToon shader for a cartoon style\r\n  - Post-processing shaders such as tone mapping and bloom, which are used to enhance the game's visuals\r\n\r\n除了NekoToon和PBR，其它着色器需要配合L4N使用\r\n你可以单独安装NekoShaders，只要安装时忽略left4dead2.exe这个文件即可\r\nAside from NekoToon and PBR, all other shaders require L4N to function.\r\nYou can install NekoShaders separately; just make sure to skip the `left4dead2.exe` file during installation.\r\n\r\n[h1]🛠️ 安装指南[/h1]\r\n[olist]\r\n[*]点击 [b]订阅[/b] 按钮。\r\n[*]启动游戏，在主菜单等待创意工坊内容下载/加载完毕，随后 [b]关闭游戏[/b]。\r\n[*]打开游戏根目录，进入以下路径：\r\n[code]left4dead2\\addons\\workshop[/code]\r\n[*]在该文件夹内找到名为 [b]3558049615.vpk[/b] 的文件。\r\n[i]（若看不到 .vpk 后缀，请先在 Windows 资源管理器中开启“显示文件扩展名”）[/i]\r\n[*]将文件后缀 [b].vpk[/b] 重命名修改为 [b].zip[/b]。\r\n[*]使用解压软件（如 WinRAR / 7-Zip）打开该 zip 文件，将其中的 [b]所有内容直接解压并覆盖到游戏根目录[/b] 下。\r\n[/olist]\r\n\r\n[h1]🛠️ Installation Guide[/h1]\r\n[olist]\r\n[*]Click the [b]Subscribe[/b] button.\r\n[*]Launch the game, wait for the workshop content to finish downloading/loading on the main menu, then [b]exit the game[/b].\r\n[*]Navigate to your game root directory and open the following path:\r\n[code]left4dead2\\addons\\workshop[/code]\r\n[*]Locate the file named [b]3558049615.vpk[/b].\r\n[i](If you cannot see the .vpk extension, make sure \"File name extensions\" is enabled in Windows File Explorer.)[/i]\r\n[*]Rename the file extension from [b].vpk[/b] to [b].zip[/b].\r\n[*]Open the .zip file with any archive tool (e.g., WinRAR, 7-Zip) and [b]extract all contents directly into the game root directory[/b] (overwrite if prompted).\r\n[/olist]\r\n\r\n\r\n[img]https://images.steamusercontent.com/ugc/12316515522153754209/7DCB3847DDFBAF3B57C44F2E9E21B8B157DCE05B/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false[/img]",
+        "time_created": 1756461368,
+        "time_updated": 1791462722,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 152603,
+        "favorited": 17707,
+        "lifetime_subscriptions": 281593,
+        "lifetime_favorited": 19447,
+        "views": 160124,
+        "tags": []
+      },
+      "version": "2.51.0",
+      "archive": "l4n/L4N_v2.51.0.zip",
+      "sha256": "9adf35391cbb0ef88dc5b060d6e0dabf8bf4b48aa2280349dbdfde73bd55d652",
+      "checked": "2026-10-26T18:13:22Z"
+    },
+    {
+      "platform": "skeeto",
+      "detail": {
+        "publishedfileid": "3787239937",
+        "result": 1,
+        "creator": "76561199180614377",
+        "creator_app_id": 550,
+        "consumer_app_id": 550,
+        "filename": "Skeeto_2.2.4.vpk",
+        "file_size": "1715627",
+        "file_url": "https://cdn.steamusercontent.com/ugc/12450748370088602631/6630691FBFDA14FC67A94FFABE7D6097042C5E5A/",
+        "hcontent_file": "12450748370088602631",
+        "preview_url": "https://images.steamusercontent.com/ugc/17294637525271173113/1BDBEE5D2181E94E4C9EEBCAB8E9724813C0204B/",
+        "hcontent_preview": "17294637525271173113",
+        "title": "Skeeto 客户端模块化增强框架 A Modular Client-Side Enhancement Framework",
+        "description": "Skeeto now supports English localization.\r\n\r\nThis is not a traditional mod — it will redefine what you thought was possible in Left 4 Dead 2.\r\n\r\nPrepare to be amazed.\r\n\r\n\r\nSkeeto保姆级安装教程：https://www.bilibili.com/opus/1258983063457628164\r\nBug反馈：bilibili @regoists\r\n\r\n【Skeeto】\r\n\r\nSkeeto 产品关键词：“正反馈”与“实用性”。在不破坏游戏平衡的前提下，优先提升反馈、局势可读性与操作确定性，解决原版诸多痛点。\r\n**Core Philosophy: Server-Compatible · Highly Customizable · Positive Feedback · Practicality First** Improve feedback, readability and control without affecting game balance.\r\n\r\n这不是传统意义上的 Mod。\r\nSkeeto（SKT）是一个《求生之路 2》客户端增强框架。绝大多数功能运行于客户端，可在多数服务器直接使用，无需服主安装 VScript / SourceMod，不修改敏感游戏文件，不触发 LAC / VAC。功能默认关闭、相互隔离，支持独立开关、样式、方向键挪位及 JSON / 素材 DIY。进入禁用 Mod 的对抗服务器时会自动隔离全部功能。\r\n\r\n**Skeeto (SKT) is a client-side enhancement framework for Left 4 Dead 2.** Most features work on regular servers without server-side VScript/SourceMod. Features are modular, disabled by default and highly customizable. They are automatically isolated on Mod-restricted competitive servers.\r\n\r\n相比脚本包、服务器插件和资源硬替换，SKT 更强调：**联机可用、关闭无残留、反馈直接、配置可保存。**\r\nCompared with scripts, server plugins or hard asset replacement, SKT focuses on **online compatibility, clean disabling, direct feedback and persistent configs.**\r\n\r\n主菜单模块包括：命中反馈、准星、自定义 HUD、世界 HUD、Skeetoscript、Background Engine、Career Archive、客户端体验优化、本地服体验优化等。\r\n\r\n━━━━━━━━━━━━━━━━━━━━\r\n◆ 安装与更新 / Installation\r\n━━━━━━━━━━━━━━━━━━━━\r\n\r\n· **首次安装 / First install：**将工坊 `.vpk` 改为 `.zip` 并完整解压，包内所有文件拖入游戏根目录即可。\r\nRename the workshop .vpk to .zip and extract everything, then drag all files from the package into the game root directory.\r\n\r\n· **更新 / Updates：**保持订阅即可，Skeeto 会自动更新。建议同时订阅官方预设素材包。\r\nKeep the Workshop item subscribed; Skeeto updates automatically. The official preset asset pack is recommended.\r\n\r\n· 安装异常优先检查游戏目录、杀毒拦截以及游戏是否已关闭。\r\n\r\n━━━━━━━━━━━━━━━━━━━━\r\n◆ 能力与优势 / Features\r\n━━━━━━━━━━━━━━━━━━━━\r\n\r\n【命中与击杀反馈 / Hit & Kill Feedback】\r\n\r\n将 Hit / Kill / 爆头，以及空爆、断舌、Crown 等特殊击杀转化为可配置的图标、粒子和音效。普感与特感可分开配置，画面/音量独立控制；友伤仅真实掉血时触发。支持 JSON DIY，无需改源码即可新增反馈。\r\n\r\nConfigurable **hit, kill, headshot and special-kill feedback** such as skeets, tongue cuts and Crowns, using icons, particles and sounds. JSON-based custom presets are supported.\r\n\r\n【自定义准星 / Custom Crosshairs】\r\n\r\n静态准星使用高清外置叠加层；动态准星读取引擎实时散布；贴图准星支持 VTF、工坊与 DIY。三套可同时开启且互不影响。\r\nStatic overlay, real-time spread crosshair and VTF texture crosshair can be enabled independently or together.\r\n\r\n【自定义 HUD / Custom HUD】\r\n\r\n将队友状态、弹药、被控/救援、击杀统计与击杀列表、特感预警、开麦、导演压力、换弹/开火后摇、推击疲劳、治疗/投掷物计时、关卡进度、速度等拆成独立 HUD 模块。\r\n\r\n全部可独立开关、调样式/大小，并用方向键挪位（Shift 大步）。把原版固定 HUD 变成一套由玩家自由组合的工具箱。\r\n\r\nModular HUD for **teammates, ammo, rescues, kill feed, infected warnings, Director pressure, reload/fire recovery, shove fatigue, item timers, map progress, speed and more.** Position, size and style are customizable.\r\n\r\n【世界 HUD / World HUD】\r\n\r\n将特感血条、伤害数字、技巧/击杀浮字、救援/解控、胆汁感染、黑白状态、惊扰警示等信息直接绑定实际角色模型，形成真正的三维世界 HUD。\r\n3D HUD elements attached directly to world entities: infected health, damage numbers, kills, rescues, bile, incapacitation warnings and more.\r\n\r\n【Skeetoscript】\r\n\r\n将低血量红屏、治疗绿屏、空仓/低弹提示音、弹壳与弹匣落地等常见 VScript 视听增强改为纯客户端 C++ 实现。\r\nClient-side C++ replacements for common VScript visual/audio enhancements, usable online without server scripts.\r\n\r\n【Skeeto Background Engine】\r\n\r\n突破原版主菜单仅支持 BIK 的限制。将 PNG / JPG、H.264 MP4 或 BIK 放入 `skeeto/backgrounds/` 即可使用，支持局内热切换、音量、显示模式与独立开关。\r\nCustom main-menu backgrounds with **PNG/JPG, H.264 MP4 and BIK**, including hot switching and display/audio controls.\r\n\r\n【Skeeto Career Archive】\r\n\r\n直接在游戏内查看自己的 Steam 对局与生涯统计，方便总结与复盘。\r\nView Steam match and career statistics directly in-game.\r\n\r\n【客户端体验优化 / Client QoL】\r\n\r\n包含投掷落点/轨迹预览、尸体/布偶瞬间隐藏（无需 `-lv`）、角色描边与强制客户端 CVar、听声辨位优化、闲置接管后视角/手电/武器槽恢复、Config Override、`skt_cvar`、L4N 内存清理、导演 HUD 常开等。\r\n\r\n目标不是堆功能，而是解决实际游玩中反复出现的痛点。\r\nQoL features include trajectory previews, instant ragdoll hiding, glow/CVar controls, positional-audio improvements, idle takeover fixes, config override, `skt_cvar`, L4N cleanup, Director HUD and more.\r\n\r\n【本地服体验优化 / Local Server】\r\n\r\n无需 SourceMod，即可为本地听服主机提供 Tick 解锁、NextBot 刷新率、0 lerp、空中加速 AA、单人闲置/去延迟、人物切换（类 `!csm`）、视角倾斜等功能。\r\n\r\n这些功能**仅主机生效**，不作为远程服务器功能宣传。适合练枪、练特感、本地开黑与调手感。\r\nHost-only tools for local servers: tick unlock, NextBot update rate, 0 lerp, air acceleration, idle/latency tweaks, character switching and view controls.\r\n\r\n━━━━━━━━━━━━━━━━━━━━\r\n◆ 使用说明 / Usage\r\n━━━━━━━━━━━━━━━━━━━━\r\n\r\n· 游戏内按 **[** 打开 Skeeto 菜单\r\nPress **[** to open the Skeeto menu.\r\n\r\n· 也可使用：`bind xxx skeeto_menu`\r\n\r\n· 项目将持续维护，并保持纯公益性质。\r\nSkeeto is continuously maintained and completely non-commercial.\r\n\r\n· 问题反馈：bilibili @regoists\r\n\r\n· 进入禁用 Mod 的对抗服务器时，会自动隔离全部功能，避免公平性风险。\r\nAll features are automatically isolated on Mod-restricted competitive servers.\r\n\r\nSkeeto is designed to be compatible with other similar platforms by default (such as Left 4 Neko).\r\n\r\n感谢使用 Skeeto。\r\n**Hope Skeeto brings you the same satisfying feeling as landing a clean skeet.**\r\n",
+        "time_created": 1787284306,
+        "time_updated": 1793030566,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 2294,
+        "favorited": 995,
+        "lifetime_subscriptions": 4455,
+        "lifetime_favorited": 1036,
+        "views": 7727,
+        "tags": [
+          {
+            "tag": "Textures"
+          },
+          {
+            "tag": "UI"
+          },
+          {
+            "tag": "Sounds"
+          },
+          {
+            "tag": "Co-op"
+          }
+        ]
+      },
+      "version": "2.2.4",
+      "archive": "skeeto/Skeeto-2.2.4.zip",
+      "sha256": "5321b310c4898d9e052a528c854bfbdf1b29dee4ce88b99d5668cb01970f7129",
+      "checked": "2026-10-26T18:13:22Z"
+    },
+    {
+      "platform": "evolved",
+      "detail": {
+        "publishedfileid": "3785109042",
+        "result": 1,
+        "creator": "76561199256986034",
+        "creator_app_id": 563,
+        "consumer_app_id": 550,
+        "filename": "myl4d2addons/L4D2Evolved1.2.5.vpk",
+        "file_size": "6180529",
+        "file_url": "https://cdn.steamusercontent.com/ugc/16788804601380964734/0FFFBD21B8DAF5B66224941254480915ADE44AD1/",
+        "hcontent_file": "16788804601380964734",
+        "preview_url": "https://images.steamusercontent.com/ugc/10369677107623944921/3029956DDE71F2DFA69DEC4FD3215742050236D6/",
+        "hcontent_preview": "10369677107623944921",
+        "title": "L4D2Evolved",
+        "description": "[h1]Left 4 Dead 2: Evolved[/h1]\nL4D2 Evolved is a major enhancement project for Left 4 Dead 2. It integrates first-person body rendering, ADS, third-person aim correction, model switching, Mod management, MMD dancing, frame generation, and memory optimization. Most features can be configured in-game.\n\nIf pressing F8 does not open the menu after installation, you may have launched the game using a BAT file. Please launch the game directly through Steam instead, or download [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3558049615]L4N[/url] to bypass the built-in DLL injection launch method.\n\n[h1]Main Features[/h1]\n\n[h2]First-Person Body & Ladders[/h2]\n[list]\n[*]Displays your character body in first person, including torso and legs.\n[*]Supports body position adjustment and an alternative B Mode for compatibility.\n[*]Body rendering can be disabled while incapacitated or climbing.\n[*]Includes built-in ladder body rendering and optional camera locking.\n[/list]\n\n[h2]ADS, Sight Switching & Inspection[/h2]\nIncludes an ADS system compatible with the animation standard used by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3576501343]Aim Down Sight Addon [VScript][/url]. Compatible weapon Mods can provide ADS, sight switching, hybrid optics, magnifiers, and inspection animations.\n[list]\n[*]ADS, sight switching, and inspection can use separate keys, including mouse buttons and key combinations.\n[*]Supports hold/toggle ADS and adjustable hold timing.\n[*]Supports ADS FOV, laser/trajectory display, reload/shove ADS exit, and automatic ADS return.\n[*]Supports reload, holster, draw, and inspection behavior when provided by the model.\n[*]Single-player/local hosts use full ADS. Compatible Evolved hosts can provide server-side support.\n[*]If server support is unavailable, Evolved uses local visual ADS. Spread, ammo, fire rate, and hit detection remain server-controlled.\n[/list]\n[b]Weapon models must provide the required animations or Bodygroups. Evolved does not generate missing ADS or inspection animations, and the original ADS script does not need to run separately.[/b]\n\n[h2]Third-Person Aim & ALT Free Look[/h2]\n[list]\n[*]Corrects crosshair and firing-direction mismatch caused by third-person camera offset.\n[*]Hold ALT to freely look around while keeping the character's original aiming direction.\n[*]Free-look sensitivity is adjustable.\n[/list]\n\n[h2]Dynamic Crosshair & Combat Feedback[/h2]\n[list]\n[*]Dynamic spread crosshair with adjustable size, spacing, center dot, and opacity.\n[*]Melee weapons, throwables, and medical items use separate fixed crosshairs.\n[*]Hit, kill, and headshot indicators plus hit/kill confirmation sounds.\n[*]Visual and audio feedback can be configured separately.\n[/list]\n\n[h2]Character, Weapon & Item Model Switching[/h2]\nMultiple replacement Mods for the same character, weapon, or item can coexist as selectable models.\n[list]\n[*]F7: character model menu.\n[*]F4: current weapon/item model menu.\n[*]Supports random player models on map changes and random weapon/item models on spawn.\n[*]Weapons can replace only the first-person model while keeping third-person/world models.\n[*]Optional model preloading reduces switching delays but increases memory use and loading time.\n[/list]\nModel selection is local-only and does not send your installed model files to other players.\n\n[h2]Model Parts & Materials[/h2]\n[list]\n[*]F6 opens the parts/material panel.\n[*]Switch model Bodygroups such as clothing and accessories.\n[*]Hide parts/materials, adjust transparency, and save settings.\n[*]Displays recognizable author-defined part names.\n[/list]\n\n[h2]In-Game Mod Manager & Workshop Downloads[/h2]\n[list]\n[*]F5 opens the Mod Manager with previews, search, categories, filters, and bulk enable/disable.\n[*]Supports Mod/group priority, resource override checks, conflict detection, and issue reporting.\n[*]Save and load Mod enable/disable presets.\n[*]Enter Workshop Mod or collection links/IDs to download and install them directly.\n[*]Supports download queues, pause, speed limits, update checks, and optional auto-update.\n[*]Supports Steam downloads, CDN downloads, and HTTP/HTTPS proxy settings.\n[*]Drag VPK, ZIP, 7Z, RAR, or folders containing VPK files into the game window to install local Mods.\n[*]Supports FireAxe libraries.\n[/list]\nAfter changing Mods or loading a preset, use “Apply and Refresh Game”. Some resources may still require a map change or restart.\n\n[h2]MMD Dance Clones & Camera[/h2]\nSupports [b]MMD Dance Part3-1[/b], compatible dance resources, and dance packs generated by the project converter.\n[list]\n[*]Press P to open the song menu.\n[*]Spawn a dancing clone at the crosshair position while continuing to move freely.\n[*]Supports music, facial expressions, Camera Motion, and volume control.\n[*]Supports camera-height adjustment for small-character dances.\n[/list]\nCommands:\n[code]!d z d01[/code]\nSpawns dance d01 using the Zoey slot.\n\n[code]!cam[/code]\nPlays the included dance Camera Motion.\n\n[code]!sd[/code]\nStops the dance.\n\n[b]Dance motions, music, and camera data require the corresponding resource packs.[/b]\n\n[h2]DXVK & Desktop Frame Generation[/h2]\n[list]\n[*]Optional built-in DXVK converts Direct3D 9 rendering to Vulkan.\n[*]Asynchronous Shader/Pipeline compilation and caching reduce shader stutter.\n[*]Supports 2x optical-flow desktop frame generation with NVIDIA and FidelityFX backends.\n[*]Can use depth, camera motion, and supported object/bone motion vectors.\n[/list]\nFrame generation requires compatible DXVK, GPU, and drivers. When enabled, the game renders real frames at half the display refresh rate and alternates them with generated frames. Disabled by default; enable it from F8.\n\n[h2]Cache & Other Settings[/h2]\n[list]\n[*]Expands DataCache to 2048 MB in the vanilla environment. Left4Neko keeps its own cache strategy when detected.\n[*]Optional cache offloading moves idle mesh, animation, and audio data to a helper process to reduce game-process memory usage. Enabled by default.\n[*]Option to keep game audio playing in the background.\n[/list]\n\n[h1]Installation[/h1]\n[olist]\n[*]Subscribe to this Workshop item, launch the game once, wait for Steam to finish downloading, then exit.\n[*]Open [b]left4dead2/addons/workshop/[/b] and find [b]3785109042.vpk[/b].\n[*]Rename it to [b]3785109042.zip[/b] and extract all files into the game folder containing [b]left4dead2.exe[/b].\n[*]Launch the game normally and press [b]F8[/b] to open Evolved settings.\n[/olist]\n\nGame directory example:\n[code]...\\Steam\\steamapps\\common\\Left 4 Dead 2[/code]\n\n[b]Please remain subscribed.[/b] When a new Workshop version is detected, Evolved will show an update prompt and update the files after confirmation.\n\n[h1]Default Hotkeys[/h1]\n[list]\n[*][b]F8[/b]: Evolved settings\n[*][b]F7[/b]: Character models\n[*][b]F6[/b]: Parts/materials\n[*][b]F5[/b]: Mod Manager\n[*][b]F4[/b]: Weapon/item models\n[*][b]P[/b]: Dance menu\n[*][b]ALT[/b]: Third-person free look\n[/list]\nMenu and ADS keys can be changed in F8.\n\n[h1]Compatibility Notes[/h1]\n[list]\n[*]ADS, part switching, and dance features depend on installed models and resources.\n[*]Built-in ADS/external ADS scripts and built-in ladders/Immersive Ladder are handled by feature toggles. Disable the built-in version before using an external implementation.\n[*]Normal Direct3D 9 rendering remains supported. Desktop frame generation requires DXVK.\n[*]When reporting issues, include the feature name, reproduction steps, and related Mods.\n[/list]",
+        "time_created": 1786968936,
+        "time_updated": 1792823804,
+        "visibility": 0,
+        "banned": 0,
+        "ban_reason": "",
+        "subscriptions": 1572,
+        "favorited": 1165,
+        "lifetime_subscriptions": 3159,
+        "lifetime_favorited": 1226,
+        "views": 10674,
+        "tags": [
+          {
+            "tag": "Campaigns"
+          },
+          {
+            "tag": "Miscellaneous"
+          },
+          {
+            "tag": "Scripts"
+          },
+          {
+            "tag": "Survivors"
+          },
+          {
+            "tag": "Special Infected"
+          },
+          {
+            "tag": "Common Infected"
+          }
+        ]
+      },
+      "version": "1.2.5",
+      "archive": "evolved/L4D2Evolved-1.2.5.zip",
+      "sha256": "0d79e10915130f52d00657c43b04a0a6a5eee01a49955d0acbdc09b8a47d788b",
+      "checked": "2026-10-26T18:13:24Z"
+    }
+  ],
+  "latest": {
+    "l4n": "l4n/L4N_v2.51.0.zip",
+    "skeeto": "skeeto/Skeeto-2.2.4.zip",
+    "evolved": "evolved/L4D2Evolved-1.2.5.zip"
+  }
+}

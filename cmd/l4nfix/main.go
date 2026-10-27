@@ -436,7 +436,7 @@ func wndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) uintptr {
 func createControls(hwnd uintptr) {
 	title := label(hwnd, "L4N + DXVK · 平台部署工具", 20, 16, 580, 26)
 	procSendMessageW.Call(title, wmSetFont, titleFont, 1)
-	desc := label(hwnd, "1 / 2 优先（可直接做 2） → 3 基础部署 → 4 可选增强；清理独立于检测步骤", 20, 50, 968, 22)
+	desc := label(hwnd, "本地资源可直接部署 · 1 / 2 联网操作可选 → 3 基础部署 → 4 可选增强；清理独立", 20, 50, 968, 22)
 	procSendMessageW.Call(desc, wmSetFont, textFont, 1)
 	btnRefreshVersion = button(hwnd, "刷新版本", idRefreshVersion, 686, 14, 120, 32)
 	btnHelp = button(hwnd, "使用说明（在线）", idHelp, 818, 14, 170, 32)
@@ -461,21 +461,20 @@ func createControls(hwnd uintptr) {
 	btnRestoreMod = button(hwnd, "恢复MOD", idRestoreMod, 160, 372, 116, 34)
 	btnClose = button(hwnd, "系统字体/游戏默认", idClose, 288, 372, 192, 34)
 	installedVersionCtl = label(hwnd, "当前游戏：正在检测版本…", 32, 420, 448, 46)
-	label(hwnd, "先完成 2，再部署；已有基础可直接用于 4。", 32, 474, 448, 24)
+	label(hwnd, "本地版本可离线部署；已有基础可直接用于 4。", 32, 474, 448, 24)
 	createPlatformControls(hwnd)
 
 	groupBox(hwnd, "5  日志 · 最新消息置顶", 16, 532, 972, 170)
 	progress = create("msctls_progress32", "", wsChild|wsVisible, 32, 558, 500, 16, hwnd, 0)
 	procSendMessageW.Call(progress, pbmSetRange32, 0, 100)
 	procSendMessageW.Call(progress, pbmSetPos, 0, 0)
-	statusCtl = label(hwnd, "就绪 · 可先检测网络或直接检查更新", 548, 554, 424, 24)
+	statusCtl = label(hwnd, "就绪 · 本地资源可离线部署", 548, 554, 424, 24)
 	logCtl = create("EDIT", "", wsChild|wsVisible|wsBorder|esMultiline|esAutovScroll|esReadOnly|wsVScroll, 32, 588, 940, 98, hwnd, 0)
 	// Enough for recent UI messages; chronological session logs remain on disk.
 	procSendMessageW.Call(logCtl, 0x00C5, 1<<20, 0) // EM_SETLIMITTEXT
 	refreshWorkflowControls()
 
-	loadDxvkOptionsIntoCombo()
-	loadL4nOptionsIntoCombo()
+	loadLocalResourceChoices()
 	appendLog("[prepare] ready; resources directory: " + resourceDirName)
 	appendLog("[prepare] select L4N directory or archive from resources")
 	appendLog("[prepare] DXVK versions directory: " + dxvkVersionsDirName)
@@ -634,6 +633,7 @@ func loadDxvkOptionsIntoCombo() {
 	resRoot := resourceRoot(root)
 	procSendMessageW.Call(comboDxvk, 0x014B, 0, 0) // CB_RESETCONTENT
 	dxvkOptions = discoverDxvkOptions(root, resRoot)
+	changeWorkflow(func(s *workflowState) { s.DXVKReady = len(dxvkOptions) > 0 })
 	if len(dxvkOptions) == 0 {
 		appendLog("[prepare] no DXVK versions found under " + dxvkVersionsDirName)
 		return
@@ -778,7 +778,7 @@ func appendLog(s string) {
 
 func runInstall() error {
 	if !workflowSnapshot().canDeployBase() {
-		return fmt.Errorf("请先进行 2 检测更新，完成 L4N 和 DXVK 资源下载校验后再部署")
+		return fmt.Errorf("缺少本地 L4N 或 DXVK 资源；请放入离线资源包，或联网检查更新后补充")
 	}
 	opt, err := selectedDxvkOption()
 	if err != nil {
@@ -2292,6 +2292,7 @@ func loadL4nOptionsIntoCombo() {
 	}
 	procSendMessageW.Call(comboL4n, 0x014B, 0, 0)
 	l4nOptions = discoverL4nOptions(root, resourceRoot(root))
+	changeWorkflow(func(s *workflowState) { s.L4NReady = len(l4nOptions) > 0 })
 	for _, opt := range l4nOptions {
 		procSendMessageW.Call(comboL4n, cbAddString, 0, uintptr(unsafe.Pointer(utf16Ptr(opt.Name))))
 	}

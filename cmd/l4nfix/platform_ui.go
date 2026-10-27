@@ -68,9 +68,9 @@ func refreshPlatformChoices() {
 func runCheckUpdates() (result error) {
 	changeWorkflow(func(s *workflowState) {
 		s.Updates = checkRunning
-		s.L4NReady, s.DXVKReady = false, false
 	})
 	defer func() {
+		invokeUI(loadLocalResourceChoices)
 		changeWorkflow(func(s *workflowState) {
 			if result == nil {
 				s.Updates = checkPassed
@@ -86,11 +86,7 @@ func runCheckUpdates() (result error) {
 	if e != nil {
 		return e
 	}
-	// Revoke stale choices first. A partial check publishes successful items only.
-	platformReadyMu.Lock()
-	platformReady = map[string]workshopResource{}
-	platformReadyMu.Unlock()
-	invokeUI(refreshPlatformChoices)
+	// Keep complete local versions usable even if a remote check fails.
 	workshop := func() error {
 		ctx, cancel := context.WithTimeout(context.Background(), 16*time.Minute)
 		defer cancel()
@@ -142,21 +138,34 @@ func runCheckUpdates() (result error) {
 		})
 		return nil
 	}
-	return checkUpdateSources(workshop, dxvk)
+	var networkErr error
+	if workflowSnapshot().Network != checkPassed {
+		networkErr = runCheckNetwork()
+	}
+	updateErr := checkUpdateSources(workshop, dxvk)
+	var historyErr error
+	if workflowSnapshot().Network == checkPassed {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+		historyErr = downloadEmbeddedHistory(ctx, dxvkReleaseClient(), resourceRoot(root), embeddedResourceCatalog.History)
+		cancel()
+	} else {
+		appendLog("[update] 网络检测未通过，跳过历史版本批量下载；已有本地版本仍可部署")
+	}
+	return errors.Join(networkErr, updateErr, historyErr)
 }
 func runDeployPlatform() error {
 	// Controls are frozen by guarded while the worker reads the selection.
 	idx, _, _ := procSendMessageW.Call(comboPlatform, cbGetCurSel, 0, 0)
 	i := int(int32(idx))
 	if i < 0 || i >= len(platformChoices) {
-		return fmt.Errorf("请先检查更新，下载完成后选择平台")
+		return fmt.Errorf("请先准备完整本地平台资源，再选择平台")
 	}
 	kind := platformChoices[i]
 	platformReadyMu.Lock()
 	r, ok := platformReady[kind]
 	platformReadyMu.Unlock()
 	if !ok {
-		return fmt.Errorf("请先检查所选平台更新")
+		return fmt.Errorf("所选平台的本地资源未就绪")
 	}
 	root, e := packageRoot()
 	if e != nil {
@@ -171,7 +180,7 @@ func runDeployPlatform() error {
 	}
 	// Pin to the exact content verified in this check, even if another process
 	// updates the on-disk index before deployment.
-	selected, p, e := selectWorkshopResource(resourceRoot(root), kind, "")
+	selected, p, e := selectDeployablePlatformResource(resourceRoot(root), kind, "")
 	if e != nil {
 		return e
 	}
