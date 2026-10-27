@@ -112,6 +112,32 @@ func TestDXVKUpdateDownloadCacheRepairAndHistoricalVersions(t *testing.T) {
 		t.Fatal("download temporary files left", temp)
 	}
 }
+
+func TestDXVKShippedArchiveNeedsNoFirstDownloadOrIndex(t *testing.T) {
+	res := t.TempDir()
+	payload := dxvkUpdateFixture(t, dxvkFixture("dxvk-3.1.1/x32/"))
+	release := dxvkUpdateRelease(payload)
+	downloads := 0
+	client := dxvkTestClient(t, release, payload, &downloads)
+	archive := filepath.Join(res, "dxvk", release.Assets[0].Name)
+	if err := os.MkdirAll(filepath.Dir(archive), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(archive, payload, 0600); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 2; i++ {
+		if _, err := checkDXVKUpdate(context.Background(), client, dxvkReleaseAPI, res); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Remove(filepath.Join(res, "dxvk-index.json")); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if downloads != 0 {
+		t.Fatal("complete shipped payload redownloaded because updater index was absent", downloads)
+	}
+}
 func TestDXVKReleaseRejectsWrongAssets(t *testing.T) {
 	payload := []byte("payload")
 	changes := []func(*dxvkRelease){

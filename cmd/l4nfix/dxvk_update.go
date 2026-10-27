@@ -211,6 +211,34 @@ func checkDXVKUpdate(ctx context.Context, c *http.Client, endpoint, res string) 
 	} else if !os.IsNotExist(e) {
 		return record, e
 	}
+	// A shipped/manual archive may be complete even when no updater index has
+	// been written yet. Reuse it against the fresh official digest rather than
+	// downloading the bundled latest release again on the first online check.
+	if asset.Digest != "" {
+		local := dxvkDownloadRecord{ReleaseID: release.ID, Tag: release.Tag, Asset: asset, Archive: filepath.Join("dxvk", asset.Name), SHA256: strings.TrimPrefix(asset.Digest, "sha256:"), Checked: time.Now().UTC().Format(time.RFC3339)}
+		if path, err := dxvkCachedArchive(res, local); err == nil {
+			prepared, err := preparePackage(path, res, "dxvk")
+			if err != nil {
+				return record, fmt.Errorf("本地 DXVK 安装包校验失败: %w", err)
+			}
+			os.RemoveAll(prepared.TemporaryDir)
+			if prepared.SHA256 != local.SHA256 {
+				return record, fmt.Errorf("本地 DXVK 校验期间变化")
+			}
+			if err := ctx.Err(); err != nil {
+				return record, err
+			}
+			data, err := json.MarshalIndent(local, "", "  ")
+			if err != nil {
+				return record, err
+			}
+			if err := writeFileAtomic(index, data, 0644); err != nil {
+				return record, err
+			}
+			appendLog("[update] DXVK " + release.Tag + " 本地包已通过官方 SHA256，无需重复下载")
+			return local, nil
+		}
+	}
 	appendLog("[update] 发现 DXVK 更新或本地缓存缺失/损坏，下载 " + release.Tag)
 	dir := filepath.Join(res, "dxvk")
 	target := filepath.Join(dir, asset.Name)
