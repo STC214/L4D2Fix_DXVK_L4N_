@@ -132,10 +132,10 @@
     },
     {
       "kind": "evolved",
-      "version": "1.2.5",
-      "archive": "evolved/L4D2Evolved-1.2.5.zip",
-      "size": 6180529,
-      "sha256": "0d79e10915130f52d00657c43b04a0a6a5eee01a49955d0acbdc09b8a47d788b"
+      "version": "1.2.7",
+      "archive": "evolved/L4D2Evolved-1.2.7.zip",
+      "size": 17215071,
+      "sha256": "ad2704cc794693d458795a237cea85bf0c2263b78a9edcd431f8c953a2599063"
     },
     {
       "kind": "dxvk",

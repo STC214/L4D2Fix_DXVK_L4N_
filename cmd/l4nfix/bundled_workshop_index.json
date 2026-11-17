@@ -51,56 +51,21 @@
       "detail": {
         "publishedfileid": "3785109042",
         "result": 1,
-        "creator": "76561199256986034",
-        "creator_app_id": 563,
         "consumer_app_id": 550,
-        "filename": "myl4d2addons/L4D2Evolved1.2.5.vpk",
-        "file_size": "6180529",
-        "file_url": "https://cdn.steamusercontent.com/ugc/16788804601380964734/0FFFBD21B8DAF5B66224941254480915ADE44AD1/",
-        "hcontent_file": "16788804601380964734",
-        "preview_url": "https://images.steamusercontent.com/ugc/10369677107623944921/3029956DDE71F2DFA69DEC4FD3215742050236D6/",
-        "hcontent_preview": "10369677107623944921",
-        "title": "L4D2Evolved",
-        "description": "[h1]Left 4 Dead 2: Evolved[/h1]\nL4D2 Evolved is a major enhancement project for Left 4 Dead 2. It integrates first-person body rendering, ADS, third-person aim correction, model switching, Mod management, MMD dancing, frame generation, and memory optimization. Most features can be configured in-game.\n\nIf pressing F8 does not open the menu after installation, you may have launched the game using a BAT file. Please launch the game directly through Steam instead, or download [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3558049615]L4N[/url] to bypass the built-in DLL injection launch method.\n\n[h1]Main Features[/h1]\n\n[h2]First-Person Body & Ladders[/h2]\n[list]\n[*]Displays your character body in first person, including torso and legs.\n[*]Supports body position adjustment and an alternative B Mode for compatibility.\n[*]Body rendering can be disabled while incapacitated or climbing.\n[*]Includes built-in ladder body rendering and optional camera locking.\n[/list]\n\n[h2]ADS, Sight Switching & Inspection[/h2]\nIncludes an ADS system compatible with the animation standard used by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3576501343]Aim Down Sight Addon [VScript][/url]. Compatible weapon Mods can provide ADS, sight switching, hybrid optics, magnifiers, and inspection animations.\n[list]\n[*]ADS, sight switching, and inspection can use separate keys, including mouse buttons and key combinations.\n[*]Supports hold/toggle ADS and adjustable hold timing.\n[*]Supports ADS FOV, laser/trajectory display, reload/shove ADS exit, and automatic ADS return.\n[*]Supports reload, holster, draw, and inspection behavior when provided by the model.\n[*]Single-player/local hosts use full ADS. Compatible Evolved hosts can provide server-side support.\n[*]If server support is unavailable, Evolved uses local visual ADS. Spread, ammo, fire rate, and hit detection remain server-controlled.\n[/list]\n[b]Weapon models must provide the required animations or Bodygroups. Evolved does not generate missing ADS or inspection animations, and the original ADS script does not need to run separately.[/b]\n\n[h2]Third-Person Aim & ALT Free Look[/h2]\n[list]\n[*]Corrects crosshair and firing-direction mismatch caused by third-person camera offset.\n[*]Hold ALT to freely look around while keeping the character's original aiming direction.\n[*]Free-look sensitivity is adjustable.\n[/list]\n\n[h2]Dynamic Crosshair & Combat Feedback[/h2]\n[list]\n[*]Dynamic spread crosshair with adjustable size, spacing, center dot, and opacity.\n[*]Melee weapons, throwables, and medical items use separate fixed crosshairs.\n[*]Hit, kill, and headshot indicators plus hit/kill confirmation sounds.\n[*]Visual and audio feedback can be configured separately.\n[/list]\n\n[h2]Character, Weapon & Item Model Switching[/h2]\nMultiple replacement Mods for the same character, weapon, or item can coexist as selectable models.\n[list]\n[*]F7: character model menu.\n[*]F4: current weapon/item model menu.\n[*]Supports random player models on map changes and random weapon/item models on spawn.\n[*]Weapons can replace only the first-person model while keeping third-person/world models.\n[*]Optional model preloading reduces switching delays but increases memory use and loading time.\n[/list]\nModel selection is local-only and does not send your installed model files to other players.\n\n[h2]Model Parts & Materials[/h2]\n[list]\n[*]F6 opens the parts/material panel.\n[*]Switch model Bodygroups such as clothing and accessories.\n[*]Hide parts/materials, adjust transparency, and save settings.\n[*]Displays recognizable author-defined part names.\n[/list]\n\n[h2]In-Game Mod Manager & Workshop Downloads[/h2]\n[list]\n[*]F5 opens the Mod Manager with previews, search, categories, filters, and bulk enable/disable.\n[*]Supports Mod/group priority, resource override checks, conflict detection, and issue reporting.\n[*]Save and load Mod enable/disable presets.\n[*]Enter Workshop Mod or collection links/IDs to download and install them directly.\n[*]Supports download queues, pause, speed limits, update checks, and optional auto-update.\n[*]Supports Steam downloads, CDN downloads, and HTTP/HTTPS proxy settings.\n[*]Drag VPK, ZIP, 7Z, RAR, or folders containing VPK files into the game window to install local Mods.\n[*]Supports FireAxe libraries.\n[/list]\nAfter changing Mods or loading a preset, use “Apply and Refresh Game”. Some resources may still require a map change or restart.\n\n[h2]MMD Dance Clones & Camera[/h2]\nSupports [b]MMD Dance Part3-1[/b], compatible dance resources, and dance packs generated by the project converter.\n[list]\n[*]Press P to open the song menu.\n[*]Spawn a dancing clone at the crosshair position while continuing to move freely.\n[*]Supports music, facial expressions, Camera Motion, and volume control.\n[*]Supports camera-height adjustment for small-character dances.\n[/list]\nCommands:\n[code]!d z d01[/code]\nSpawns dance d01 using the Zoey slot.\n\n[code]!cam[/code]\nPlays the included dance Camera Motion.\n\n[code]!sd[/code]\nStops the dance.\n\n[b]Dance motions, music, and camera data require the corresponding resource packs.[/b]\n\n[h2]DXVK & Desktop Frame Generation[/h2]\n[list]\n[*]Optional built-in DXVK converts Direct3D 9 rendering to Vulkan.\n[*]Asynchronous Shader/Pipeline compilation and caching reduce shader stutter.\n[*]Supports 2x optical-flow desktop frame generation with NVIDIA and FidelityFX backends.\n[*]Can use depth, camera motion, and supported object/bone motion vectors.\n[/list]\nFrame generation requires compatible DXVK, GPU, and drivers. When enabled, the game renders real frames at half the display refresh rate and alternates them with generated frames. Disabled by default; enable it from F8.\n\n[h2]Cache & Other Settings[/h2]\n[list]\n[*]Expands DataCache to 2048 MB in the vanilla environment. Left4Neko keeps its own cache strategy when detected.\n[*]Optional cache offloading moves idle mesh, animation, and audio data to a helper process to reduce game-process memory usage. Enabled by default.\n[*]Option to keep game audio playing in the background.\n[/list]\n\n[h1]Installation[/h1]\n[olist]\n[*]Subscribe to this Workshop item, launch the game once, wait for Steam to finish downloading, then exit.\n[*]Open [b]left4dead2/addons/workshop/[/b] and find [b]3785109042.vpk[/b].\n[*]Rename it to [b]3785109042.zip[/b] and extract all files into the game folder containing [b]left4dead2.exe[/b].\n[*]Launch the game normally and press [b]F8[/b] to open Evolved settings.\n[/olist]\n\nGame directory example:\n[code]...\\Steam\\steamapps\\common\\Left 4 Dead 2[/code]\n\n[b]Please remain subscribed.[/b] When a new Workshop version is detected, Evolved will show an update prompt and update the files after confirmation.\n\n[h1]Default Hotkeys[/h1]\n[list]\n[*][b]F8[/b]: Evolved settings\n[*][b]F7[/b]: Character models\n[*][b]F6[/b]: Parts/materials\n[*][b]F5[/b]: Mod Manager\n[*][b]F4[/b]: Weapon/item models\n[*][b]P[/b]: Dance menu\n[*][b]ALT[/b]: Third-person free look\n[/list]\nMenu and ADS keys can be changed in F8.\n\n[h1]Compatibility Notes[/h1]\n[list]\n[*]ADS, part switching, and dance features depend on installed models and resources.\n[*]Built-in ADS/external ADS scripts and built-in ladders/Immersive Ladder are handled by feature toggles. Disable the built-in version before using an external implementation.\n[*]Normal Direct3D 9 rendering remains supported. Desktop frame generation requires DXVK.\n[*]When reporting issues, include the feature name, reproduction steps, and related Mods.\n[/list]",
-        "time_created": 1786968936,
-        "time_updated": 1792823804,
-        "visibility": 0,
-        "banned": 0,
-        "ban_reason": "",
-        "subscriptions": 1572,
-        "favorited": 1165,
-        "lifetime_subscriptions": 3159,
-        "lifetime_favorited": 1226,
-        "views": 10674,
-        "tags": [
-          {
-            "tag": "Campaigns"
-          },
-          {
-            "tag": "Miscellaneous"
-          },
-          {
-            "tag": "Scripts"
-          },
-          {
-            "tag": "Survivors"
-          },
-          {
-            "tag": "Special Infected"
-          },
-          {
-            "tag": "Common Infected"
-          }
-        ]
+        "hcontent_file": "17609284609595222400",
+        "time_updated": 1794850795,
+        "file_size": 17215071,
+        "file_url": "https://cdn.steamusercontent.com/ugc/17609284609595222400/C2BFFAF943D0EEE291DE1CD415B5B18A51E1E5B7/",
+        "title": "L4D2Evolved"
       },
-      "version": "1.2.5",
-      "archive": "evolved/L4D2Evolved-1.2.5.zip",
-      "sha256": "0d79e10915130f52d00657c43b04a0a6a5eee01a49955d0acbdc09b8a47d788b",
-      "checked": "2026-10-26T18:13:24Z"
+      "version": "1.2.7",
+      "archive": "evolved/L4D2Evolved-1.2.7.zip",
+      "sha256": "ad2704cc794693d458795a237cea85bf0c2263b78a9edcd431f8c953a2599063",
+      "checked": "2026-11-17T13:34:31Z"
     }
   ],
   "latest": {
     "skeeto": "skeeto/Skeeto-2.2.4.zip",
-    "evolved": "evolved/L4D2Evolved-1.2.5.zip"
+    "evolved": "evolved/L4D2Evolved-1.2.7.zip"
   }
 }

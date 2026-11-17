@@ -22,11 +22,15 @@ const skeetoNavEnd = "// END L4NFix Skeeto navigation"
 func platformMappings(kind, root string, files []string) ([]packageMapping, error) {
 	required := []string{"skeeto.dll", "bin/wininet.dll", "Skeeto/Manifest.json", "Skeeto/Commands.txt"}
 	if kind == "evolved" {
-		required = []string{"bin/neko/plugins/L4D2Evolved.dll", "bin/neko/plugins/L4d2evomodel.dll", "Evolved/config.sample"}
+		required = nil // Plugin names and splits are defined by the selected package.
 	}
 	byPath := map[string]string{}
 	for _, f := range files {
-		key := strings.ToLower(filepath.ToSlash(f))
+		rel, e := packageRelative(f)
+		if e != nil || rel == "" {
+			return nil, fmt.Errorf("平台资源路径无效: %s", f)
+		}
+		key := strings.ToLower(filepath.ToSlash(rel))
 		if _, ok := byPath[key]; ok {
 			return nil, fmt.Errorf("重复平台路径: %s", f)
 		}
@@ -58,14 +62,22 @@ func platformMappings(kind, root string, files []string) ([]packageMapping, erro
 			return nil, fmt.Errorf("Skeeto 导航命令版本待核对")
 		}
 	} else {
-		b, e := os.ReadFile(filepath.Join(root, byPath["evolved/config.sample"]))
-		if e != nil || !strings.Contains(string(b), "NoHmdMinimapEnabled") || !strings.Contains(string(b), "NoHmdWorldNavigationEnabled") {
-			return nil, fmt.Errorf("Evolved 导航配置版本待核对")
+		plugins := 0
+		for key, f := range byPath {
+			if strings.HasPrefix(key, "bin/neko/plugins/") && strings.HasSuffix(key, ".dll") {
+				if !isX86DLL(filepath.Join(root, f)) {
+					return nil, fmt.Errorf("平台 DLL 不是 x86: %s", f)
+				}
+				plugins++
+			}
+		}
+		if plugins == 0 {
+			return nil, fmt.Errorf("Evolved 资源包未包含插件 DLL")
 		}
 	}
 	var out []packageMapping
 	for key, f := range byPath {
-		allow := platformOwnedRelative(kind, key) && key != "left4dead2/cfg/autoexec.cfg"
+		allow := platformOwnedRelative(kind, key) && (kind == "evolved" || key != "left4dead2/cfg/autoexec.cfg")
 		if kind == "skeeto" && (key == skeetoAddonListRel || isSkeetoModRelative(key)) {
 			allow = false
 		}
@@ -83,7 +95,14 @@ func platformOwnedRelative(kind, relative string) bool {
 		return key == "skeeto.dll" || key == "bin/wininet.dll" || key == "version.txt" || key == "skeeto_workshop.txt" || key == "skeeto_apply_update.bat" || key == "left4dead2/cfg/autoexec.cfg" || key == skeetoAddonListRel || isSkeetoModRelative(key) || strings.HasPrefix(key, "skeeto/")
 	}
 	if kind == "evolved" {
-		return key == "bin/neko/plugins/l4d2evolved.dll" || key == "bin/neko/plugins/l4d2evomodel.dll" || (strings.HasPrefix(key, "evolved/") && key != "evolved/d3d9.dll") || strings.HasPrefix(key, "left4dead2/addons/") || strings.HasPrefix(key, "left4dead2/sound/vrmod/")
+		rel, err := packageRelative(key)
+		if err != nil || rel == "" {
+			return false
+		}
+		// The selected package, not a filename/directory allowlist, defines
+		// runtime ownership. Exclude only known alternate loaders and metadata.
+		base := strings.ToLower(filepath.Base(key))
+		return key != "winmm.dll" && key != "bin/winmm.dll" && key != "evolved/d3d9.dll" && key != "manifest.json" && key != "updatelog.txt" && !strings.HasPrefix(base, "readme") && !strings.HasPrefix(base, "删除evo")
 	}
 	return false
 }
@@ -209,7 +228,7 @@ func restoreModifiedPlatformAutoexec(m *manifest, f fileEntry, apply bool) (bool
 	}
 	return true, writeFileAtomic(f.Target, []byte(s[:a]+s[end:]), 0644)
 }
-func platformNavigationFiles(kind, stage, game string) ([]patchFile, error) {
+func platformNavigationFiles(kind, stage, game string, packageRoot ...string) ([]patchFile, error) {
 	var files []patchFile
 	add := func(rel string, b []byte) error {
 		p := filepath.Join(stage, "navigation", filepath.FromSlash(rel))
@@ -248,6 +267,12 @@ func platformNavigationFiles(kind, stage, game string) ([]patchFile, error) {
 			b, e := os.ReadFile(p)
 			if e != nil && !os.IsNotExist(e) {
 				return nil, e
+			}
+			if os.IsNotExist(e) && len(packageRoot) > 0 {
+				b, e = os.ReadFile(filepath.Join(packageRoot[0], filepath.FromSlash(rel)))
+				if e != nil && !os.IsNotExist(e) {
+					return nil, e
+				}
 			}
 			if os.IsNotExist(e) && strings.HasSuffix(rel, "config2.txt") {
 				continue
@@ -298,11 +323,21 @@ func deployPlatformLocked(exeRoot, res, game, kind, version string) (err error) 
 	for _, m := range source.Files {
 		files = append(files, patchFile{Src: filepath.Join(source.NormalizedDir, m.Relative), Rel: m.Relative})
 	}
-	nav, e := platformNavigationFiles(kind, source.TemporaryDir, game)
+	nav, e := platformNavigationFiles(kind, source.TemporaryDir, game, source.NormalizedDir)
 	if e != nil {
 		return e
 	}
-	files = append(files, nav...)
+	// Generated configuration replaces the package default at the same target;
+	// it must not create duplicate entries or erase existing user settings.
+	for _, generated := range nav {
+		filtered := files[:0]
+		for _, f := range files {
+			if !strings.EqualFold(filepath.ToSlash(f.Rel), filepath.ToSlash(generated.Rel)) {
+				filtered = append(filtered, f)
+			}
+		}
+		files = append(filtered, generated)
+	}
 	if kind == "skeeto" {
 		mods, e := skeetoPreparedModFiles(res, source.TemporaryDir, game, record)
 		if e != nil {
@@ -387,6 +422,24 @@ func restorePlatformLocked(exeRoot, game string, protectEdits bool) error {
 	for _, f := range m.Files {
 		if !platformOwnedRelative(m.Platform, f.Rel) {
 			return fmt.Errorf("平台清单含非平台文件: %s", f.Rel)
+		}
+		// Directory eligibility is not ownership. A plugin must also occur in
+		// this deployment's recorded package inventory, with the same hash.
+		if m.Platform == "evolved" && !strings.EqualFold(filepath.ToSlash(f.Rel), "Evolved/config.txt") && !strings.EqualFold(filepath.ToSlash(f.Rel), "Evolved/config2.txt") {
+			owned := false
+			for _, source := range m.PackageSources {
+				if source.Kind != m.Platform {
+					continue
+				}
+				for _, item := range source.Files {
+					if strings.EqualFold(filepath.ToSlash(item.Relative), filepath.ToSlash(f.Rel)) && item.SHA256 == f.SourceSHA256 {
+						owned = true
+					}
+				}
+			}
+			if !owned {
+				return fmt.Errorf("平台插件未匹配资源包清单: %s", f.Rel)
+			}
 		}
 		if manifestHasFile(base, f.Target) {
 			return fmt.Errorf("平台清单与基础部署重叠，已停止清理")

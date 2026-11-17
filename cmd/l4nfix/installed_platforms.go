@@ -243,6 +243,29 @@ func detectedPlatformText(game, res, backup, kind string) (string, bool, error) 
 				}
 				if platformIdentityMatches(kind, platformIdentityFromMappings(mappings), actual) {
 					version = m.PlatformVersion
+					// Core identity does not prove that split plugins were deployed.
+					for _, source := range m.PackageSources {
+						if source.Kind != kind {
+							continue
+						}
+						for _, item := range source.Files {
+							rel := strings.ToLower(filepath.ToSlash(item.Relative))
+							if !strings.HasPrefix(rel, "bin/neko/plugins/") || !strings.HasSuffix(rel, ".dll") {
+								continue
+							}
+							p := filepath.Join(game, filepath.FromSlash(item.Relative))
+							if err := pathguard.Within(game, p); err != nil {
+								return "", false, err
+							}
+							h, err := fileHash(p)
+							if err != nil && !os.IsNotExist(err) {
+								return "", false, err
+							}
+							if err != nil || h != item.SHA256 {
+								complete = false
+							}
+						}
+					}
 				}
 			}
 		}

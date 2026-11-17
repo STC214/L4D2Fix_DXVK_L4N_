@@ -228,7 +228,7 @@ func TestRealOfflineResourceDirectory(t *testing.T) {
 	if len(ready) != 2 {
 		t.Fatalf("offline platform payloads incomplete: %v", ready)
 	}
-	if ready["skeeto"].Version != "2.2.4" || ready["evolved"].Version != "1.2.5" {
+	if ready["skeeto"].Version != "2.2.4" || ready["evolved"].Version != "1.2.7" {
 		t.Fatal("wrong bundled platform versions", ready)
 	}
 	t.Log("Real local resources ready without HTTP: 2 L4N, 4 DXVK, Skeeto and EVO, including both Skeeto MOD payloads")
